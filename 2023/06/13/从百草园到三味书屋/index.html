@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0-rc1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.11.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="0x00 引言最近看论文看到使用SIMD指令加速，从指令集到AT&amp;T汇编再到linux系统调用一路折腾，这里就做一个小小的记录。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从百草园到三味书屋">
+<meta property="og:url" content="http://example.com/2023/06/13/%E4%BB%8E%E7%99%BE%E8%8D%89%E5%9B%AD%E5%88%B0%E4%B8%89%E5%91%B3%E4%B9%A6%E5%B1%8B/index.html">
+<meta property="og:site_name" content="singheart&#39;s blog">
+<meta property="og:description" content="0x00 引言最近看论文看到使用SIMD指令加速，从指令集到AT&amp;T汇编再到linux系统调用一路折腾，这里就做一个小小的记录。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://img.singhe.art/syscall.h.png">
+<meta property="og:image" content="http://img.singhe.art/20180413032340186">
+<meta property="og:image" content="https://i.stack.imgur.com/j8hpC.png">
+<meta property="article:published_time" content="2023-06-13T12:07:32.000Z">
+<meta property="article:modified_time" content="2023-06-13T13:43:50.665Z">
+<meta property="article:author" content="singheart">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://img.singhe.art/syscall.h.png">
+
+
+<link rel="canonical" href="http://example.com/2023/06/13/%E4%BB%8E%E7%99%BE%E8%8D%89%E5%9B%AD%E5%88%B0%E4%B8%89%E5%91%B3%E4%B9%A6%E5%B1%8B/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2023/06/13/%E4%BB%8E%E7%99%BE%E8%8D%89%E5%9B%AD%E5%88%B0%E4%B8%89%E5%91%B3%E4%B9%A6%E5%B1%8B/","path":"2023/06/13/从百草园到三味书屋/","title":"从百草园到三味书屋"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>从百草园到三味书屋 | singheart's blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">singheart's blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">多读书，多思考</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x00-%E5%BC%95%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">0x00 引言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01-System-call%E5%92%8CSystem-interrupt"><span class="nav-number">2.</span> <span class="nav-text">0x01 System call和System interrupt</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8C%E8%AF%AD%E8%A8%80%E8%BF%9B%E8%A1%8Csyscall"><span class="nav-number">2.1.</span> <span class="nav-text">使用C语言进行syscall</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%B1%87%E7%BC%96%E8%BF%9B%E8%A1%8Csyscall"><span class="nav-number">2.2.</span> <span class="nav-text">使用汇编进行syscall</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%B1%87%E7%BC%96%E8%BF%9B%E8%A1%8Cinterrupt"><span class="nav-number">2.3.</span> <span class="nav-text">使用汇编进行interrupt</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%B1%87%E7%BC%96%E8%BF%9B%E8%A1%8Cprintf"><span class="nav-number">2.4.</span> <span class="nav-text">使用汇编进行printf</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="singheart"
+      src="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+  <p class="site-author-name" itemprop="name">singheart</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">38</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">32</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xinjiempolde" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xinjiempolde" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/06/13/%E4%BB%8E%E7%99%BE%E8%8D%89%E5%9B%AD%E5%88%B0%E4%B8%89%E5%91%B3%E4%B9%A6%E5%B1%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+      <meta itemprop="name" content="singheart">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="从百草园到三味书屋 | singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          从百草园到三味书屋
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2023-06-13 20:07:32 / 修改时间：21:43:50" itemprop="dateCreated datePublished" datetime="2023-06-13T20:07:32+08:00">2023-06-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/others/" itemprop="url" rel="index"><span itemprop="name">others</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="0x00-引言"><a href="#0x00-引言" class="headerlink" title="0x00 引言"></a>0x00 引言</h1><p>最近看论文看到使用SIMD指令加速，从指令集到AT&amp;T汇编再到linux系统调用一路折腾，这里就做一个小小的记录。</p>
+<span id="more"></span>
+
+<h1 id="0x01-System-call和System-interrupt"><a href="#0x01-System-call和System-interrupt" class="headerlink" title="0x01 System call和System interrupt"></a>0x01 System call和System interrupt</h1><p>简单来说，这两者均是为了用户态调用内核态的功能（比如文件读写等）。</p>
+<h2 id="使用C语言进行syscall"><a href="#使用C语言进行syscall" class="headerlink" title="使用C语言进行syscall"></a>使用C语言进行syscall</h2><blockquote>
+<p>参考<a target="_blank" rel="noopener" href="https://www.baeldung.com/cs/system-call-vs-system-interrupt">https://www.baeldung.com/cs/system-call-vs-system-interrupt</a></p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/syscall.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	syscall(SYS_write, <span class="number">1</span>, <span class="string">&quot;hello world\n&quot;</span>, <span class="number">12</span>);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>先来看看头文件的内容，&lt;sys&#x2F;syscall.h&gt;文件在<code>/usr/include/x86_64-linux-gnu/sys/syscall.h</code>下，内如如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">ifndef</span> _SYSCALL_H</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _SYSCALL_H      1</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* This file should list the numbers of the system calls the system knows.</span></span><br><span class="line"><span class="comment">   But instead of duplicating this we use the information available</span></span><br><span class="line"><span class="comment">   from the kernel sources.  */</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;asm/unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* The Linux kernel header file defines macros __NR_*, but some</span></span><br><span class="line"><span class="comment">   programs expect the traditional form SYS_*.  &lt;bits/syscall.h&gt;</span></span><br><span class="line"><span class="comment">   defines SYS_* macros for __NR_* macros of known names.  */</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;bits/syscall.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<p>再来看看&lt;bits&#x2F;syscall.h&gt;中的内容，<code>vim /usr/include/x86_64-linux-gnu/bits/syscall.h</code>:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">ifdef</span> __NR_waitid</span></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> SYS_waitid __NR_waitid</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> __NR_waitpid</span></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> SYS_waitpid __NR_waitpid</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> __NR_write</span></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> SYS_write __NR_write</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> __NR_writev</span></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> SYS_writev __NR_writev</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<p>可以看到<code>SYS_write</code>就是<code>__NR_write</code></p>
+<p>再来看看<code>&lt;asm/unistd.h&gt;</code>中的内容，<code>vim /usr/include/x86_64-linux-gnu/asm/unistd.h</code></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">ifndef</span> _ASM_X86_UNISTD_H</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _ASM_X86_UNISTD_H</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * x32 syscall flag bit.  Some user programs expect syscall NR macros</span></span><br><span class="line"><span class="comment"> * and __X32_SYSCALL_BIT to have type int, even though syscall numbers</span></span><br><span class="line"><span class="comment"> * are, for practical purposes, unsigned long.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * Fortunately, expressions like (nr &amp; ~__X32_SYSCALL_BIT) do the right</span></span><br><span class="line"><span class="comment"> * thing regardless.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __X32_SYSCALL_BIT       0x40000000</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># <span class="keyword">ifdef</span> __i386__</span></span><br><span class="line"><span class="meta">#  <span class="keyword">include</span> <span class="string">&lt;asm/unistd_32.h&gt;</span></span></span><br><span class="line"><span class="meta"># <span class="keyword">elif</span> defined(__ILP32__)</span></span><br><span class="line"><span class="meta">#  <span class="keyword">include</span> <span class="string">&lt;asm/unistd_x32.h&gt;</span></span></span><br><span class="line"><span class="meta"># <span class="keyword">else</span></span></span><br><span class="line"><span class="meta">#  <span class="keyword">include</span> <span class="string">&lt;asm/unistd_64.h&gt;</span></span></span><br><span class="line"><span class="meta"># <span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span> <span class="comment">/* _ASM_X86_UNISTD_H */</span></span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>找到了我们最后想要的<code>&lt;asm/unistd_64.h&gt;</code>，<code>vim /usr/include/x86_64-linux-gnu/asm/unistd_64.h</code></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">ifndef</span> _ASM_X86_UNISTD_64_H</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _ASM_X86_UNISTD_64_H 1</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __NR_read 0</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __NR_write 1</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __NR_open 2</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __NR_close 3</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __NR_stat 4</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __NR_fstat 5</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __NR_lstat 6</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __NR_poll 7</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __NR_lseek 8</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __NR_mmap 9</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __NR_mprotect 10</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __NR_munmap 11</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __NR_brk 12</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __NR_rt_sigaction 13</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __NR_rt_sigprocmask 14</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __NR_rt_sigreturn 15</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __NR_ioctl 16</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __NR_pread64 17</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __NR_pwrite64 18</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __NR_readv 19</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __NR_writev 20</span></span><br><span class="line">...</span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __NR_exit 60</span></span><br></pre></td></tr></table></figure>
+
+<p>下面用一张图简单梳理一下：</p>
+<p><img src="http://img.singhe.art/syscall.h.png" alt="syscall.h"></p>
+<p>回到最开始的程序</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/syscall.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	syscall(SYS_write, <span class="number">1</span>, <span class="string">&quot;hello world\n&quot;</span>, <span class="number">12</span>);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>syscall的原型为<code>long syscall(long number, ...);</code>，通过SYS_write调用sys_write，其函数原型为<code>long sys_write(unsigned int fd, const char __user *buf, size_t count);</code></p>
+<p>其作用就是通过syscall调用sys_write()功能，并写入stdout(1)中，stdin为0，stderr为2，内容为”hello world\n”，长度为12.</p>
+<h2 id="使用汇编进行syscall"><a href="#使用汇编进行syscall" class="headerlink" title="使用汇编进行syscall"></a>使用汇编进行syscall</h2><blockquote>
+<p>参考<a target="_blank" rel="noopener" href="https://blog.csdn.net/chuck_huang/article/details/79922595">https://blog.csdn.net/chuck_huang&#x2F;article&#x2F;details&#x2F;79922595</a></p>
+<p><a target="_blank" rel="noopener" href="https://web.archive.org/web/20160801075139/http://www.x86-64.org/documentation/abi.pdf">AMD64 ABI convention</a></p>
+</blockquote>
+<p><img src="http://img.singhe.art/20180413032340186" alt="ABI_reg_usage"></p>
+<p><img src="https://i.stack.imgur.com/j8hpC.png" alt="enter image description here"></p>
+<p>System V ABI规定了对64位程序的接口，也规定了函数参数的传递规则，根据此规则，用调用sys_write(这里参数的第一第二的顺序是针对sys_write而言的，syscall要调用哪一个函数由rax决定，由#define __NR_write 1知道要调用sys_write应该将rax设置为1)，所以文件描述符1需要加载到rdi寄存器，“hello world\n” 字符串的地址需要加载到 %rsi，字符串的长度加载到 rdx。</p>
+<p>那么我们的AT&amp;T汇编程序<code>hello.s</code>如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">    .section .data</span><br><span class="line">message:</span><br><span class="line">    .ascii &quot;hello world!\n&quot;</span><br><span class="line">    length = . - message</span><br><span class="line"></span><br><span class="line">    .section .text</span><br><span class="line">    .global _start      # must be declared for linker</span><br><span class="line">_start:</span><br><span class="line">    movq $1, %rax      # &#x27;write&#x27; syscall number</span><br><span class="line">    movq $1, %rdi      # file descriptor, stdout</span><br><span class="line">    lea message(%rip), %rsi # relative addressing string message </span><br><span class="line">    movq $length, %rdx</span><br><span class="line">    syscall</span><br><span class="line"></span><br><span class="line">    movq $60, %rax     # &#x27;exit&#x27; syscall number</span><br><span class="line">    xor %rdi, %rdi      # set rdi to zero, first parameter of sys_exit</span><br><span class="line">    syscall</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>其中 .section .data 和 .section .text 定义个数据段 和代码段。</p>
+<p>message 只是一个label 方便我们来引用 hello world 字符串。</p>
+<p>length &#x3D; . - message 用来计算字符串的长度。. 用来表示当前的地址</p>
+<p>_start 是程序的入口</p>
+<p>进行汇编和链接，并运行：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">singheart@amd:~/project/assembly$ as -o hello.o hello.s</span><br><span class="line">singheart@amd:~/project/assembly$ ld -o hello hello.o</span><br><span class="line">singheart@amd:~/project/assembly$ ./hello </span><br><span class="line">hello world!</span><br><span class="line">singheart@amd:~/project/assembly$ </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="使用汇编进行interrupt"><a href="#使用汇编进行interrupt" class="headerlink" title="使用汇编进行interrupt"></a>使用汇编进行interrupt</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">#hello.s</span><br><span class="line">.data                                # 数据段声明</span><br><span class="line">    msg : .string &quot;hello,world!\n&quot;    # 要输出的字符串</span><br><span class="line">    len = . - msg                    # 字串长度</span><br><span class="line">.text                                # 代码段声明</span><br><span class="line">.global _start                        # 指定入口函数</span><br><span class="line"></span><br><span class="line">_start:                                # 在屏幕上显示一个字符串</span><br><span class="line">    movl $len, %edx                    # 参数三：字符串长度</span><br><span class="line">    movl $msg, %ecx                    # 参数二：要显示的字符串</span><br><span class="line">    movl $1, %ebx                    # 参数一：文件描述符(stdout)</span><br><span class="line">    movl $4, %eax                    # 系统调用号(sys_write)</span><br><span class="line">    int $0x80                        # 调用内核功能    </span><br><span class="line">                                    # 退出程序</span><br><span class="line">    movl $0, %ebx                    # 参数一：退出代码</span><br><span class="line">    movl $1, %eax                    # 系统调用号(sys_exit)</span><br><span class="line">    int $0x80                        # 调用内核功能</span><br><span class="line">#end</span><br></pre></td></tr></table></figure>
+
+<p>这里使用int $0x80中断，不太了解详细信息，不做过多解释。</p>
+<h2 id="使用汇编进行printf"><a href="#使用汇编进行printf" class="headerlink" title="使用汇编进行printf"></a>使用汇编进行printf</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">.section .data</span><br><span class="line">msg:</span><br><span class="line">    .asciz &quot;Printf In Assembly!!\n&quot;</span><br><span class="line"></span><br><span class="line">.section .text</span><br><span class="line">.globl main</span><br><span class="line">main:</span><br><span class="line">    leaq msg(%rip), %rdi</span><br><span class="line">    xor %al, %al</span><br><span class="line">    call printf</span><br><span class="line"></span><br><span class="line">    xor %edi, %edi</span><br><span class="line">    call exit</span><br></pre></td></tr></table></figure>
+
+<p>还是根据AMD64 ABI convention，传递函数参数并进行函数调用</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">singheart@amd:~/project/assembly$ gcc -o print print.s </span><br><span class="line">singheart@amd:~/project/assembly$ ./print </span><br><span class="line">Printf In Assembly!!</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2023/06/11/rust-c-call-each-other/" rel="prev" title="rust-c-call-each-other">
+                  <i class="fa fa-chevron-left"></i> rust-c-call-each-other
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">singheart</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div><script color="0,0,255" opacity="0.5" zIndex="-1" count="99" src="https://cdn.jsdelivr.net/npm/canvas-nest.js@1/dist/canvas-nest.js"></script>
+
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"xinjiempolde","repo":"xinjiempolde.github.io","client_id":"89019d63999840fdbf7f","client_secret":"48d2133d88acfafada6414ec6eee5a9d9febcbc8","admin_user":"xinjiempolde","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"96e2fca086dc5609a79e06fa7c7734d0"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/haruto.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>

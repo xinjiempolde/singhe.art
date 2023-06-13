@@ -20,27 +20,28 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.11.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="glogglog是谷歌开源的C++日志库，这里对glog进行一个简单的学习记录。">
+    <meta name="description" content="转载自csdn  简介getopt函数是命令行参数解析函数，在头文件getopt.h中，这里对齐用法做一个简单的介绍。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="singheart&#39;s blog">
-<meta property="og:url" content="http://example.com/2023/05/22/glog_learn/index.html">
+<meta property="og:title" content="getopt详解">
+<meta property="og:url" content="http://example.com/2023/05/31/getopt/index.html">
 <meta property="og:site_name" content="singheart&#39;s blog">
-<meta property="og:description" content="glogglog是谷歌开源的C++日志库，这里对glog进行一个简单的学习记录。">
+<meta property="og:description" content="转载自csdn  简介getopt函数是命令行参数解析函数，在头文件getopt.h中，这里对齐用法做一个简单的介绍。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2023-05-22T02:04:29.027Z">
-<meta property="article:modified_time" content="2023-05-22T02:20:08.812Z">
+<meta property="article:published_time" content="2023-05-31T03:54:23.000Z">
+<meta property="article:modified_time" content="2023-06-09T12:31:26.571Z">
 <meta property="article:author" content="singheart">
+<meta property="article:tag" content="linux">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="http://example.com/2023/05/22/glog_learn/">
+<link rel="canonical" href="http://example.com/2023/05/31/getopt/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2023/05/22/glog_learn/","path":"2023/05/22/glog_learn/","title":""}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2023/05/31/getopt/","path":"2023/05/31/getopt/","title":"getopt详解"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title> | singheart's blog</title>
+<title>getopt详解 | singheart's blog</title>
   
 
 
@@ -116,7 +117,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#glog"><span class="nav-number">1.</span> <span class="nav-text">glog</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9C%A8CMake%E4%B8%AD%E6%B7%BB%E5%8A%A0glog"><span class="nav-number">2.</span> <span class="nav-text">在CMake中添加glog</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">3.</span> <span class="nav-text">注意事项</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E"><span class="nav-number">2.</span> <span class="nav-text">使用说明</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="nav-number">3.</span> <span class="nav-text">一个简单的例子</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -131,7 +132,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">34</span>
+          <span class="site-state-item-count">38</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -142,7 +143,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-count">32</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -186,7 +187,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/05/22/glog_learn/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/05/31/getopt/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
@@ -199,12 +200,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | singheart's blog">
+      <meta itemprop="name" content="getopt详解 | singheart's blog">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          
+          getopt详解
         </h1>
 
         <div class="post-meta-container">
@@ -214,9 +215,24 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
-      
 
-      <time title="创建时间：2023-05-22 10:04:29 / 修改时间：10:20:08" itemprop="dateCreated datePublished" datetime="2023-05-22T10:04:29+08:00">2023-05-22</time>
+      <time title="创建时间：2023-05-31 11:54:23" itemprop="dateCreated datePublished" datetime="2023-05-31T11:54:23+08:00">2023-05-31</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-06-09 20:31:26" itemprop="dateModified" datetime="2023-06-09T20:31:26+08:00">2023-06-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
+        </span>
     </span>
 
   
@@ -236,23 +252,18 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <h1 id="glog"><a href="#glog" class="headerlink" title="glog"></a>glog</h1><p>glog是谷歌开源的C++日志库，这里对glog进行一个简单的学习记录。</p>
-<span id="more"></span>c
-
-<h1 id="在CMake中添加glog"><a href="#在CMake中添加glog" class="headerlink" title="在CMake中添加glog"></a>在CMake中添加glog</h1><p>CMakeLists.txt</p>
-<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">3.16</span>)</span><br><span class="line"><span class="keyword">project</span>(glog_learn VERSION <span class="number">1.0</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span>(CMAKE_CXX_STANDARD <span class="number">14</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">add_executable</span>(glog_main main.cpp)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用FetchContent添加github外部库</span></span><br><span class="line"><span class="keyword">include</span>(FetchContent)</span><br><span class="line"></span><br><span class="line">FetchContent_Declare(glog</span><br><span class="line">        GIT_REPOSITORY https://github.com/google/glog</span><br><span class="line">        GIT_TAG v0.<span class="number">6.0</span>)</span><br><span class="line">FetchContent_MakeAvailable(glog)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 添加外部库</span></span><br><span class="line"><span class="keyword">target_link_libraries</span>(glog_main glog::glog)</span><br></pre></td></tr></table></figure>
-
-
-
-<p>main.cpp</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;glog/logging.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  FLAGS_log_dir = <span class="string">&quot;~/project/cpp_project/glog_learn/build/log&quot;</span>;</span><br><span class="line">  google::<span class="built_in">InitGoogleLogging</span>(<span class="string">&quot;glog_learn&quot;</span>);</span><br><span class="line">  <span class="built_in">LOG</span>(INFO) &lt;&lt; <span class="string">&quot;Starting&quot;</span>;</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;hello world\n&quot;</span>);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+        <blockquote>
+<p>转载自<a target="_blank" rel="noopener" href="https://blog.csdn.net/c1523456/article/details/79173776#commentBox">csdn</a></p>
+</blockquote>
+<h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>getopt函数是命令行参数解析函数，在头文件<code>getopt.h</code>中，这里对齐用法做一个简单的介绍。</p>
+<span id="more"></span>
 
 
 
-<p>更多详细信息见<a target="_blank" rel="noopener" href="https://github.com/google/glog">官网</a></p>
-<h1 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h1><p>不能在conda环境中编译，否则会报错：<code>/usr/bin/ld: CMakeFiles/cleanup_with_absolute_prefix_unittest.dir/src/cleanup_with_absolute_prefix_unittest.cc.oo:(.data.rel.ro._ZTI47CleanImmediatelyWithAbsolutePrefix_logging_Test[_ZTI47CleanImmediatelyWithAbsolutePrefix_logging_Test]+0x10): undefined reference totypeinfo for testing::Test</code>。</p>
-<p>退出conda环境:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">conda deactivate</span><br></pre></td></tr></table></figure>
+<h1 id="使用说明"><a href="#使用说明" class="headerlink" title="使用说明"></a>使用说明</h1><p>getopt()函数将传递给mian()函数的argc,argv作为参数，同时接受字符串参数optstring – optstring是由选项Option字母组成的字符串。关于optstring的格式规范简单总结如下：<br>(1) 单个字符，表示该选项Option不需要参数。<br>(2) 单个字符后接一个冒号”:”，表示该选项Option需要一个选项参数Option argument。选项参数Option argument可以紧跟在选项Option之后，或者以空格隔开。选项参数Option argument的首地址赋给optarg。<br>(3) 单个字符后接两个冒号”::”，表示该选项Option的选项参数Option argument是可选的。当提供了Option argument时，必须紧跟Option之后，不能以空格隔开，否则getopt()会认为该选项Option没有选项参数Option argument，optarg赋值为NULL。相反，提供了选项参数Option argument，则optarg指向Option argument。</p>
+<p>为了使用getopt()，我们需要在while循环中不断地调用直到其返回-1为止。每一次调用，当getopt()找到一个有效的Option的时候就会返回这个Option字符，并设置几个全局变量。<br>getopt()设置的全局变量包括：<br>char *optarg  －－ 当匹配一个选项后，如果该选项带选项参数，则optarg指向选项参数字符串；若该选项不带选项参数，则optarg为NULL；若该选项的选项参数为可选时，optarg为NULL表明无选项参数，optarg不为NULL时则指向选项参数字符串。</p>
+<p>int optind  －－ 下一个待处理元素在argv中的索引值。即下一次调用getopt的时候，从optind存储的位置处开始扫描选项。当getopt()返回-1后，optind是argv中第一个Operands的索引值。optind的初始值为1。<br>int opterr  －－ opterr的值非0时，在getopt()遇到无法识别的选项，或者某个选项丢失选项参数的时候，getopt()会打印错误信息到标准错误输出。opterr值为0时，则不打印错误信息。<br>int optopt  －－ 在上述两种错误之一发生时，一般情况下getopt()会返回’?’，并且将optopt赋值为发生错误的选项。 </p>
+<h1 id="一个简单的例子"><a href="#一个简单的例子" class="headerlink" title="一个简单的例子"></a>一个简单的例子</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="type">const</span> <span class="type">char</span> *unix_socket_path = <span class="literal">nullptr</span>;</span><br><span class="line">  <span class="type">const</span> <span class="type">char</span> *server_host = <span class="string">&quot;127.0.0.1&quot;</span>;</span><br><span class="line">  <span class="type">int</span> server_port = PORT_DEFAULT;</span><br><span class="line">  <span class="type">int</span> opt;</span><br><span class="line">  <span class="keyword">extern</span> <span class="type">char</span> *optarg;</span><br><span class="line">  <span class="keyword">while</span> ((opt = <span class="built_in">getopt</span>(argc, argv, <span class="string">&quot;s:h:p:&quot;</span>)) &gt; <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="keyword">switch</span> (opt) &#123;</span><br><span class="line">      <span class="keyword">case</span> <span class="string">&#x27;s&#x27;</span>:</span><br><span class="line">        unix_socket_path = optarg;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="string">&#x27;p&#x27;</span>:</span><br><span class="line">        server_port = <span class="built_in">atoi</span>(optarg);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="string">&#x27;h&#x27;</span>:</span><br><span class="line">        server_host = optarg;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 
     </div>
@@ -262,18 +273,21 @@
     
 
     <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/linux/" rel="tag"># linux</a>
+          </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2023/02/22/std-future/" rel="prev" title="std::future">
-                  <i class="fa fa-chevron-left"></i> std::future
+                <a href="/2023/02/22/foundationdb%E7%9A%84%E5%AE%89%E8%A3%85%E5%92%8C%E6%B5%8B%E8%AF%95/" rel="prev" title="foundationdb的安装和测试">
+                  <i class="fa fa-chevron-left"></i> foundationdb的安装和测试
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2023/06/07/multi-clock-snapshot-isolation/" rel="next" title="multi-clock snapshot isolation">
-                  multi-clock snapshot isolation <i class="fa fa-chevron-right"></i>
+                <a href="/2023/05/31/glog_learn/" rel="next" title="glog">
+                  glog <i class="fa fa-chevron-right"></i>
                 </a>
             </div>
           </div>
@@ -345,7 +359,7 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
 
-<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"xinjiempolde","repo":"xinjiempolde.github.io","client_id":"89019d63999840fdbf7f","client_secret":"48d2133d88acfafada6414ec6eee5a9d9febcbc8","admin_user":"xinjiempolde","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"ba608c3499485c992e5fd4eaa5a4b036"}</script>
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"xinjiempolde","repo":"xinjiempolde.github.io","client_id":"89019d63999840fdbf7f","client_secret":"48d2133d88acfafada6414ec6eee5a9d9febcbc8","admin_user":"xinjiempolde","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"6475c42c5c9d195a2e9f682481909e4d"}</script>
 <script src="/js/third-party/comments/gitalk.js"></script>
 
 <script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/haruto.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
