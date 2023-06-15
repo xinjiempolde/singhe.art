@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width">
-<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.1.0">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0-rc1">
 
 
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
@@ -20,12 +20,12 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.11.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="Motivationea previous single-layer NVM database N2DB[14] used the snapshot isolation from PostgreSQL[17]. Its snapshot generation process involves taking a lock and scanning a global active transactio">
+    <meta name="description" content="Motivatione a previous single-layer NVM database N2DB[14] used the snapshot isolation from PostgreSQL[17]. Its snapshot generation process involves taking a lock and scanning a global active transact">
 <meta property="og:type" content="article">
 <meta property="og:title" content="multi-clock snapshot isolation">
 <meta property="og:url" content="http://example.com/2023/06/07/multi-clock-snapshot-isolation/index.html">
 <meta property="og:site_name" content="singheart&#39;s blog">
-<meta property="og:description" content="Motivationea previous single-layer NVM database N2DB[14] used the snapshot isolation from PostgreSQL[17]. Its snapshot generation process involves taking a lock and scanning a global active transactio">
+<meta property="og:description" content="Motivatione a previous single-layer NVM database N2DB[14] used the snapshot isolation from PostgreSQL[17]. Its snapshot generation process involves taking a lock and scanning a global active transact">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-06-07T03:07:01.000Z">
 <meta property="article:modified_time" content="2023-06-11T09:55:42.947Z">
@@ -116,7 +116,9 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Motivatione"><span class="nav-number">2.</span> <span class="nav-text">Motivatione</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Background"><span class="nav-number">3.</span> <span class="nav-text">Background</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-Concurrency-control-for-NVM-databases"><span class="nav-number">3.1.</span> <span class="nav-text">2.3 Concurrency control for NVM databases</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Multi-Clock-Concurrency-Control"><span class="nav-number">4.</span> <span class="nav-text">Multi-Clock Concurrency Control</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#section"><span class="nav-number">1.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#motivatione"><span class="nav-number">2.</span> <span class="nav-text">Motivatione</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#background"><span class="nav-number">3.</span> <span class="nav-text">Background</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#concurrency-control-for-nvm-databases"><span class="nav-number">3.1.</span> <span class="nav-text">2.3 Concurrency control
+for NVM databases</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#multi-clock-concurrency-control"><span class="nav-number">4.</span> <span class="nav-text">Multi-Clock Concurrency
+Control</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -131,7 +133,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">37</span>
+          <span class="site-state-item-count">39</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -251,9 +253,44 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <h1 id=""><a href="#" class="headerlink" title=""></a></h1><h1 id="Motivatione"><a href="#Motivatione" class="headerlink" title="Motivatione"></a>Motivatione</h1><p>a previous single-layer NVM database N2DB[14] used the snapshot isolation from PostgreSQL[17]. Its snapshot generation process involves taking a lock and scanning a global active transaction list, which blocks concurrent transactions and is not scalable</p>
-<h1 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h1><h2 id="2-3-Concurrency-control-for-NVM-databases"><a href="#2-3-Concurrency-control-for-NVM-databases" class="headerlink" title="2.3 Concurrency control for NVM databases"></a>2.3 Concurrency control for NVM databases</h2><p>The snapshot isolation concurrency control implementation used in traditional MVCC databases is not well suited for NVM because of two reasons. (1) The concurrency control implementations of traditional databases mainly focus on their in-memory part without discussing durability and crash consistency. They leave those to another dedicated recovery protocol, such as ARIES or write-ahead logging. The situation is different in NVM databases because a single copy of data is used for both runtime access and durability. Ensuring crash consistency should unavoidably be part of the concurrency control itself. (2) Concurrency control methods from a two-layer architecture have suboptimal performance when directly applied to a single-layer NVM database. FOEDUS[28] points out that centralized components, such as lock manager and logs in traditional concurrency control implementations, will cause performance bottlenecks in a multicore NVM database. A previous NVM database N2DB[14] adopted the concurrency control from PostgreSQL[17] to implement snapshot isolation. The concurrency control scheme from PostgreSQL uses the currently completed transactions in the system to represent a snapshot. When generating a snapshot, it has to take a lock and scan the global active transaction list. This approach blocks concurrent transactions and is not scalable. N2DB also adopted the commit log in NVM to persistently store transaction status for crash consistency. The commit log is an array-like structure and is write-shared by all threads, which limits its scalability. Zen[29] also points out that traditional concurrency control methods often need to modify the tuple metadata not only by tuple writes but also by tuple reads, which incurs expensive NVM writes.</p>
-<h1 id="Multi-Clock-Concurrency-Control"><a href="#Multi-Clock-Concurrency-Control" class="headerlink" title="Multi-Clock Concurrency Control"></a>Multi-Clock Concurrency Control</h1>
+        <h1 id="section"></h1>
+<h1 id="motivatione">Motivatione</h1>
+<p>a previous single-layer NVM database N2DB[14] used the snapshot
+isolation from PostgreSQL[17]. Its snapshot generation process involves
+taking a lock and scanning a global active transaction list, which
+blocks concurrent transactions and is not scalable</p>
+<h1 id="background">Background</h1>
+<h2 id="concurrency-control-for-nvm-databases">2.3 Concurrency control
+for NVM databases</h2>
+<p>The snapshot isolation concurrency control implementation used in
+traditional MVCC databases is not well suited for NVM because of two
+reasons. (1) The concurrency control implementations of traditional
+databases mainly focus on their in-memory part without discussing
+durability and crash consistency. They leave those to another dedicated
+recovery protocol, such as ARIES or write-ahead logging. The situation
+is different in NVM databases because a single copy of data is used for
+both runtime access and durability. Ensuring crash consistency should
+unavoidably be part of the concurrency control itself. (2) Concurrency
+control methods from a two-layer architecture have suboptimal
+performance when directly applied to a single-layer NVM database.
+FOEDUS[28] points out that centralized components, such as lock manager
+and logs in traditional concurrency control implementations, will cause
+performance bottlenecks in a multicore NVM database. A previous NVM
+database N2DB[14] adopted the concurrency control from PostgreSQL[17] to
+implement snapshot isolation. The concurrency control scheme from
+PostgreSQL uses the currently completed transactions in the system to
+represent a snapshot. When generating a snapshot, it has to take a lock
+and scan the global active transaction list. This approach blocks
+concurrent transactions and is not scalable. N2DB also adopted the
+commit log in NVM to persistently store transaction status for crash
+consistency. The commit log is an array-like structure and is
+write-shared by all threads, which limits its scalability. Zen[29] also
+points out that traditional concurrency control methods often need to
+modify the tuple metadata not only by tuple writes but also by tuple
+reads, which incurs expensive NVM writes.</p>
+<h1 id="multi-clock-concurrency-control">Multi-Clock Concurrency
+Control</h1>
+
     </div>
 
     
@@ -340,6 +377,12 @@
   <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">

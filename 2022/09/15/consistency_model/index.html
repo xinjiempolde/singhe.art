@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width">
-<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.1.0">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0-rc1">
 
 
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
@@ -20,12 +20,12 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.11.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="memory consistency model 由于一些优化（可能来自编译器或者操作系统或者硬件之类的），在核1真正执行的时候可能不会按照程序原有的顺序执行，比如core1会将两个操作交换顺序，这就导致多个核之间的执行顺序可能会任意进行。为了让结果符合预期，就产生了memory consistency model这一概念，以及各种不同的memory model。">
+    <meta name="description" content="memory consistency model   image-20220903234055396  由于一些优化（可能来自编译器或者操作系统或者硬件之类的），在核1真正执行的时候可能不会按照程序原有的顺序执行，比如core1会将两个操作交换顺序，这就导致多个核之间的执行顺序可能会任意进行。为了让结果符合预期，就产生了memory consistency model这一概念，以及各种不同的mem">
 <meta property="og:type" content="article">
 <meta property="og:title" content="memory model">
 <meta property="og:url" content="http://example.com/2022/09/15/consistency_model/index.html">
 <meta property="og:site_name" content="singheart&#39;s blog">
-<meta property="og:description" content="memory consistency model 由于一些优化（可能来自编译器或者操作系统或者硬件之类的），在核1真正执行的时候可能不会按照程序原有的顺序执行，比如core1会将两个操作交换顺序，这就导致多个核之间的执行顺序可能会任意进行。为了让结果符合预期，就产生了memory consistency model这一概念，以及各种不同的memory model。">
+<meta property="og:description" content="memory consistency model   image-20220903234055396  由于一些优化（可能来自编译器或者操作系统或者硬件之类的），在核1真正执行的时候可能不会按照程序原有的顺序执行，比如core1会将两个操作交换顺序，这就导致多个核之间的执行顺序可能会任意进行。为了让结果符合预期，就产生了memory consistency model这一概念，以及各种不同的mem">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://img.singhe.art/image-20220903234055396.png">
 <meta property="og:image" content="http://img.singhe.art/puke.jpeg">
@@ -120,7 +120,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#memory-consistency-model"><span class="nav-number">1.</span> <span class="nav-text">memory consistency model</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Sequential-consistency-model"><span class="nav-number">2.</span> <span class="nav-text">Sequential consistency model</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#references"><span class="nav-number">3.</span> <span class="nav-text">references</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#memory-consistency-model"><span class="nav-number">1.</span> <span class="nav-text">memory consistency model</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#sequential-consistency-model"><span class="nav-number">2.</span> <span class="nav-text">Sequential consistency model</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#references"><span class="nav-number">3.</span> <span class="nav-text">references</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -135,7 +135,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">37</span>
+          <span class="site-state-item-count">39</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -255,22 +255,32 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <h1 id="memory-consistency-model"><a href="#memory-consistency-model" class="headerlink" title="memory consistency model"></a>memory consistency model</h1><p><img src="http://img.singhe.art/image-20220903234055396.png" alt="image-20220903234055396"></p>
-<p>由于一些优化（可能来自编译器或者操作系统或者硬件之类的），在核1真正执行的时候可能不会按照程序原有的顺序执行，比如core1会将两个操作交换顺序，这就导致多个核之间的执行顺序可能会任意进行。为了让结果符合预期，就产生了memory consistency model这一概念，以及各种不同的memory model。</p>
+        <h1 id="memory-consistency-model">memory consistency model</h1>
+<figure>
+<img src="http://img.singhe.art/image-20220903234055396.png"
+alt="image-20220903234055396" />
+<figcaption aria-hidden="true">image-20220903234055396</figcaption>
+</figure>
+<p>由于一些优化（可能来自编译器或者操作系统或者硬件之类的），在核1真正执行的时候可能不会按照程序原有的顺序执行，比如core1会将两个操作交换顺序，这就导致多个核之间的执行顺序可能会任意进行。为了让结果符合预期，就产生了memory
+consistency model这一概念，以及各种不同的memory model。</p>
 <span id="more"></span>
-
-<h1 id="Sequential-consistency-model"><a href="#Sequential-consistency-model" class="headerlink" title="Sequential consistency model"></a>Sequential consistency model</h1><p>顺序一致性有两点要求：</p>
+<h1 id="sequential-consistency-model">Sequential consistency model</h1>
+<p>顺序一致性有两点要求：</p>
 <ul>
 <li>在同一个核里的指令顺序与程序顺序相同（也就是不能交换指令改变指令顺序）</li>
 <li>在不同核之间可以按照任意的顺序进行。</li>
 </ul>
 <p>这就好像洗牌的时候将两堆扑克牌合起来一样，每堆扑克牌各自的顺序保持不变，但是两堆扑克牌合起来的顺序可以任意进行。</p>
-<p><img src="http://img.singhe.art/puke.jpeg" alt="puke"></p>
-<h1 id="references"><a href="#references" class="headerlink" title="references"></a>references</h1><ul>
-<li><p><a target="_blank" rel="noopener" href="https://www.cis.upenn.edu/~devietti/classes/cis601-spring2016/sc_tso.pdf">https://www.cis.upenn.edu/~devietti&#x2F;classes&#x2F;cis601-spring2016&#x2F;sc_tso.pdf</a></p>
-</li>
-<li><p><a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=AUxFuD_IfqA">https://www.youtube.com/watch?v=AUxFuD_IfqA</a></p>
-</li>
+<figure>
+<img src="http://img.singhe.art/puke.jpeg" alt="puke" />
+<figcaption aria-hidden="true">puke</figcaption>
+</figure>
+<h1 id="references">references</h1>
+<ul>
+<li><p><a
+target="_blank" rel="noopener" href="https://www.cis.upenn.edu/~devietti/classes/cis601-spring2016/sc_tso.pdf">https://www.cis.upenn.edu/~devietti/classes/cis601-spring2016/sc_tso.pdf</a></p></li>
+<li><p><a
+target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=AUxFuD_IfqA">https://www.youtube.com/watch?v=AUxFuD_IfqA</a></p></li>
 </ul>
 
     </div>
@@ -362,6 +372,12 @@
   <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">

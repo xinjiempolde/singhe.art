@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width">
-<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.1.0">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0-rc1">
 
 
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
@@ -20,14 +20,13 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.11.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="本文转载自CSDN-架构师忠哥  file_fdw介绍fdw (Foreign Data Wrapper) 是一种外部访问接口，被用来访问存储在数据库外部的数据，这些数据可以是外部的pg数据库，也可以oracle、mysql等数据库，甚至可以是文件。 本文讲解如何通过file_fdw，访问外部的数据文件">
+    <meta name="description" content="本文转载自CSDN-架构师忠哥  file_fdw介绍 fdw (Foreign Data Wrapper)是一种外部访问接口，被用来访问存储在数据库外部的数据，这些数据可以是外部的pg数据库，也可以oracle、mysql等数据库，甚至可以是文件。 本文讲解如何通过file_fdw，访问外部的数据文件">
 <meta property="og:type" content="article">
 <meta property="og:title" content="opengauss之file-fdw实践">
 <meta property="og:url" content="http://example.com/2022/04/18/opengauss%E4%B9%8Bfile-fdw%E5%AE%9E%E8%B7%B5/index.html">
 <meta property="og:site_name" content="singheart&#39;s blog">
-<meta property="og:description" content="本文转载自CSDN-架构师忠哥  file_fdw介绍fdw (Foreign Data Wrapper) 是一种外部访问接口，被用来访问存储在数据库外部的数据，这些数据可以是外部的pg数据库，也可以oracle、mysql等数据库，甚至可以是文件。 本文讲解如何通过file_fdw，访问外部的数据文件">
+<meta property="og:description" content="本文转载自CSDN-架构师忠哥  file_fdw介绍 fdw (Foreign Data Wrapper)是一种外部访问接口，被用来访问存储在数据库外部的数据，这些数据可以是外部的pg数据库，也可以oracle、mysql等数据库，甚至可以是文件。 本文讲解如何通过file_fdw，访问外部的数据文件">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://img.singhe.art/0dad6640addc46b2890ad7541ad407ae.png">
 <meta property="og:image" content="http://img.singhe.art/select.png">
 <meta property="article:published_time" content="2022-04-18T02:28:40.000Z">
 <meta property="article:modified_time" content="2023-02-17T02:21:22.963Z">
@@ -35,7 +34,7 @@
 <meta property="article:tag" content="openGauss">
 <meta property="article:tag" content="数据库">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://img.singhe.art/0dad6640addc46b2890ad7541ad407ae.png">
+<meta name="twitter:image" content="http://img.singhe.art/select.png">
 
 
 <link rel="canonical" href="http://example.com/2022/04/18/opengauss%E4%B9%8Bfile-fdw%E5%AE%9E%E8%B7%B5/">
@@ -121,7 +120,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#file-fdw%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">file_fdw介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#file-fdw%E5%AE%9E%E8%B7%B5"><span class="nav-number">2.</span> <span class="nav-text">file_fdw实践</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E5%A4%96%E9%83%A8server"><span class="nav-number">2.1.</span> <span class="nav-text">创建外部server</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E8%A1%A8"><span class="nav-number">2.2.</span> <span class="nav-text">创建表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E6%9F%A5%E8%AF%A2"><span class="nav-number">2.3.</span> <span class="nav-text">数据查询</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A1%A8%E5%88%A0%E9%99%A4"><span class="nav-number">2.4.</span> <span class="nav-text">表删除</span></a></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#file_fdw%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">file_fdw介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#file_fdw%E5%AE%9E%E8%B7%B5"><span class="nav-number">2.</span> <span class="nav-text">file_fdw实践</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E5%A4%96%E9%83%A8server"><span class="nav-number">2.1.</span> <span class="nav-text">创建外部server</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E8%A1%A8"><span class="nav-number">2.2.</span> <span class="nav-text">创建表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E6%9F%A5%E8%AF%A2"><span class="nav-number">2.3.</span> <span class="nav-text">数据查询</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A1%A8%E5%88%A0%E9%99%A4"><span class="nav-number">2.4.</span> <span class="nav-text">表删除</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -136,7 +135,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">37</span>
+          <span class="site-state-item-count">39</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -257,41 +256,40 @@
     
     <div class="post-body" itemprop="articleBody">
         <blockquote>
-<p>本文转载自<a target="_blank" rel="noopener" href="https://blog.csdn.net/penriver/article/details/122260524">CSDN-架构师忠哥</a></p>
+<p>本文转载自<a
+target="_blank" rel="noopener" href="https://blog.csdn.net/penriver/article/details/122260524">CSDN-架构师忠哥</a></p>
 </blockquote>
-<h1 id="file-fdw介绍"><a href="#file-fdw介绍" class="headerlink" title="file_fdw介绍"></a>file_fdw介绍</h1><p><code>fdw (Foreign Data Wrapper) </code>是一种外部访问接口，被用来访问存储在数据库外部的数据，这些数据可以是外部的pg数据库，也可以<code>oracle</code>、<code>mysql</code>等数据库，甚至可以是文件。</p>
+<h1 id="file_fdw介绍">file_fdw介绍</h1>
+<p><code>fdw (Foreign Data Wrapper)</code>是一种外部访问接口，被用来访问存储在数据库外部的数据，这些数据可以是外部的pg数据库，也可以<code>oracle</code>、<code>mysql</code>等数据库，甚至可以是文件。</p>
 <p>本文讲解如何通过<code>file_fdw</code>，访问外部的数据文件</p>
 <span id="more"></span>
-
 <p>使用时注意如下：</p>
 <ul>
-<li><p>数据文件必须是COPY FROM可读的格式；具体可参照COPY语句的介绍。</p>
-</li>
-<li><p>访问这样的数据文件当前只是可读的。当前不支持对该数据文件的写入操作。</p>
-</li>
-<li><p>CREATE FOREIGN TABLE 外表的表结构需要与指定的文件的数据保持一致。</p>
-</li>
-<li><p>当前openGauss会默认编译file_fdw，在initdb的时候会在pg_catalog schema中创建该插件。</p>
-</li>
+<li><p>数据文件必须是COPY
+FROM可读的格式；具体可参照COPY语句的介绍。</p></li>
+<li><p>访问这样的数据文件当前只是可读的。当前不支持对该数据文件的写入操作。</p></li>
+<li><p>CREATE FOREIGN TABLE
+外表的表结构需要与指定的文件的数据保持一致。</p></li>
+<li><p>当前openGauss会默认编译file_fdw，在initdb的时候会在pg_catalog
+schema中创建该插件。</p></li>
 </ul>
-<h1 id="file-fdw实践"><a href="#file-fdw实践" class="headerlink" title="file_fdw实践"></a>file_fdw实践</h1><h2 id="创建外部server"><a href="#创建外部server" class="headerlink" title="创建外部server"></a>创建外部server</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> pg_foreign_server ;</span><br><span class="line"><span class="comment">--默认已经存在，不用创建</span></span><br><span class="line"><span class="comment">--create extension file_fdw;</span></span><br><span class="line"><span class="keyword">create</span> server pgcsv <span class="keyword">foreign</span> data wrapper file_fdw;</span><br></pre></td></tr></table></figure>
-
-<h2 id="创建表"><a href="#创建表" class="headerlink" title="创建表"></a>创建表</h2><p>使用<code>file_fdw</code>创建的外部表的选项参见 <code>file_fdw</code><br>通过filename选项指定要读取的文件，是必需的参数，且必须是一个绝对路径名。</p>
+<h1 id="file_fdw实践">file_fdw实践</h1>
+<h2 id="创建外部server">创建外部server</h2>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> pg_foreign_server ;</span><br><span class="line"><span class="comment">--默认已经存在，不用创建</span></span><br><span class="line"><span class="comment">--create extension file_fdw;</span></span><br><span class="line"><span class="keyword">create</span> server pgcsv <span class="keyword">foreign</span> data wrapper file_fdw;</span><br></pre></td></tr></table></figure>
+<h2 id="创建表">创建表</h2>
+<p>使用<code>file_fdw</code>创建的外部表的选项参见 <code>file_fdw</code>
+通过filename选项指定要读取的文件，是必需的参数，且必须是一个绝对路径名。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> <span class="keyword">foreign</span> <span class="keyword">table</span> person (</span><br><span class="line">    id <span class="type">integer</span>,</span><br><span class="line">    name <span class="type">varchar</span>(<span class="number">20</span>),</span><br><span class="line">    departno <span class="type">integer</span>,</span><br><span class="line">    age <span class="type">integer</span></span><br><span class="line">) SERVER pgcsv</span><br><span class="line">OPTIONS ( filename <span class="string">&#x27;/tmp/persons.csv&#x27;</span>, format <span class="string">&#x27;csv&#x27;</span>,header <span class="string">&#x27;true&#x27;</span>, delimiter <span class="string">&#x27;#&#x27;</span>);</span><br></pre></td></tr></table></figure>
-
 <p><code>persons.csv</code>文件的内容如下：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">id#name#departno#age</span><br><span class="line">1#张三#22#56</span><br><span class="line">2#李四#22#56</span><br><span class="line">2#王五#22#51</span><br><span class="line">2#赵六#22#51</span><br><span class="line">2#张三丰#22# 51</span><br><span class="line">3#张无敌#1#111</span><br></pre></td></tr></table></figure>
-
-
-<h2 id="数据查询"><a href="#数据查询" class="headerlink" title="数据查询"></a>数据查询</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">explain <span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> person;</span><br></pre></td></tr></table></figure>
-
-
-<p><img src="http://img.singhe.art/0dad6640addc46b2890ad7541ad407ae.png"></p>
+<h2 id="数据查询">数据查询</h2>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">explain <span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> person;</span><br></pre></td></tr></table></figure>
+<p><img
+src="http://img.singhe.art/0dad6640addc46b2890ad7541ad407ae.png" /></p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> person;</span><br></pre></td></tr></table></figure>
-
-<p><img src="http://img.singhe.art/select.png"></p>
-<h2 id="表删除"><a href="#表删除" class="headerlink" title="表删除"></a>表删除</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">drop</span> <span class="keyword">foreign</span> <span class="keyword">table</span> person</span><br></pre></td></tr></table></figure>
-
+<p><img src="http://img.singhe.art/select.png" /></p>
+<h2 id="表删除">表删除</h2>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">drop</span> <span class="keyword">foreign</span> <span class="keyword">table</span> person</span><br></pre></td></tr></table></figure>
 
     </div>
 
@@ -383,6 +381,12 @@
   <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
