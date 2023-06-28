@@ -287,23 +287,45 @@
     
     <div class="post-body" itemprop="articleBody">
         <blockquote>
-<p>本文在mysql上验证快照隔离的特性。参考<a target="_blank" rel="noopener" href="http://t.zoukankan.com/xwdreamer-p-2297081.html">文章</a>。</p>
+<p>本文在mysql上验证快照隔离的特性。参考<a
+target="_blank" rel="noopener" href="http://t.zoukankan.com/xwdreamer-p-2297081.html">文章</a>。</p>
 </blockquote>
 <span id="more"></span>
-<h1 id="创建数据库"><a href="#创建数据库" class="headerlink" title="创建数据库"></a>创建数据库</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> database demo;</span><br><span class="line">use demo;</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> test</span><br><span class="line">(</span><br><span class="line">tid <span class="type">INT</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">primary</span> key,</span><br><span class="line">tname <span class="type">VARCHAR</span>(<span class="number">50</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span></span><br><span class="line">);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test <span class="keyword">VALUES</span>(<span class="number">1</span>,<span class="string">&#x27;version1&#x27;</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test <span class="keyword">VALUES</span>(<span class="number">2</span>,<span class="string">&#x27;version2&#x27;</span>);</span><br></pre></td></tr></table></figure>
-
-<p><img src="http://img.singhe.art/image-20220715113204595.png" alt="image-20220715113204595"></p>
-<h1 id="连接一"><a href="#连接一" class="headerlink" title="连接一"></a>连接一</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">USE demo;</span><br><span class="line"><span class="keyword">START</span> TRANSACTION <span class="keyword">WITH</span> CONSISTENT SNAPSHOT;</span><br><span class="line"><span class="keyword">UPDATE</span> test <span class="keyword">SET</span> tname<span class="operator">=</span><span class="string">&#x27;version3&#x27;</span> <span class="keyword">WHERE</span> tid<span class="operator">=</span><span class="number">2</span>;</span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> test;</span><br></pre></td></tr></table></figure>
-
-<p><img src="http://img.singhe.art/image-20220715113440161.png" alt="image-20220715113440161"></p>
+<h1 id="创建数据库">创建数据库</h1>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> database demo;</span><br><span class="line">use demo;</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> test</span><br><span class="line">(</span><br><span class="line">tid <span class="type">INT</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">primary</span> key,</span><br><span class="line">tname <span class="type">VARCHAR</span>(<span class="number">50</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span></span><br><span class="line">);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test <span class="keyword">VALUES</span>(<span class="number">1</span>,<span class="string">&#x27;version1&#x27;</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test <span class="keyword">VALUES</span>(<span class="number">2</span>,<span class="string">&#x27;version2&#x27;</span>);</span><br></pre></td></tr></table></figure>
+<figure>
+<img src="http://img.singhe.art/image-20220715113204595.png"
+alt="image-20220715113204595" />
+<figcaption aria-hidden="true">image-20220715113204595</figcaption>
+</figure>
+<h1 id="连接一">连接一</h1>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">USE demo;</span><br><span class="line"><span class="keyword">START</span> TRANSACTION <span class="keyword">WITH</span> CONSISTENT SNAPSHOT;</span><br><span class="line"><span class="keyword">UPDATE</span> test <span class="keyword">SET</span> tname<span class="operator">=</span><span class="string">&#x27;version3&#x27;</span> <span class="keyword">WHERE</span> tid<span class="operator">=</span><span class="number">2</span>;</span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> test;</span><br></pre></td></tr></table></figure>
+<figure>
+<img src="http://img.singhe.art/image-20220715113440161.png"
+alt="image-20220715113440161" />
+<figcaption aria-hidden="true">image-20220715113440161</figcaption>
+</figure>
 <p>可以看到连接一中数据已被修改。</p>
-<h1 id="连接二"><a href="#连接二" class="headerlink" title="连接二"></a>连接二</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">USE demo;</span><br><span class="line"><span class="keyword">START</span> TRANSACTION <span class="keyword">WITH</span> CONSISTENT SNAPSHOT;</span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> test;</span><br></pre></td></tr></table></figure>
-
-<p><img src="http://img.singhe.art/image-20220715113625028.png" alt="image-20220715113625028"></p>
+<h1 id="连接二">连接二</h1>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">USE demo;</span><br><span class="line"><span class="keyword">START</span> TRANSACTION <span class="keyword">WITH</span> CONSISTENT SNAPSHOT;</span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> test;</span><br></pre></td></tr></table></figure>
+<figure>
+<img src="http://img.singhe.art/image-20220715113625028.png"
+alt="image-20220715113625028" />
+<figcaption aria-hidden="true">image-20220715113625028</figcaption>
+</figure>
 <p>由于事务一(连接一)还没有提交，因此连接二看到的是version2而不是version3。</p>
-<h1 id="commit"><a href="#commit" class="headerlink" title="commit"></a>commit</h1><p><img src="http://img.singhe.art/image-20220715114056294.png" alt="image-20220715114056294"></p>
+<h1 id="commit">commit</h1>
+<figure>
+<img src="http://img.singhe.art/image-20220715114056294.png"
+alt="image-20220715114056294" />
+<figcaption aria-hidden="true">image-20220715114056294</figcaption>
+</figure>
 <p>即使连接一commit之后，连接二在当前事务中也不能看到最新的版本version3。</p>
-<p><img src="http://img.singhe.art/image-20220715114239913.png" alt="image-20220715114239913"></p>
+<figure>
+<img src="http://img.singhe.art/image-20220715114239913.png"
+alt="image-20220715114239913" />
+<figcaption aria-hidden="true">image-20220715114239913</figcaption>
+</figure>
 <p>而当连接二commit退出当前事务后，便能够看到version3了。</p>
 
     </div>

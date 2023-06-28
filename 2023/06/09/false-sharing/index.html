@@ -20,21 +20,17 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.11.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="本文转载自https:&#x2F;&#x2F;blog.csdn.net&#x2F;qq_28119741&#x2F;article&#x2F;details&#x2F;102815659  什么是false sharing这里需要解决这几个问题 （1）什么是cpu缓存行 （2）什么是内存屏障 （3）什么是伪共享 （4）如何避免伪共享">
+    <meta name="description" content="本文转载自https:&#x2F;&#x2F;blog.csdn.net&#x2F;qq_28119741&#x2F;article&#x2F;details&#x2F;102815659  什么是false sharing 这里需要解决这几个问题 （1）什么是cpu缓存行 （2）什么是内存屏障 （3）什么是伪共享 （4）如何避免伪共享">
 <meta property="og:type" content="article">
 <meta property="og:title" content="false sharing">
 <meta property="og:url" content="http://example.com/2023/06/09/false-sharing/index.html">
 <meta property="og:site_name" content="singheart&#39;s blog">
-<meta property="og:description" content="本文转载自https:&#x2F;&#x2F;blog.csdn.net&#x2F;qq_28119741&#x2F;article&#x2F;details&#x2F;102815659  什么是false sharing这里需要解决这几个问题 （1）什么是cpu缓存行 （2）什么是内存屏障 （3）什么是伪共享 （4）如何避免伪共享">
+<meta property="og:description" content="本文转载自https:&#x2F;&#x2F;blog.csdn.net&#x2F;qq_28119741&#x2F;article&#x2F;details&#x2F;102815659  什么是false sharing 这里需要解决这几个问题 （1）什么是cpu缓存行 （2）什么是内存屏障 （3）什么是伪共享 （4）如何避免伪共享">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://img.singhe.art/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy8yOTY5MDYzLWIwYTI2MzVhNDM4ZGZlMDUucG5n">
-<meta property="og:image" content="http://img.singhe.art/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy8yOTY5MDYzLTE3M2RiMTU5ZDdjY2Q5NzYucG5n">
-<meta property="og:image" content="http://img.singhe.art/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy8yOTY5MDYzLTIzNDExZTFlYTA3ZDhhMTIucG5n">
 <meta property="article:published_time" content="2023-06-09T12:10:45.000Z">
 <meta property="article:modified_time" content="2023-06-09T12:30:20.329Z">
 <meta property="article:author" content="singheart">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://img.singhe.art/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy8yOTY5MDYzLWIwYTI2MzVhNDM4ZGZlMDUucG5n">
 
 
 <link rel="canonical" href="http://example.com/2023/06/09/false-sharing/">
@@ -147,7 +143,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFfalse-sharing"><span class="nav-number">1.</span> <span class="nav-text">什么是false sharing</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CPU%E7%BC%93%E5%AD%98%E6%9E%B6%E6%9E%84"><span class="nav-number">2.</span> <span class="nav-text">CPU缓存架构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CPU%E7%BC%93%E5%AD%98%E8%A1%8C"><span class="nav-number">3.</span> <span class="nav-text">CPU缓存行</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BC%AA%E5%85%B1%E4%BA%AB"><span class="nav-number">4.</span> <span class="nav-text">伪共享</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E9%81%BF%E5%85%8D"><span class="nav-number">5.</span> <span class="nav-text">如何避免</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFfalse-sharing"><span class="nav-number">1.</span> <span class="nav-text">什么是false sharing</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#cpu%E7%BC%93%E5%AD%98%E6%9E%B6%E6%9E%84"><span class="nav-number">2.</span> <span class="nav-text">CPU缓存架构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#cpu%E7%BC%93%E5%AD%98%E8%A1%8C"><span class="nav-number">3.</span> <span class="nav-text">CPU缓存行</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BC%AA%E5%85%B1%E4%BA%AB"><span class="nav-number">4.</span> <span class="nav-text">伪共享</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E9%81%BF%E5%85%8D"><span class="nav-number">5.</span> <span class="nav-text">如何避免</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -277,19 +273,26 @@
     
     <div class="post-body" itemprop="articleBody">
         <blockquote>
-<p>本文转载自<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_28119741/article/details/102815659">https://blog.csdn.net/qq_28119741&#x2F;article&#x2F;details&#x2F;102815659</a></p>
+<p>本文转载自<a
+target="_blank" rel="noopener" href="https://blog.csdn.net/qq_28119741/article/details/102815659">https://blog.csdn.net/qq_28119741/article/details/102815659</a></p>
 </blockquote>
-<h1 id="什么是false-sharing"><a href="#什么是false-sharing" class="headerlink" title="什么是false sharing"></a>什么是false sharing</h1><p>这里需要解决这几个问题</p>
+<h1 id="什么是false-sharing">什么是false sharing</h1>
+<p>这里需要解决这几个问题</p>
 <p>（1）什么是cpu缓存行</p>
 <p>（2）什么是内存屏障</p>
 <p>（3）什么是伪共享</p>
 <p>（4）如何避免伪共享</p>
 <span id="more"></span>
-
-<h1 id="CPU缓存架构"><a href="#CPU缓存架构" class="headerlink" title="CPU缓存架构"></a>CPU缓存架构</h1><p>cpu是计算机的心脏，所有运算和程序最终都要由他来执行。</p>
+<h1 id="cpu缓存架构">CPU缓存架构</h1>
+<p>cpu是计算机的心脏，所有运算和程序最终都要由他来执行。</p>
 <p>主内存RAM是数据存在的地方，CPU和主内存之间有好几级缓存，因为即使直接访问主内存相对来说也是非常慢的。</p>
 <p>如果对一块数据做相同的运算多次，那么在执行运算的时候把它加载到离CPU很近的地方就有意义了，比如一个循环计数，你不想每次循环都到主内存中去取这个数据来增长它吧。</p>
-<p><img src="http://img.singhe.art/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy8yOTY5MDYzLWIwYTI2MzVhNDM4ZGZlMDUucG5n" alt="img"></p>
+<figure>
+<img
+src="http://img.singhe.art/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy8yOTY5MDYzLWIwYTI2MzVhNDM4ZGZlMDUucG5n"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
 <p>越靠近CPU的缓存越快也越小</p>
 <p>所以L1缓存很小但很快，并且紧靠着在使用它的CPU内核。</p>
 <p>L2大一些，但也慢一些，并且仍然只能被一个单独的CPU核使用</p>
@@ -297,37 +300,45 @@
 <p>最后，主内存保存着程序运行的所有数据，它更大，更慢，由全部插槽上的所有CPU核共享。</p>
 <p>当CPU执行运算的时候，它先去L1查找所需的数据，再去L2，然后L3，最后如果这些缓存中都没有，所需的数据就要去主内存拿。</p>
 <p>走得越远，运算耗费的时间就越长。所以如果进行一些很频繁的运算，要确保数据在L1缓存中。</p>
-<h1 id="CPU缓存行"><a href="#CPU缓存行" class="headerlink" title="CPU缓存行"></a>CPU缓存行</h1><p>缓存是由缓存行组成的，通常是64字节（常用处理器的缓存行是64字节的，比较旧的处理器缓存行是32字节的），并且它有效地引用主内存中的一块地址。</p>
+<h1 id="cpu缓存行">CPU缓存行</h1>
+<p>缓存是由缓存行组成的，通常是64字节（常用处理器的缓存行是64字节的，比较旧的处理器缓存行是32字节的），并且它有效地引用主内存中的一块地址。</p>
 <p>一个java的long类型是8字节，因此在一个缓存行中可以存8个long类型的变量</p>
-<p><img src="http://img.singhe.art/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy8yOTY5MDYzLTE3M2RiMTU5ZDdjY2Q5NzYucG5n" alt="img"></p>
+<figure>
+<img
+src="http://img.singhe.art/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy8yOTY5MDYzLTE3M2RiMTU5ZDdjY2Q5NzYucG5n"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
 <p>在程序运行的过程中，缓存每次更新都从主内存中加载连续的64个字节。因此，如果访问一个long类型的数组时，当数组中的一个值被加载到缓存中时，另外7个元素也会被加载到缓存中。但是，如果使用的数据结构中的项在内存中不是彼此相邻的，比如链表，那么将得不到免费缓存加载带来的好处。</p>
 <p>不过，这种免费加载也有一个坏处。设想如果我们有个long类型的变量a，它不是数组的一部分，而是一个单独的变量，并且还有另外一个long类型的变量b紧挨着它，那么当加载a的时候将免费加载b。</p>
 <p>看起来似乎没有什么问题，但是如果一个cpu核心的线程在对a进行修改，另一个cpu核心的线程却在对b进行读取。当前者修改a时，会把a和b同时加载到前者核心的缓存行中，更新完a后其它所有包含a的缓存行都将失效，因为其它缓存中的a不是最新值了。而当后者读取b时，发现这个缓存行已经失效了，需要从主内存中重新加载。</p>
 <p>请记着，我们的缓存都是以缓存行作为一个单位来处理的，所以失效a的缓存的同时，也会把b失效，反之亦然。</p>
-<p><img src="http://img.singhe.art/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy8yOTY5MDYzLTIzNDExZTFlYTA3ZDhhMTIucG5n" alt="img"></p>
+<figure>
+<img
+src="http://img.singhe.art/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy8yOTY5MDYzLTIzNDExZTFlYTA3ZDhhMTIucG5n"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
 <p>这样就出现了一个问题，b和a完全不相干，每次却要因为a的更新需要从主内存重新读取，它被缓存未命中给拖慢了。这就是传说中的伪共享。</p>
-<h1 id="伪共享"><a href="#伪共享" class="headerlink" title="伪共享"></a>伪共享</h1><p>当多线程修改互相独立的变量时，如果这些变量共享同一个缓存行，就会无意中影响彼此的性能，这就是伪共享。</p>
+<h1 id="伪共享">伪共享</h1>
+<p>当多线程修改互相独立的变量时，如果这些变量共享同一个缓存行，就会无意中影响彼此的性能，这就是伪共享。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">FalseSharingTest</span> &#123;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="type">static</span> <span class="type">void</span> <span class="title">main</span><span class="params">(String[] args)</span> throws InterruptedException </span>&#123;</span><br><span class="line">        <span class="built_in">testPointer</span>(<span class="keyword">new</span> <span class="built_in">Pointer</span>());</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="type">static</span> <span class="type">void</span> <span class="title">testPointer</span><span class="params">(Pointer pointer)</span> throws InterruptedException </span>&#123;</span><br><span class="line">        <span class="type">long</span> start = System.<span class="built_in">currentTimeMillis</span>();</span><br><span class="line">        Thread t1 = <span class="keyword">new</span> <span class="built_in">Thread</span>(() -&gt; &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">100000000</span>; i++) &#123;</span><br><span class="line">                pointer.x++;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"> </span><br><span class="line">        Thread t2 = <span class="keyword">new</span> <span class="built_in">Thread</span>(() -&gt; &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">100000000</span>; i++) &#123;</span><br><span class="line">                pointer.y++;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"> </span><br><span class="line">        t1.<span class="built_in">start</span>();</span><br><span class="line">        t2.<span class="built_in">start</span>();</span><br><span class="line">        t1.<span class="built_in">join</span>();</span><br><span class="line">        t2.<span class="built_in">join</span>();</span><br><span class="line"> </span><br><span class="line">        System.out.<span class="built_in">println</span>(System.<span class="built_in">currentTimeMillis</span>() - start);</span><br><span class="line">        System.out.<span class="built_in">println</span>(pointer);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Pointer</span> &#123;</span><br><span class="line">    <span class="keyword">volatile</span> <span class="type">long</span> x;</span><br><span class="line">    <span class="keyword">volatile</span> <span class="type">long</span> y;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
 <p>上面这个例子，我们声明了一个Pointer的类，它包含了x和y两个变量（必须声明为volatile，保证可见性，关于内存屏障的东西我们后面再讲），一个线程对x进行自增1亿次，一个线程对y进行自增1亿次。</p>
 <p>可以看到，x和y完全没有任何关系，但是更新x的时候会把其它包含x的缓存行失效，同时y也就失效了，运行这段程序输出的时间为3890ms。</p>
-<h1 id="如何避免"><a href="#如何避免" class="headerlink" title="如何避免"></a>如何避免</h1><p>伪共享的原理我们知道了，一个缓存行是64字节，一个long类型是8个字节，所以避免伪共享也很简单，大概有以下三种方式：</p>
+<h1 id="如何避免">如何避免</h1>
+<p>伪共享的原理我们知道了，一个缓存行是64字节，一个long类型是8个字节，所以避免伪共享也很简单，大概有以下三种方式：</p>
 <p>（1）在两个long类型的变量之间再加7个long类型</p>
 <p>我们把上面的pointer改成下面这个结构</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Pointer</span> &#123;</span><br><span class="line">    <span class="keyword">volatile</span> <span class="type">long</span> x;</span><br><span class="line">    <span class="type">long</span> p1, p2, p3, p4, p5, p6, p7;</span><br><span class="line">    <span class="keyword">volatile</span> <span class="type">long</span> y;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>再次运行程序，会发现输出时间神奇的缩短为695ms</p>
 <p>（2）重新创建自己的long类型，而不是java自带的long修改Pointer如下</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Pointer</span> &#123;</span><br><span class="line">    MyLong x = <span class="keyword">new</span> <span class="built_in">MyLong</span>();</span><br><span class="line">    MyLong y = <span class="keyword">new</span> <span class="built_in">MyLong</span>();</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyLong</span> &#123;</span><br><span class="line">    <span class="keyword">volatile</span> <span class="type">long</span> value;</span><br><span class="line">    <span class="type">long</span> p1, p2, p3, p4, p5, p6, p7;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>同时把pointer.x++改为pointer.x.value++;等，再次运行程序发现时间是724ms，这样本质上还是填充。</p>
 <p>（3）使用@sun.misc.Contended注解（java8）</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">@sun.misc.Contended</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyLong</span> &#123;</span><br><span class="line">    <span class="keyword">volatile</span> <span class="type">long</span> value;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>默认使用这个注解是无效的，需要在JVM启动参数加上-XX:-RestrictContended才会生效,再次运行程序发现时间是718ms。注意，以上三种方式中的前两种是通过加字段的形式实现的（上面go代码里的实现也是这样的），加的字段又没有地方使用，可能会被jvm优化掉，所以建议使用第三种方式。</p>
-<p>内存屏障<br>1.volatile是一个类型修饰符，volatile的作用是作为指令关键字，确保本条指令不会因编译器的优化而省略。</p>
+<p>内存屏障
+1.volatile是一个类型修饰符，volatile的作用是作为指令关键字，确保本条指令不会因编译器的优化而省略。</p>
 <p>2.volatile的特性：</p>
 <p>（1）保证了不同线程对这个变量进行操作时的可见性，即一个线程修改了某个变量的值，这新值对其它线程来说是立即可见的-》实现可见性</p>
 <p>（2）禁止进行指令重排序（实现有序性）</p>
@@ -335,7 +346,8 @@
 <p>3.volatile的实现原理中的可见性就是基于内存屏障实现</p>
 <p>内存屏障（Memory Barrier）：又称内存栅栏，是一个CPU指令。</p>
 <p>在程序运行时，为了提高执行性能，编译器和处理器会对指令进行重排序，JVM为了保证在不同的编译器和CPU上有相同的结果，通过插入特定类型的内存屏障来禁止特定类型的编译器重排序和处理器重排序，插入一条内存屏障会告诉编译器和CPU：不管什么指令都不能和这条内存屏障指令重排序</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>（1）CPU具有多级缓存，越接近CPU的缓存越小也越快</p>
+<h1 id="总结">总结</h1>
+<p>（1）CPU具有多级缓存，越接近CPU的缓存越小也越快</p>
 <p>（2）CPU缓存中的数据是以缓存行为单位处理的；</p>
 <p>（3）CPU缓存行能带来免费加载数据的好处，所以处理数据性能非常高</p>
 <p>（4）CPU缓存行也带来了弊端，多线程处理不相干的变量时会相互影响，也就是伪共享</p>

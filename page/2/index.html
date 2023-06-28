@@ -265,7 +265,8 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">用这个版本</span></span><br><span class="line">wget https://github.com/apple/foundationdb/releases/download/7.2.3/foundationdb-server_7.2.3-1_amd64.deb</span><br><span class="line">wget https://github.com/apple/foundationdb/releases/download/7.2.3/foundationdb-clients_7.2.3-1_amd64.deb</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">安装</span></span><br><span class="line">sudo dpkg -i foundationdb-clients_7.2.3-1_amd64.deb</span><br><span class="line">sudo dpkg -i foundationdb-server_7.2.3-1_amd64.deb</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">卸载</span></span><br><span class="line">sudo dpkg --purge foundationdb-server</span><br><span class="line">sudo dpkg --purge foundationdb-clients</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">wget https://github.com/apple/foundationdb/releases/download/6.2.11/foundationdb-server_6.2.11-1_amd64.deb</span><br><span class="line">wget https://github.com/apple/foundationdb/releases/download/6.2.11/foundationdb-clients_6.2.11-1_amd64.deb</span><br><span class="line">sudo dpkg -i foundationdb-clients_6.2.11-1_amd64.deb</span><br><span class="line">sudo dpkg -i foundationdb-server_6.2.11-1_amd64.deb</span><br><span class="line">sudo dpkg --purge foundationdb-server</span><br><span class="line">sudo dpkg --purge foundationdb-clients</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+          <h1 id="安装">安装</h1>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">用这个版本</span></span><br><span class="line">wget https://github.com/apple/foundationdb/releases/download/7.2.3/foundationdb-server_7.2.3-1_amd64.deb</span><br><span class="line">wget https://github.com/apple/foundationdb/releases/download/7.2.3/foundationdb-clients_7.2.3-1_amd64.deb</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">安装</span></span><br><span class="line">sudo dpkg -i foundationdb-clients_7.2.3-1_amd64.deb</span><br><span class="line">sudo dpkg -i foundationdb-server_7.2.3-1_amd64.deb</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">卸载</span></span><br><span class="line">sudo dpkg --purge foundationdb-server</span><br><span class="line">sudo dpkg --purge foundationdb-clients</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">wget https://github.com/apple/foundationdb/releases/download/6.2.11/foundationdb-server_6.2.11-1_amd64.deb</span><br><span class="line">wget https://github.com/apple/foundationdb/releases/download/6.2.11/foundationdb-clients_6.2.11-1_amd64.deb</span><br><span class="line">sudo dpkg -i foundationdb-clients_6.2.11-1_amd64.deb</span><br><span class="line">sudo dpkg -i foundationdb-server_6.2.11-1_amd64.deb</span><br><span class="line">sudo dpkg --purge foundationdb-server</span><br><span class="line">sudo dpkg --purge foundationdb-clients</span><br><span class="line"></span><br></pre></td></tr></table></figure>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2023/02/22/foundationdb%E7%9A%84%E5%AE%89%E8%A3%85%E5%92%8C%E6%B5%8B%E8%AF%95/#more" rel="contents">
@@ -357,8 +358,10 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p>参考：<a target="_blank" rel="noopener" href="https://blog.csdn.net/lizhichao410/article/details/123732787">https://blog.csdn.net/lizhichao410/article/details/123732787</a></p>
-<h1 id="使用背景"><a href="#使用背景" class="headerlink" title="使用背景"></a>使用背景</h1><p>在C++中使用std::thread可创建一个线程，使用互斥量std::mutex来确保多个线程对共享数据的读写操作同步问题;使用std::condition_variable来解决线程执行顺序的同步问题。那么多个线程之间怎么传递数据呢？其中一种做法是使用一个全局变量，然后让线程之间互斥的访问就可以传递数据，还有一种做法就是使用std::future和std::async。</p>
+          <p>参考：<a
+target="_blank" rel="noopener" href="https://blog.csdn.net/lizhichao410/article/details/123732787">https://blog.csdn.net/lizhichao410/article/details/123732787</a></p>
+<h1 id="使用背景">使用背景</h1>
+<p>在C++中使用std::thread可创建一个线程，使用互斥量std::mutex来确保多个线程对共享数据的读写操作同步问题;使用std::condition_variable来解决线程执行顺序的同步问题。那么多个线程之间怎么传递数据呢？其中一种做法是使用一个全局变量，然后让线程之间互斥的访问就可以传递数据，还有一种做法就是使用std::future和std::async。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2023/02/22/std-future/#more" rel="contents">
@@ -450,7 +453,9 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>参考：<a target="_blank" rel="noopener" href="https://blog.csdn.net/m0_46825740/article/details/127768826">https://blog.csdn.net/m0_46825740&#x2F;article&#x2F;details&#x2F;127768826</a></p>
+          <h1 id="前言">前言</h1>
+<p>参考：<a
+target="_blank" rel="noopener" href="https://blog.csdn.net/m0_46825740/article/details/127768826">https://blog.csdn.net/m0_46825740/article/details/127768826</a></p>
 <p>我的系统是<code>ubuntu 18.04</code>，Windows用户可以划走了。<code>ubuntu 18.04</code>使用<code>sudo apt install mysql-server</code>安装的mysql版本是5.7，当忘记了密码的时候可以采取下面的方法。</p>
           <!--noindex-->
             <div class="post-button">
@@ -548,7 +553,6 @@
 </blockquote>
 <p>Inline_function.cpp</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">__attribute__((always_inline))</span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="type">void</span> <span class="title">func</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> j = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">2</span>; i++) &#123;</span><br><span class="line">        j++;</span><br><span class="line">        <span class="keyword">if</span> (j == <span class="number">20</span>) j *= <span class="number">2</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">func</span>();</span><br><span class="line">    <span class="built_in">func</span>();</span><br><span class="line">    <span class="built_in">func</span>();</span><br><span class="line">    <span class="built_in">func</span>();</span><br><span class="line">    <span class="built_in">func</span>();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p><code>__attribute__((always_inline))</code>告诉编译器强制内联。</p>
           <!--noindex-->
             <div class="post-button">
@@ -641,7 +645,10 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="shell基本用法"><a href="#shell基本用法" class="headerlink" title="shell基本用法"></a>shell基本用法</h1><p>最近有写shell的需求，因此花了几个小时简单学习了下，在此做个简单的记录，学习资料为<a target="_blank" rel="noopener" href="https://www.runoob.com/linux/linux-shell.html">菜鸟教程</a>。个人博客：<a href="singhe.art">singhe.art</a></p>
+          <h1 id="shell基本用法">shell基本用法</h1>
+<p>最近有写shell的需求，因此花了几个小时简单学习了下，在此做个简单的记录，学习资料为<a
+target="_blank" rel="noopener" href="https://www.runoob.com/linux/linux-shell.html">菜鸟教程</a>。个人博客：<a
+href="singhe.art">singhe.art</a></p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2023/02/10/shell%E8%84%9A%E6%9C%AC%E5%85%A5%E9%97%A8/#more" rel="contents">
@@ -734,12 +741,21 @@
     
     <div class="post-body" itemprop="articleBody">
           <blockquote>
-<p>转载自<a target="_blank" rel="noopener" href="https://baijiahao.baidu.com/s?id=1710441201075985657&wfr=spider&for=pc">https://baijiahao.baidu.com/s?id=1710441201075985657&wfr=spider&for=pc</a></p>
+<p>转载自<a
+target="_blank" rel="noopener" href="https://baijiahao.baidu.com/s?id=1710441201075985657&amp;wfr=spider&amp;for=pc">https://baijiahao.baidu.com/s?id=1710441201075985657&amp;wfr=spider&amp;for=pc</a></p>
 </blockquote>
-<h1 id="什么是跳表？"><a href="#什么是跳表？" class="headerlink" title="什么是跳表？"></a>什么是跳表？</h1><p><del>类似MineCraft的地狱交通，在地狱走一个相当于主世界走8格</del></p>
+<h1 id="什么是跳表">什么是跳表？</h1>
+<p><del>类似MineCraft的地狱交通，在地狱走一个相当于主世界走8格</del></p>
 <p>跳表全称为跳跃列表，它允许快速查询，插入和删除一个有序连续元素的数据链表。跳跃列表的平均查找和插入时间复杂度都是O(logn)。快速查询是通过维护一个多层次的链表，且每一层链表中的元素是前一层链表元素的子集（见右边的示意图）。一开始时，算法在最稀疏的层次进行搜索，直至需要查找的元素在该层两个相邻的元素中间。这时，算法将跳转到下一个层次，重复刚才的搜索，直到找到需要查找的元素为止。</p>
-<p><img src="http://img.singhe.art/e61190ef76c6a7ef314419fa0f46b858f1de66d6.jpeg" alt="img"></p>
-<p>一张跳跃列表的示意图。每个带有箭头的框表示一个指针, 而每行是一个稀疏子序列的链表；底部的编号框（黄色）表示有序的数据序列。查找从顶部最稀疏的子序列向下进行, 直至需要查找的元素在该层两个相邻的元素中间。</p>
+<figure>
+<img
+src="http://img.singhe.art/e61190ef76c6a7ef314419fa0f46b858f1de66d6.jpeg"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>一张跳跃列表的示意图。每个带有箭头的框表示一个指针,
+而每行是一个稀疏子序列的链表；底部的编号框（黄色）表示有序的数据序列。查找从顶部最稀疏的子序列向下进行,
+直至需要查找的元素在该层两个相邻的元素中间。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2022/09/15/SkipList/#more" rel="contents">
@@ -831,8 +847,14 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="memory-consistency-model"><a href="#memory-consistency-model" class="headerlink" title="memory consistency model"></a>memory consistency model</h1><p><img src="http://img.singhe.art/image-20220903234055396.png" alt="image-20220903234055396"></p>
-<p>由于一些优化（可能来自编译器或者操作系统或者硬件之类的），在核1真正执行的时候可能不会按照程序原有的顺序执行，比如core1会将两个操作交换顺序，这就导致多个核之间的执行顺序可能会任意进行。为了让结果符合预期，就产生了memory consistency model这一概念，以及各种不同的memory model。</p>
+          <h1 id="memory-consistency-model">memory consistency model</h1>
+<figure>
+<img src="http://img.singhe.art/image-20220903234055396.png"
+alt="image-20220903234055396" />
+<figcaption aria-hidden="true">image-20220903234055396</figcaption>
+</figure>
+<p>由于一些优化（可能来自编译器或者操作系统或者硬件之类的），在核1真正执行的时候可能不会按照程序原有的顺序执行，比如core1会将两个操作交换顺序，这就导致多个核之间的执行顺序可能会任意进行。为了让结果符合预期，就产生了memory
+consistency model这一概念，以及各种不同的memory model。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2022/09/15/consistency_model/#more" rel="contents">
@@ -927,7 +949,8 @@
           <blockquote>
 <p>前面已经对mutex以及相关的lock进行了梳理，这里对thread和condition_variable做一个简单的梳理。</p>
 </blockquote>
-<h1 id="std-thread"><a href="#std-thread" class="headerlink" title="# std::thread"></a># std::thread</h1><p>通过该函数能够创建一个线程。</p>
+<h1 id="stdthread"># std::thread</h1>
+<p>通过该函数能够创建一个线程。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;thread&gt;</span></span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">worker1_func</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;worker1\n&quot;</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">void</span>)</span> </span>&#123;</span><br><span class="line">  <span class="function">std::thread <span class="title">worker1</span><span class="params">(worker1_func)</span></span>;</span><br><span class="line">  <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;main func\n&quot;</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  worker1.<span class="built_in">join</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
           <!--noindex-->
             <div class="post-button">
@@ -1021,9 +1044,10 @@
     
     <div class="post-body" itemprop="articleBody">
           <blockquote>
-<p>参考文章<a target="_blank" rel="noopener" href="https://www.cprogramming.com/c++11/rvalue-references-and-move-semantics-in-c++11.html">https://www.cprogramming.com/c++11/rvalue-references-and-move-semantics-in-c++11.html</a></p>
+<p>参考文章<a
+target="_blank" rel="noopener" href="https://www.cprogramming.com/c++11/rvalue-references-and-move-semantics-in-c++11.html">https://www.cprogramming.com/c++11/rvalue-references-and-move-semantics-in-c++11.html</a></p>
 </blockquote>
-<h1 id="问题引出"><a href="#问题引出" class="headerlink" title="问题引出"></a>问题引出</h1>
+<h1 id="问题引出">问题引出</h1>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2022/08/03/rvalue-and-std-move/#more" rel="contents">
@@ -1116,9 +1140,11 @@
     
     <div class="post-body" itemprop="articleBody">
           <blockquote>
-<p>参考<a target="_blank" rel="noopener" href="https://baijiahao.baidu.com/s?id=1653384309305389312&wfr=spider&for=pc">https://baijiahao.baidu.com/s?id=1653384309305389312&wfr=spider&for=pc</a></p>
+<p>参考<a
+target="_blank" rel="noopener" href="https://baijiahao.baidu.com/s?id=1653384309305389312&amp;wfr=spider&amp;for=pc">https://baijiahao.baidu.com/s?id=1653384309305389312&amp;wfr=spider&amp;for=pc</a></p>
 </blockquote>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>我们知道在C++中<code>char</code>占用一个字节，<code>int</code>占用四个字节。那么类在内存中是怎么布局的呢？成员变量和成员函数是放在一起存储的吗？</p>
+<h1 id="背景">背景</h1>
+<p>我们知道在C++中<code>char</code>占用一个字节，<code>int</code>占用四个字节。那么类在内存中是怎么布局的呢？成员变量和成员函数是放在一起存储的吗？</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2022/08/03/C++%E7%B1%BB%E5%9C%A8%E5%86%85%E5%AD%98%E4%B8%AD%E5%A6%82%E4%BD%95%E5%AD%98%E5%82%A8/#more" rel="contents">

@@ -20,12 +20,12 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.11.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="前面已经对mutex以及相关的lock进行了梳理，这里对thread和condition_variable做一个简单的梳理。  # std::thread通过该函数能够创建一个线程。 1234567891011121314#include &lt;iostream&gt;#include &lt;thread&gt;void worker1_func() &amp;#123;  for (int i &#x3D;">
+    <meta name="description" content="前面已经对mutex以及相关的lock进行了梳理，这里对thread和condition_variable做一个简单的梳理。  # std::thread 通过该函数能够创建一个线程。 1234567891011121314#include &lt;iostream&gt;#include &lt;thread&gt;void worker1_func() &amp;#123;  for (int i">
 <meta property="og:type" content="article">
 <meta property="og:title" content="condition-variable">
 <meta property="og:url" content="http://example.com/2022/08/13/condition-variable/index.html">
 <meta property="og:site_name" content="singheart&#39;s blog">
-<meta property="og:description" content="前面已经对mutex以及相关的lock进行了梳理，这里对thread和condition_variable做一个简单的梳理。  # std::thread通过该函数能够创建一个线程。 1234567891011121314#include &lt;iostream&gt;#include &lt;thread&gt;void worker1_func() &amp;#123;  for (int i &#x3D;">
+<meta property="og:description" content="前面已经对mutex以及相关的lock进行了梳理，这里对thread和condition_variable做一个简单的梳理。  # std::thread 通过该函数能够创建一个线程。 1234567891011121314#include &lt;iostream&gt;#include &lt;thread&gt;void worker1_func() &amp;#123;  for (int i">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-08-13T15:24:25.000Z">
 <meta property="article:modified_time" content="2023-05-22T01:04:57.463Z">
@@ -145,7 +145,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#std-thread"><span class="nav-number">1.</span> <span class="nav-text"># std::thread</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#std-condition-variable"><span class="nav-number">2.</span> <span class="nav-text">std::condition_variable</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#stdthread"><span class="nav-number">1.</span> <span class="nav-text"># std::thread</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#stdcondition_variable"><span class="nav-number">2.</span> <span class="nav-text">std::condition_variable</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -283,19 +283,18 @@
         <blockquote>
 <p>前面已经对mutex以及相关的lock进行了梳理，这里对thread和condition_variable做一个简单的梳理。</p>
 </blockquote>
-<h1 id="std-thread"><a href="#std-thread" class="headerlink" title="# std::thread"></a># std::thread</h1><p>通过该函数能够创建一个线程。</p>
+<h1 id="stdthread"># std::thread</h1>
+<p>通过该函数能够创建一个线程。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;thread&gt;</span></span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">worker1_func</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;worker1\n&quot;</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">void</span>)</span> </span>&#123;</span><br><span class="line">  <span class="function">std::thread <span class="title">worker1</span><span class="params">(worker1_func)</span></span>;</span><br><span class="line">  <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;main func\n&quot;</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  worker1.<span class="built_in">join</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <span id="more"></span>
-
 <p>通过以下命令编译执行:</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">g++ test.cc -o a.out -lpthread</span><br><span class="line">./a.out</span><br></pre></td></tr></table></figure>
-
 <p>得到如下结果：</p>
-<p>main func<br>main func<br>main func<br>worker1<br>worker1<br>worker1<br>worker1<br>worker1<br>main func<br>main func</p>
+<p>main func main func main func worker1 worker1 worker1 worker1 worker1
+main func main func</p>
 <p>那么worker1.join()的用处是什么呢？它的用处是执行这个语句的线程(主线程)必须等待woker1这个线程执行完成后才能继续执行，可以实现一个简单的线程同步。而更复杂的线程同步则需要通过condition_variable来实现。</p>
-<h1 id="std-condition-variable"><a href="#std-condition-variable" class="headerlink" title="std::condition_variable"></a>std::condition_variable</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">wait</span>()</span><br></pre></td></tr></table></figure>
-
+<h1 id="stdcondition_variable">std::condition_variable</h1>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">wait</span>()</span><br></pre></td></tr></table></figure>
 <p>wait会阻塞本线程，直到有人用condition_variable将其唤醒或者复活条件成立。在阻塞的过程中会将锁释放，在苏醒后又会重新获取锁。</p>
 
     </div>

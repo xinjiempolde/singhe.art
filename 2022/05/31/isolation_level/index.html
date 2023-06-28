@@ -20,14 +20,13 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.11.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="背景数据库并发如果不做任何的控制，会破坏事务ACID特性的隔离性和一致性，如丢失修改、不可重复读、幻影现象和读“脏数据”等问题。">
+    <meta name="description" content="背景 数据库并发如果不做任何的控制，会破坏事务ACID特性的隔离性和一致性，如丢失修改、不可重复读、幻影现象和读“脏数据”等问题。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="丢失修改、不可重复度、读脏数据">
 <meta property="og:url" content="http://example.com/2022/05/31/isolation_level/index.html">
 <meta property="og:site_name" content="singheart&#39;s blog">
-<meta property="og:description" content="背景数据库并发如果不做任何的控制，会破坏事务ACID特性的隔离性和一致性，如丢失修改、不可重复读、幻影现象和读“脏数据”等问题。">
+<meta property="og:description" content="背景 数据库并发如果不做任何的控制，会破坏事务ACID特性的隔离性和一致性，如丢失修改、不可重复读、幻影现象和读“脏数据”等问题。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://img.singhe.art/%E4%B8%A2%E5%A4%B1%E4%BF%AE%E6%94%B9.png">
 <meta property="og:image" content="http://img.singhe.art/image-20220715091255981.png">
 <meta property="og:image" content="http://img.singhe.art/image-20220715091933540.png">
 <meta property="og:image" content="http://img.singhe.art/image-20220715093307688.png">
@@ -37,7 +36,7 @@
 <meta property="article:tag" content="database">
 <meta property="article:tag" content="lock">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://img.singhe.art/%E4%B8%A2%E5%A4%B1%E4%BF%AE%E6%94%B9.png">
+<meta name="twitter:image" content="http://img.singhe.art/image-20220715091255981.png">
 
 
 <link rel="canonical" href="http://example.com/2022/05/31/isolation_level/">
@@ -150,7 +149,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E8%A7%A3%E9%87%8A"><span class="nav-number">2.</span> <span class="nav-text">问题解释</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%A2%E5%A4%B1%E4%BF%AE%E6%94%B9"><span class="nav-number">2.1.</span> <span class="nav-text">丢失修改</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB"><span class="nav-number">2.2.</span> <span class="nav-text">不可重复读</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B9%BB%E5%BD%B1%E7%8E%B0%E8%B1%A1"><span class="nav-number">2.3.</span> <span class="nav-text">幻影现象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E2%80%9C%E8%84%8F%E6%95%B0%E6%8D%AE%E2%80%9D"><span class="nav-number">2.4.</span> <span class="nav-text">读“脏数据”</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3"><span class="nav-number">3.</span> <span class="nav-text">问题解决</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%81%E9%94%81%E7%9A%84%E7%9B%B8%E5%AE%B9%E7%9F%A9%E9%98%B5"><span class="nav-number">3.1.</span> <span class="nav-text">封锁的相容矩阵</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%81%E9%94%81%E5%8D%8F%E8%AE%AE"><span class="nav-number">3.2.</span> <span class="nav-text">封锁协议</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E7%BA%A7%E5%B0%81%E9%94%81%E5%8D%8F%E8%AE%AE-%E8%AF%BB%E6%9C%AA%E6%8F%90%E4%BA%A4"><span class="nav-number">3.2.1.</span> <span class="nav-text">一级封锁协议(读未提交)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E7%BA%A7%E5%B0%81%E9%94%81%E5%8D%8F%E8%AE%AE-%E8%AF%BB%E5%B7%B2%E6%8F%90%E4%BA%A4"><span class="nav-number">3.2.2.</span> <span class="nav-text">二级封锁协议(读已提交)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E7%BA%A7%E5%B0%81%E9%94%81%E5%8D%8F%E8%AE%AE-%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB"><span class="nav-number">3.2.3.</span> <span class="nav-text">三级封锁协议(可重复读)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%AF%E4%B8%B2%E5%BD%A2%E5%8C%96"><span class="nav-number">3.2.4.</span> <span class="nav-text">可串形化</span></a></li></ol></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E8%A7%A3%E9%87%8A"><span class="nav-number">2.</span> <span class="nav-text">问题解释</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%A2%E5%A4%B1%E4%BF%AE%E6%94%B9"><span class="nav-number">2.1.</span> <span class="nav-text">丢失修改</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB"><span class="nav-number">2.2.</span> <span class="nav-text">不可重复读</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B9%BB%E5%BD%B1%E7%8E%B0%E8%B1%A1"><span class="nav-number">2.3.</span> <span class="nav-text">幻影现象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E8%84%8F%E6%95%B0%E6%8D%AE"><span class="nav-number">2.4.</span> <span class="nav-text">读“脏数据”</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3"><span class="nav-number">3.</span> <span class="nav-text">问题解决</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%81%E9%94%81%E7%9A%84%E7%9B%B8%E5%AE%B9%E7%9F%A9%E9%98%B5"><span class="nav-number">3.1.</span> <span class="nav-text">封锁的相容矩阵</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%81%E9%94%81%E5%8D%8F%E8%AE%AE"><span class="nav-number">3.2.</span> <span class="nav-text">封锁协议</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E7%BA%A7%E5%B0%81%E9%94%81%E5%8D%8F%E8%AE%AE%E8%AF%BB%E6%9C%AA%E6%8F%90%E4%BA%A4"><span class="nav-number">3.2.1.</span> <span class="nav-text">一级封锁协议(读未提交)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E7%BA%A7%E5%B0%81%E9%94%81%E5%8D%8F%E8%AE%AE%E8%AF%BB%E5%B7%B2%E6%8F%90%E4%BA%A4"><span class="nav-number">3.2.2.</span> <span class="nav-text">二级封锁协议(读已提交)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E7%BA%A7%E5%B0%81%E9%94%81%E5%8D%8F%E8%AE%AE%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB"><span class="nav-number">3.2.3.</span> <span class="nav-text">三级封锁协议(可重复读)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%AF%E4%B8%B2%E5%BD%A2%E5%8C%96"><span class="nav-number">3.2.4.</span> <span class="nav-text">可串形化</span></a></li></ol></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -285,27 +284,56 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>数据库并发如果不做任何的控制，会破坏事务ACID特性的隔离性和一致性，如丢失修改、不可重复读、幻影现象和读“脏数据”等问题。</p>
+        <h1 id="背景">背景</h1>
+<p>数据库并发如果不做任何的控制，会破坏事务ACID特性的隔离性和一致性，如丢失修改、不可重复读、幻影现象和读“脏数据”等问题。</p>
 <span id="more"></span>
-
-<h1 id="问题解释"><a href="#问题解释" class="headerlink" title="问题解释"></a>问题解释</h1><p>本章介绍丢失修改、不可重复读和读“脏数据”的概念。</p>
-<h2 id="丢失修改"><a href="#丢失修改" class="headerlink" title="丢失修改"></a>丢失修改</h2><p><img src="http://img.singhe.art/%E4%B8%A2%E5%A4%B1%E4%BF%AE%E6%94%B9.png" alt="image-20220714104421583"></p>
-<p>两个事务T<del>1</del>和T<del>2</del>读入同一数据并修改，T<del>2</del>提交的结果破坏了T<del>1</del>提交的结果，导致T<del>1</del>的修改被丢失。</p>
-<h2 id="不可重复读"><a href="#不可重复读" class="headerlink" title="不可重复读"></a>不可重复读</h2><p><img src="http://img.singhe.art/image-20220715091255981.png" alt="image-20220715091255981"></p>
-<p>事务T<del>1</del>读取某一数据后，事务T<del>2</del>对其进行了修改，当事务T<del>1</del>再次读区该数据时，得到与前一次不一样的结果。</p>
-<h2 id="幻影现象"><a href="#幻影现象" class="headerlink" title="幻影现象"></a>幻影现象</h2><p>事务T<del>1</del>从数据库读取某些记录后，事务T<del>2</del>删除(或者插入了)部分记录，事务T<del>1</del>再按照相同条件读取的时候发现某些记录消失了(或新增了)。</p>
-<h2 id="读“脏数据”"><a href="#读“脏数据”" class="headerlink" title="读“脏数据”"></a>读“脏数据”</h2><p><img src="http://img.singhe.art/image-20220715091933540.png" alt="image-20220715091933540"></p>
-<p>读“脏数据”是指事务T<del>1</del>修改某一数据并将其写会磁盘，事务T<del>2</del>读区同一数据后，T<del>1</del>由于某种原因被撤销，这时被T<del>1</del>修改过的数据恢复原值，T<del>2</del>读到的数据就与数据库中的数据不一致，则T<del>2</del>读到的数据就为“脏”数据，即不正确的数据。</p>
-<h1 id="问题解决"><a href="#问题解决" class="headerlink" title="问题解决"></a>问题解决</h1><p>并发控制的技术有很多，比如封锁、时间戳、乐观控制和多版本并发控制，这里介绍封锁的方法。</p>
-<h2 id="封锁的相容矩阵"><a href="#封锁的相容矩阵" class="headerlink" title="封锁的相容矩阵"></a>封锁的相容矩阵</h2><p><img src="http://img.singhe.art/image-20220715093307688.png" alt="image-20220715093307688"></p>
-<h2 id="封锁协议"><a href="#封锁协议" class="headerlink" title="封锁协议"></a>封锁协议</h2><p>在运用X锁和S锁时，还需要约定一些规则。例如，合适申请X锁或S锁、持锁时间、何时释放等。这些规则被称为封锁协议。</p>
-<h3 id="一级封锁协议-读未提交"><a href="#一级封锁协议-读未提交" class="headerlink" title="一级封锁协议(读未提交)"></a>一级封锁协议(读未提交)</h3><p>一级封锁协议是指，事务T在修改数据R之前必须对其加X锁，知道事务结束才释放。</p>
+<h1 id="问题解释">问题解释</h1>
+<p>本章介绍丢失修改、不可重复读和读“脏数据”的概念。</p>
+<h2 id="丢失修改">丢失修改</h2>
+<figure>
+<img
+src="http://img.singhe.art/%E4%B8%A2%E5%A4%B1%E4%BF%AE%E6%94%B9.png"
+alt="image-20220714104421583" />
+<figcaption aria-hidden="true">image-20220714104421583</figcaption>
+</figure>
+<p>两个事务T<sub>1</sub>和T<sub>2</sub>读入同一数据并修改，T<sub>2</sub>提交的结果破坏了T<sub>1</sub>提交的结果，导致T<sub>1</sub>的修改被丢失。</p>
+<h2 id="不可重复读">不可重复读</h2>
+<figure>
+<img src="http://img.singhe.art/image-20220715091255981.png"
+alt="image-20220715091255981" />
+<figcaption aria-hidden="true">image-20220715091255981</figcaption>
+</figure>
+<p>事务T<sub>1</sub>读取某一数据后，事务T<sub>2</sub>对其进行了修改，当事务T<sub>1</sub>再次读区该数据时，得到与前一次不一样的结果。</p>
+<h2 id="幻影现象">幻影现象</h2>
+<p>事务T<sub>1</sub>从数据库读取某些记录后，事务T<sub>2</sub>删除(或者插入了)部分记录，事务T<sub>1</sub>再按照相同条件读取的时候发现某些记录消失了(或新增了)。</p>
+<h2 id="读脏数据">读“脏数据”</h2>
+<figure>
+<img src="http://img.singhe.art/image-20220715091933540.png"
+alt="image-20220715091933540" />
+<figcaption aria-hidden="true">image-20220715091933540</figcaption>
+</figure>
+<p>读“脏数据”是指事务T<sub>1</sub>修改某一数据并将其写会磁盘，事务T<sub>2</sub>读区同一数据后，T<sub>1</sub>由于某种原因被撤销，这时被T<sub>1</sub>修改过的数据恢复原值，T<sub>2</sub>读到的数据就与数据库中的数据不一致，则T<sub>2</sub>读到的数据就为“脏”数据，即不正确的数据。</p>
+<h1 id="问题解决">问题解决</h1>
+<p>并发控制的技术有很多，比如封锁、时间戳、乐观控制和多版本并发控制，这里介绍封锁的方法。</p>
+<h2 id="封锁的相容矩阵">封锁的相容矩阵</h2>
+<figure>
+<img src="http://img.singhe.art/image-20220715093307688.png"
+alt="image-20220715093307688" />
+<figcaption aria-hidden="true">image-20220715093307688</figcaption>
+</figure>
+<h2 id="封锁协议">封锁协议</h2>
+<p>在运用X锁和S锁时，还需要约定一些规则。例如，合适申请X锁或S锁、持锁时间、何时释放等。这些规则被称为封锁协议。</p>
+<h3 id="一级封锁协议读未提交">一级封锁协议(读未提交)</h3>
+<p>一级封锁协议是指，事务T在修改数据R之前必须对其加X锁，知道事务结束才释放。</p>
 <p>在一级封锁协议中，如果仅仅是读数据而不对其进行修改，是不需要加锁的，所以它不能保证可重复读和不读“脏数据”，它只能够解决丢失修改的问题。</p>
-<h3 id="二级封锁协议-读已提交"><a href="#二级封锁协议-读已提交" class="headerlink" title="二级封锁协议(读已提交)"></a>二级封锁协议(读已提交)</h3><p>二级封锁协议在一级封锁协议的基础上增加事务T在读取数据R之前必须对其加S锁，读完后即可释放S锁。</p>
+<h3 id="二级封锁协议读已提交">二级封锁协议(读已提交)</h3>
+<p>二级封锁协议在一级封锁协议的基础上增加事务T在读取数据R之前必须对其加S锁，读完后即可释放S锁。</p>
 <p>二级封锁协议能够解决丢失修改、读“脏数据”的问题，不能解决可重复读</p>
-<h3 id="三级封锁协议-可重复读"><a href="#三级封锁协议-可重复读" class="headerlink" title="三级封锁协议(可重复读)"></a>三级封锁协议(可重复读)</h3><p>三级封锁协议是指，在一级封锁协议的基础上增加事务T在读取R之前必须对其加S锁，直到事务结束才释放。三级封锁协议和二级封锁协议的差别在于读锁的持续时间不同。</p>
+<h3 id="三级封锁协议可重复读">三级封锁协议(可重复读)</h3>
+<p>三级封锁协议是指，在一级封锁协议的基础上增加事务T在读取R之前必须对其加S锁，直到事务结束才释放。三级封锁协议和二级封锁协议的差别在于读锁的持续时间不同。</p>
 <p>三级封锁协议能够解决丢失修改、读“脏数据”、不可重复读的问题。但是不能解决幻读的问题，因为封锁都是对某一行进行加锁，而幻读出现问题的地方是整个表格。</p>
-<h3 id="可串形化"><a href="#可串形化" class="headerlink" title="可串形化"></a>可串形化</h3><p>能够解决所有的问题，但是并发性能太差。</p>
+<h3 id="可串形化">可串形化</h3>
+<p>能够解决所有的问题，但是并发性能太差。</p>
 
     </div>
 
