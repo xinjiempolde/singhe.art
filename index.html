@@ -349,7 +349,7 @@ mjx-container[display="true"] + br {
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2024-01-11 16:10:39 / 修改时间：16:11:21" itemprop="dateCreated datePublished" datetime="2024-01-11T16:10:39+08:00">2024-01-11</time>
+      <time title="创建时间：2024-01-11 16:10:39 / 修改时间：16:11:50" itemprop="dateCreated datePublished" datetime="2024-01-11T16:10:39+08:00">2024-01-11</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -372,11 +372,15 @@ mjx-container[display="true"] + br {
     
     <div class="post-body" itemprop="articleBody">
           <h1 id="x00-背景">0x00 背景</h1>
-<p>在写<code>CMU15445</code>project 0时，报了一大堆内存泄漏的错误。经过排查，发现是<code>shared_ptr</code>互相引用导致的，所以这里进行一个简单的说明。</p>
-<p>假设有如下的代码：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">B</span>;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">A</span> &#123;</span><br><span class="line"> <span class="keyword">public</span>:</span><br><span class="line">  <span class="built_in">A</span>() &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;A()\n&quot;</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  ~<span class="built_in">A</span>() &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;~A()\n&quot;</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  std::shared_ptr&lt;B&gt; p;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">B</span> &#123;</span><br><span class="line"> <span class="keyword">public</span>:</span><br><span class="line">  <span class="built_in">B</span>() &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;B()\n&quot;</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  ~<span class="built_in">B</span>() &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;~B()\n&quot;</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  std::shared_ptr&lt;A&gt; p;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">auto</span> pa = std::<span class="built_in">make_shared</span>&lt;A&gt;();</span><br><span class="line">  <span class="keyword">auto</span> pb = std::<span class="built_in">make_shared</span>&lt;B&gt;();</span><br><span class="line">  pa-&gt;p = pb;</span><br><span class="line">  pb-&gt;p = pa;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>由于pa和pb相互引用，当离开作用域的时候pa和pb所管理的资源都不能被释放。</p>
-
+<p>在写<code>CMU15445</code>project 0时，报了一大堆内存泄漏的错误。经过排查，发现是<code>shared_ptr</code>互相引用导致的，所以这里进行一个简单的说明。
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2024/01/11/shared-ptr%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
