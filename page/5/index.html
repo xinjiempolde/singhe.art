@@ -153,7 +153,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-count">74</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -207,7 +207,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/04/10/linux/%E6%9E%84%E5%BB%BA%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91%E5%99%A8/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/02/22/database/foundationdb%E7%9A%84%E5%AE%89%E8%A3%85%E5%92%8C%E6%B5%8B%E8%AF%95/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
@@ -225,7 +225,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/04/10/linux/%E6%9E%84%E5%BB%BA%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91%E5%99%A8/" class="post-title-link" itemprop="url">构建交叉编译器</a>
+          <a href="/2023/02/22/database/foundationdb%E7%9A%84%E5%AE%89%E8%A3%85%E5%92%8C%E6%B5%8B%E8%AF%95/" class="post-title-link" itemprop="url">foundationdb的安装和测试</a>
         </h2>
 
         <div class="post-meta-container">
@@ -236,14 +236,14 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-04-10 13:21:23" itemprop="dateCreated datePublished" datetime="2022-04-10T13:21:23+08:00">2022-04-10</time>
+      <time title="创建时间：2023-02-22 15:39:24" itemprop="dateCreated datePublished" datetime="2023-02-22T15:39:24+08:00">2023-02-22</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-02-17 10:21:22" itemprop="dateModified" datetime="2023-02-17T10:21:22+08:00">2023-02-17</time>
+      <time title="修改时间：2023-05-31 15:19:40" itemprop="dateModified" datetime="2023-05-31T15:19:40+08:00">2023-05-31</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -251,7 +251,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
+          <a href="/categories/database/" itemprop="url" rel="index"><span itemprop="name">database</span></a>
         </span>
     </span>
 
@@ -265,21 +265,11 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <blockquote>
-<p>参考文章:<a
-target="_blank" rel="noopener" href="https://github.com/cfenollosa/os-tutorial/tree/master/11-kernel-crosscompiler">https://github.com/cfenollosa/os-tutorial/tree/master/11-kernel-crosscompiler</a></p>
-</blockquote>
-<h1 id="环境说明">0. 环境说明</h1>
-<ul>
-<li>ubuntu 16.04</li>
-<li>gcc 4.9源码编译</li>
-</ul>
-<h1 id="将环境变量导入">1. 将环境变量导入</h1>
-<p>我使用的是<code>oh-my-zsh</code>，所以需要修改<code>~/.zshrc</code>，在文件末尾添加以下语句.
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">export CC=/usr/bin/gcc-5</span><br><span class="line">export LD=/usr/bin/gcc-5</span><br><span class="line"></span><br><span class="line">export PREFIX=&quot;/usr/local/i386elfgcc&quot;</span><br><span class="line">export TARGET=i386-elf</span><br><span class="line">export PATH=&quot;$PREFIX/bin:$PATH&quot;</span><br></pre></td></tr></table></figure></p>
+          <h1 id="安装">安装</h1>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">用这个版本</span></span><br><span class="line">wget https://github.com/apple/foundationdb/releases/download/7.2.3/foundationdb-server_7.2.3-1_amd64.deb</span><br><span class="line">wget https://github.com/apple/foundationdb/releases/download/7.2.3/foundationdb-clients_7.2.3-1_amd64.deb</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">安装</span></span><br><span class="line">sudo dpkg -i foundationdb-clients_7.2.3-1_amd64.deb</span><br><span class="line">sudo dpkg -i foundationdb-server_7.2.3-1_amd64.deb</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">卸载</span></span><br><span class="line">sudo dpkg --purge foundationdb-server</span><br><span class="line">sudo dpkg --purge foundationdb-clients</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">wget https://github.com/apple/foundationdb/releases/download/6.2.11/foundationdb-server_6.2.11-1_amd64.deb</span><br><span class="line">wget https://github.com/apple/foundationdb/releases/download/6.2.11/foundationdb-clients_6.2.11-1_amd64.deb</span><br><span class="line">sudo dpkg -i foundationdb-clients_6.2.11-1_amd64.deb</span><br><span class="line">sudo dpkg -i foundationdb-server_6.2.11-1_amd64.deb</span><br><span class="line">sudo dpkg --purge foundationdb-server</span><br><span class="line">sudo dpkg --purge foundationdb-clients</span><br><span class="line"></span><br></pre></td></tr></table></figure>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2022/04/10/linux/%E6%9E%84%E5%BB%BA%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91%E5%99%A8/#more" rel="contents">
+              <a class="btn" href="/2023/02/22/database/foundationdb%E7%9A%84%E5%AE%89%E8%A3%85%E5%92%8C%E6%B5%8B%E8%AF%95/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -310,7 +300,7 @@ target="_blank" rel="noopener" href="https://github.com/cfenollosa/os-tutorial/t
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/04/10/cpp/%E6%A8%A1%E6%9D%BF%E7%B1%BB%E7%BB%A7%E6%89%BF%E6%A8%A1%E6%9D%BF%E7%B1%BB%EF%BC%8C%E5%AD%90%E7%B1%BB%E7%9C%8B%E4%B8%8D%E5%88%B0%E7%88%B6%E7%B1%BB%E5%AF%B9%E8%B1%A1/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/02/22/cpp/std-future/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
@@ -328,7 +318,7 @@ target="_blank" rel="noopener" href="https://github.com/cfenollosa/os-tutorial/t
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/04/10/cpp/%E6%A8%A1%E6%9D%BF%E7%B1%BB%E7%BB%A7%E6%89%BF%E6%A8%A1%E6%9D%BF%E7%B1%BB%EF%BC%8C%E5%AD%90%E7%B1%BB%E7%9C%8B%E4%B8%8D%E5%88%B0%E7%88%B6%E7%B1%BB%E5%AF%B9%E8%B1%A1/" class="post-title-link" itemprop="url">模板类继承模板类，子类看不到父类对象</a>
+          <a href="/2023/02/22/cpp/std-future/" class="post-title-link" itemprop="url">std::future</a>
         </h2>
 
         <div class="post-meta-container">
@@ -339,14 +329,14 @@ target="_blank" rel="noopener" href="https://github.com/cfenollosa/os-tutorial/t
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-04-10 12:26:56" itemprop="dateCreated datePublished" datetime="2022-04-10T12:26:56+08:00">2022-04-10</time>
+      <time title="创建时间：2023-02-22 11:33:46" itemprop="dateCreated datePublished" datetime="2023-02-22T11:33:46+08:00">2023-02-22</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-07-28 15:50:01" itemprop="dateModified" datetime="2024-07-28T15:50:01+08:00">2024-07-28</time>
+      <time title="修改时间：2024-07-28 15:52:04" itemprop="dateModified" datetime="2024-07-28T15:52:04+08:00">2024-07-28</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -368,12 +358,13 @@ target="_blank" rel="noopener" href="https://github.com/cfenollosa/os-tutorial/t
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="问题重现">问题重现</h1>
-<p><code>hello.cpp</code></p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">A</span> &#123;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    T data_;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">B</span> : <span class="keyword">public</span> A&lt;T&gt; &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">test</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; data_;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;hello world&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+          <p>参考：<a
+target="_blank" rel="noopener" href="https://blog.csdn.net/lizhichao410/article/details/123732787">https://blog.csdn.net/lizhichao410/article/details/123732787</a></p>
+<h1 id="使用背景">使用背景</h1>
+<p>在C++中使用std::thread可创建一个线程，使用互斥量std::mutex来确保多个线程对共享数据的读写操作同步问题;使用std::condition_variable来解决线程执行顺序的同步问题。那么多个线程之间怎么传递数据呢？其中一种做法是使用一个全局变量，然后让线程之间互斥的访问就可以传递数据，还有一种做法就是使用std::future和std::async。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2022/04/10/cpp/%E6%A8%A1%E6%9D%BF%E7%B1%BB%E7%BB%A7%E6%89%BF%E6%A8%A1%E6%9D%BF%E7%B1%BB%EF%BC%8C%E5%AD%90%E7%B1%BB%E7%9C%8B%E4%B8%8D%E5%88%B0%E7%88%B6%E7%B1%BB%E5%AF%B9%E8%B1%A1/#more" rel="contents">
+              <a class="btn" href="/2023/02/22/cpp/std-future/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -404,7 +395,7 @@ target="_blank" rel="noopener" href="https://github.com/cfenollosa/os-tutorial/t
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/04/08/data_structure/chinese_encoding/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/02/17/database/ubuntu-mysql%E5%BF%98%E8%AE%B0%E5%AF%86%E7%A0%81/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
@@ -422,7 +413,7 @@ target="_blank" rel="noopener" href="https://github.com/cfenollosa/os-tutorial/t
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/04/08/data_structure/chinese_encoding/" class="post-title-link" itemprop="url">编码以及中文乱码</a>
+          <a href="/2023/02/17/database/ubuntu-mysql%E5%BF%98%E8%AE%B0%E5%AF%86%E7%A0%81/" class="post-title-link" itemprop="url">ubuntu_mysql忘记密码</a>
         </h2>
 
         <div class="post-meta-container">
@@ -433,14 +424,400 @@ target="_blank" rel="noopener" href="https://github.com/cfenollosa/os-tutorial/t
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-04-08 18:19:52" itemprop="dateCreated datePublished" datetime="2022-04-08T18:19:52+08:00">2022-04-08</time>
+      <time title="创建时间：2023-02-17 11:01:03" itemprop="dateCreated datePublished" datetime="2023-02-17T11:01:03+08:00">2023-02-17</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-07-28 16:28:08" itemprop="dateModified" datetime="2024-07-28T16:28:08+08:00">2024-07-28</time>
+      <time title="修改时间：2024-07-28 16:06:05" itemprop="dateModified" datetime="2024-07-28T16:06:05+08:00">2024-07-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/database/" itemprop="url" rel="index"><span itemprop="name">database</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="前言">前言</h1>
+<p>参考：<a
+target="_blank" rel="noopener" href="https://blog.csdn.net/m0_46825740/article/details/127768826">https://blog.csdn.net/m0_46825740/article/details/127768826</a></p>
+<p>我的系统是<code>ubuntu 18.04</code>，Windows用户可以划走了。<code>ubuntu 18.04</code>使用<code>sudo apt install mysql-server</code>安装的mysql版本是5.7，当忘记了密码的时候可以采取下面的方法。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023/02/17/database/ubuntu-mysql%E5%BF%98%E8%AE%B0%E5%AF%86%E7%A0%81/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/02/10/cpp/%E6%99%AE%E9%80%9A%E5%87%BD%E6%95%B0%E5%92%8C%E5%86%85%E8%81%94%E5%87%BD%E6%95%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+      <meta itemprop="name" content="singheart">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2023/02/10/cpp/%E6%99%AE%E9%80%9A%E5%87%BD%E6%95%B0%E5%92%8C%E5%86%85%E8%81%94%E5%87%BD%E6%95%B0/" class="post-title-link" itemprop="url">普通函数和内联函数</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-02-10 22:57:37" itemprop="dateCreated datePublished" datetime="2023-02-10T22:57:37+08:00">2023-02-10</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-07-28 15:49:50" itemprop="dateModified" datetime="2024-07-28T15:49:50+08:00">2024-07-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/cpp/" itemprop="url" rel="index"><span itemprop="name">cpp</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <blockquote>
+<p>本篇文章主要验证普通函数和内联函数的区别</p>
+</blockquote>
+<p>Inline_function.cpp</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">__attribute__((always_inline))</span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="type">void</span> <span class="title">func</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> j = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">2</span>; i++) &#123;</span><br><span class="line">        j++;</span><br><span class="line">        <span class="keyword">if</span> (j == <span class="number">20</span>) j *= <span class="number">2</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">func</span>();</span><br><span class="line">    <span class="built_in">func</span>();</span><br><span class="line">    <span class="built_in">func</span>();</span><br><span class="line">    <span class="built_in">func</span>();</span><br><span class="line">    <span class="built_in">func</span>();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>__attribute__((always_inline))</code>告诉编译器强制内联。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023/02/10/cpp/%E6%99%AE%E9%80%9A%E5%87%BD%E6%95%B0%E5%92%8C%E5%86%85%E8%81%94%E5%87%BD%E6%95%B0/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/02/10/linux/shell%E8%84%9A%E6%9C%AC%E5%85%A5%E9%97%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+      <meta itemprop="name" content="singheart">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2023/02/10/linux/shell%E8%84%9A%E6%9C%AC%E5%85%A5%E9%97%A8/" class="post-title-link" itemprop="url">shell脚本入门</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-02-10 12:23:25" itemprop="dateCreated datePublished" datetime="2023-02-10T12:23:25+08:00">2023-02-10</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-07-28 16:28:27" itemprop="dateModified" datetime="2024-07-28T16:28:27+08:00">2024-07-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="shell基本用法">shell基本用法</h1>
+<p>最近有写shell的需求，因此花了几个小时简单学习了下，在此做个简单的记录，学习资料为<a
+target="_blank" rel="noopener" href="https://www.runoob.com/linux/linux-shell.html">菜鸟教程</a>。个人博客：<a
+href="singhe.art">singhe.art</a></p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023/02/10/linux/shell%E8%84%9A%E6%9C%AC%E5%85%A5%E9%97%A8/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/15/cpp/consistency_model/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+      <meta itemprop="name" content="singheart">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2022/09/15/cpp/consistency_model/" class="post-title-link" itemprop="url">memory model</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-09-15 10:44:52" itemprop="dateCreated datePublished" datetime="2022-09-15T10:44:52+08:00">2022-09-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-07-28 16:05:24" itemprop="dateModified" datetime="2024-07-28T16:05:24+08:00">2024-07-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/cpp/" itemprop="url" rel="index"><span itemprop="name">cpp</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="memory-consistency-model">memory consistency model</h1>
+<figure>
+<img src="http://img.singhe.art/image-20220903234055396.png"
+alt="image-20220903234055396" />
+<figcaption aria-hidden="true">image-20220903234055396</figcaption>
+</figure>
+<p>由于一些优化（可能来自编译器或者操作系统或者硬件之类的），在核1真正执行的时候可能不会按照程序原有的顺序执行，比如core1会将两个操作交换顺序，这就导致多个核之间的执行顺序可能会任意进行。为了让结果符合预期，就产生了memory
+consistency model这一概念，以及各种不同的memory model。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/09/15/cpp/consistency_model/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/15/data_structure/SkipList/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+      <meta itemprop="name" content="singheart">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2022/09/15/data_structure/SkipList/" class="post-title-link" itemprop="url">SkipList</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-09-15 10:44:52" itemprop="dateCreated datePublished" datetime="2022-09-15T10:44:52+08:00">2022-09-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-02-17 10:21:22" itemprop="dateModified" datetime="2023-02-17T10:21:22+08:00">2023-02-17</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -463,15 +840,24 @@ target="_blank" rel="noopener" href="https://github.com/cfenollosa/os-tutorial/t
     
     <div class="post-body" itemprop="articleBody">
           <blockquote>
-<p>参考自<a
-target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1cB4y177QR/?spm_id_from=333.337.search-card.all.click&amp;vd_source=34f42153abf8d06182c3e941bc952660">B站柴知道</a>，十分推荐观看原视频，侵权请联系删除。</p>
+<p>转载自<a
+target="_blank" rel="noopener" href="https://baijiahao.baidu.com/s?id=1710441201075985657&amp;wfr=spider&amp;for=pc">https://baijiahao.baidu.com/s?id=1710441201075985657&amp;wfr=spider&amp;for=pc</a></p>
 </blockquote>
-<h1 id="什么是编码">什么是编码</h1>
-<p>计算机存储的内容都是二进制的数据，图像、音频、文字等也都需要按照一定的规则转换成二进制数据进行存储。将文字转换成二进制数据的规则就叫做编码。</p>
-<p>假如世界上只有三个文字“柴知道”，那么我们就可以按照下面的方式进行编码：</p>
+<h1 id="什么是跳表">什么是跳表？</h1>
+<p><del>类似MineCraft的地狱交通，在地狱走一个相当于主世界走8格</del></p>
+<p>跳表全称为跳跃列表，它允许快速查询，插入和删除一个有序连续元素的数据链表。跳跃列表的平均查找和插入时间复杂度都是O(logn)。快速查询是通过维护一个多层次的链表，且每一层链表中的元素是前一层链表元素的子集（见右边的示意图）。一开始时，算法在最稀疏的层次进行搜索，直至需要查找的元素在该层两个相邻的元素中间。这时，算法将跳转到下一个层次，重复刚才的搜索，直到找到需要查找的元素为止。</p>
+<figure>
+<img
+src="http://img.singhe.art/e61190ef76c6a7ef314419fa0f46b858f1de66d6.jpeg"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>一张跳跃列表的示意图。每个带有箭头的框表示一个指针,
+而每行是一个稀疏子序列的链表；底部的编号框（黄色）表示有序的数据序列。查找从顶部最稀疏的子序列向下进行,
+直至需要查找的元素在该层两个相邻的元素中间。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2022/04/08/data_structure/chinese_encoding/#more" rel="contents">
+              <a class="btn" href="/2022/09/15/data_structure/SkipList/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -502,7 +888,7 @@ target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1cB4y177QR
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/04/08/go/go%E5%AF%BC%E5%85%A5%E8%87%AA%E5%AE%9A%E4%B9%89%E5%8C%85/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/13/cpp/condition-variable/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
@@ -520,7 +906,7 @@ target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1cB4y177QR
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/04/08/go/go%E5%AF%BC%E5%85%A5%E8%87%AA%E5%AE%9A%E4%B9%89%E5%8C%85/" class="post-title-link" itemprop="url">go导入自定义包</a>
+          <a href="/2022/08/13/cpp/condition-variable/" class="post-title-link" itemprop="url">condition-variable</a>
         </h2>
 
         <div class="post-meta-container">
@@ -531,114 +917,14 @@ target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1cB4y177QR
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-04-08 18:19:52" itemprop="dateCreated datePublished" datetime="2022-04-08T18:19:52+08:00">2022-04-08</time>
+      <time title="创建时间：2022-08-13 23:24:25" itemprop="dateCreated datePublished" datetime="2022-08-13T23:24:25+08:00">2022-08-13</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-07-28 16:27:05" itemprop="dateModified" datetime="2024-07-28T16:27:05+08:00">2024-07-28</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/go/" itemprop="url" rel="index"><span itemprop="name">go</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <blockquote>
-<p>本文参考<a
-target="_blank" rel="noopener" href="https://blog.csdn.net/deroy/article/details/123021040">CSDN博客</a></p>
-</blockquote>
-<h1 id="环境">环境</h1>
-<ul>
-<li>ubuntu18.04</li>
-<li>go 1.18</li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/04/08/go/go%E5%AF%BC%E5%85%A5%E8%87%AA%E5%AE%9A%E4%B9%89%E5%8C%85/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/04/04/cpp/C++%E9%87%8D%E8%BD%BD%E8%BF%90%E7%AE%97%E7%AC%A6/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
-      <meta itemprop="name" content="singheart">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="singheart's blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | singheart's blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/04/04/cpp/C++%E9%87%8D%E8%BD%BD%E8%BF%90%E7%AE%97%E7%AC%A6/" class="post-title-link" itemprop="url">C++重载运算符>>和<<</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-04-04 20:46:11" itemprop="dateCreated datePublished" datetime="2022-04-04T20:46:11+08:00">2022-04-04</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-07-28 15:49:00" itemprop="dateModified" datetime="2024-07-28T15:49:00+08:00">2024-07-28</time>
+      <time title="修改时间：2024-07-28 15:52:12" itemprop="dateModified" datetime="2024-07-28T15:52:12+08:00">2024-07-28</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -660,16 +946,15 @@ target="_blank" rel="noopener" href="https://blog.csdn.net/deroy/article/details
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="概述">概述</h1>
-<p>要重载一个运算符，有两种方式：</p>
-<ul>
-<li>作为成员方法，只需要一个参数。</li>
-<li>作为全局函数，需要两个参数。</li>
-</ul>
-<p>而<code>cin</code>和<code>cout</code>这两个对象我们无法对其内部成员进行修改，因此对<code>cin</code>和<code>cout</code>的重载只能使用第二种办法。</p>
+          <blockquote>
+<p>前面已经对mutex以及相关的lock进行了梳理，这里对thread和condition_variable做一个简单的梳理。</p>
+</blockquote>
+<h1 id="stdthread"># std::thread</h1>
+<p>通过该函数能够创建一个线程。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;thread&gt;</span></span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">worker1_func</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;worker1\n&quot;</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">void</span>)</span> </span>&#123;</span><br><span class="line">  <span class="function">std::thread <span class="title">worker1</span><span class="params">(worker1_func)</span></span>;</span><br><span class="line">  <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;main func\n&quot;</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  worker1.<span class="built_in">join</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2022/04/04/cpp/C++%E9%87%8D%E8%BD%BD%E8%BF%90%E7%AE%97%E7%AC%A6/#more" rel="contents">
+              <a class="btn" href="/2022/08/13/cpp/condition-variable/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -700,7 +985,7 @@ target="_blank" rel="noopener" href="https://blog.csdn.net/deroy/article/details
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/04/04/linux/socket%E7%BC%96%E7%A8%8B%E7%A4%BA%E4%BE%8B/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/03/cpp/rvalue-and-std-move/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
@@ -718,7 +1003,7 @@ target="_blank" rel="noopener" href="https://blog.csdn.net/deroy/article/details
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/04/04/linux/socket%E7%BC%96%E7%A8%8B%E7%A4%BA%E4%BE%8B/" class="post-title-link" itemprop="url">socket编程示例</a>
+          <a href="/2022/08/03/cpp/rvalue-and-std-move/" class="post-title-link" itemprop="url">rvalue_and_std::move</a>
         </h2>
 
         <div class="post-meta-container">
@@ -729,14 +1014,14 @@ target="_blank" rel="noopener" href="https://blog.csdn.net/deroy/article/details
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-04-04 20:42:43" itemprop="dateCreated datePublished" datetime="2022-04-04T20:42:43+08:00">2022-04-04</time>
+      <time title="创建时间：2022-08-03 21:05:20" itemprop="dateCreated datePublished" datetime="2022-08-03T21:05:20+08:00">2022-08-03</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-07-28 15:22:54" itemprop="dateModified" datetime="2024-07-28T15:22:54+08:00">2024-07-28</time>
+      <time title="修改时间：2024-07-28 15:48:45" itemprop="dateModified" datetime="2024-07-28T15:48:45+08:00">2024-07-28</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -744,7 +1029,7 @@ target="_blank" rel="noopener" href="https://blog.csdn.net/deroy/article/details
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
+          <a href="/categories/cpp/" itemprop="url" rel="index"><span itemprop="name">cpp</span></a>
         </span>
     </span>
 
@@ -759,14 +1044,13 @@ target="_blank" rel="noopener" href="https://blog.csdn.net/deroy/article/details
     
     <div class="post-body" itemprop="articleBody">
           <blockquote>
-<p>本次使用的环境为Ubuntu
-16.04。如果是linux操作系统能够运行本示例代码，如果是Windows操作系统，那么本篇文章不适用。</p>
+<p>参考文章<a
+target="_blank" rel="noopener" href="https://www.cprogramming.com/c++11/rvalue-references-and-move-semantics-in-c++11.html">https://www.cprogramming.com/c++11/rvalue-references-and-move-semantics-in-c++11.html</a></p>
 </blockquote>
-<h1 id="什么是socket">什么是socket</h1>
-<p><code>socket</code>是应用层和传输层之间的API接口，通过socket为本地进程和远端进程提供通信服务，如TCP、UDP，是面向client-server架构的。需要注意的是，socket也能够实现与网络层的连接，不过用得很少，这里示意图不再标出。</p>
+<h1 id="问题引出">问题引出</h1>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2022/04/04/linux/socket%E7%BC%96%E7%A8%8B%E7%A4%BA%E4%BE%8B/#more" rel="contents">
+              <a class="btn" href="/2022/08/03/cpp/rvalue-and-std-move/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -797,7 +1081,7 @@ target="_blank" rel="noopener" href="https://blog.csdn.net/deroy/article/details
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/04/04/linux/%E4%BD%BF%E7%94%A8telnet%E6%A8%A1%E6%8B%9FHTTP%E5%92%8CSMTP%E5%8D%8F%E8%AE%AE/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/03/cpp/C++%E7%B1%BB%E5%9C%A8%E5%86%85%E5%AD%98%E4%B8%AD%E5%A6%82%E4%BD%95%E5%AD%98%E5%82%A8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
@@ -815,7 +1099,7 @@ target="_blank" rel="noopener" href="https://blog.csdn.net/deroy/article/details
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/04/04/linux/%E4%BD%BF%E7%94%A8telnet%E6%A8%A1%E6%8B%9FHTTP%E5%92%8CSMTP%E5%8D%8F%E8%AE%AE/" class="post-title-link" itemprop="url">使用telnet模拟HTTP和SMTP协议</a>
+          <a href="/2022/08/03/cpp/C++%E7%B1%BB%E5%9C%A8%E5%86%85%E5%AD%98%E4%B8%AD%E5%A6%82%E4%BD%95%E5%AD%98%E5%82%A8/" class="post-title-link" itemprop="url">C++类在内存中如何存储</a>
         </h2>
 
         <div class="post-meta-container">
@@ -826,14 +1110,14 @@ target="_blank" rel="noopener" href="https://blog.csdn.net/deroy/article/details
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-04-04 20:34:49" itemprop="dateCreated datePublished" datetime="2022-04-04T20:34:49+08:00">2022-04-04</time>
+      <time title="创建时间：2022-08-03 14:09:29" itemprop="dateCreated datePublished" datetime="2022-08-03T14:09:29+08:00">2022-08-03</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-07-28 15:22:59" itemprop="dateModified" datetime="2024-07-28T15:22:59+08:00">2024-07-28</time>
+      <time title="修改时间：2024-07-28 15:50:47" itemprop="dateModified" datetime="2024-07-28T15:50:47+08:00">2024-07-28</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -841,7 +1125,7 @@ target="_blank" rel="noopener" href="https://blog.csdn.net/deroy/article/details
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
+          <a href="/categories/cpp/" itemprop="url" rel="index"><span itemprop="name">cpp</span></a>
         </span>
     </span>
 
@@ -856,16 +1140,14 @@ target="_blank" rel="noopener" href="https://blog.csdn.net/deroy/article/details
     
     <div class="post-body" itemprop="articleBody">
           <blockquote>
-<p>前言：使用telnet模拟HTTP请求访问页面，及其使用telnet发送邮件</p>
+<p>参考<a
+target="_blank" rel="noopener" href="https://baijiahao.baidu.com/s?id=1653384309305389312&amp;wfr=spider&amp;for=pc">https://baijiahao.baidu.com/s?id=1653384309305389312&amp;wfr=spider&amp;for=pc</a></p>
 </blockquote>
-<h1 id="一运行环境">一、运行环境</h1>
-<ul>
-<li>ubuntu 16.04</li>
-<li>telnet</li>
-</ul>
+<h1 id="背景">背景</h1>
+<p>我们知道在C++中<code>char</code>占用一个字节，<code>int</code>占用四个字节。那么类在内存中是怎么布局的呢？成员变量和成员函数是放在一起存储的吗？</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2022/04/04/linux/%E4%BD%BF%E7%94%A8telnet%E6%A8%A1%E6%8B%9FHTTP%E5%92%8CSMTP%E5%8D%8F%E8%AE%AE/#more" rel="contents">
+              <a class="btn" href="/2022/08/03/cpp/C++%E7%B1%BB%E5%9C%A8%E5%86%85%E5%AD%98%E4%B8%AD%E5%A6%82%E4%BD%95%E5%AD%98%E5%82%A8/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -889,7 +1171,7 @@ target="_blank" rel="noopener" href="https://blog.csdn.net/deroy/article/details
 
 
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span>
+    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 </div>

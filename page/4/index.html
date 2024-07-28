@@ -46,7 +46,119 @@
   <noscript>
     <link rel="stylesheet" href="/css/noscript.css">
   </noscript>
-</head>
+<style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
   <div class="headband"></div>
@@ -153,7 +265,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-count">74</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -207,7 +319,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/05/31/database/GFS/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/06/27/linux/%E5%B0%86%E5%86%85%E5%AD%98%E9%94%81%E5%AE%9A%E5%9C%A8%E7%89%A9%E7%90%86%E5%86%85%E5%AD%98/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
@@ -225,7 +337,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/05/31/database/GFS/" class="post-title-link" itemprop="url">GFS</a>
+          <a href="/2023/06/27/linux/%E5%B0%86%E5%86%85%E5%AD%98%E9%94%81%E5%AE%9A%E5%9C%A8%E7%89%A9%E7%90%86%E5%86%85%E5%AD%98/" class="post-title-link" itemprop="url">将内存锁定在物理内存</a>
         </h2>
 
         <div class="post-meta-container">
@@ -236,499 +348,14 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-05-31 18:41:25" itemprop="dateCreated datePublished" datetime="2022-05-31T18:41:25+08:00">2022-05-31</time>
+      <time title="创建时间：2023-06-27 20:47:24" itemprop="dateCreated datePublished" datetime="2023-06-27T20:47:24+08:00">2023-06-27</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-07-28 16:12:02" itemprop="dateModified" datetime="2024-07-28T16:12:02+08:00">2024-07-28</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/database/" itemprop="url" rel="index"><span itemprop="name">database</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="系统架构">系统架构</h1>
-<figure>
-<img src="http://img.singhe.art/image-20220902151055829.png"
-alt="image-20220902151055829" />
-<figcaption aria-hidden="true">image-20220902151055829</figcaption>
-</figure>
-<p>在GFS中，一个文件由多个chunk组成，每一个chunk大小都是64MB，而一个文件的chunk可能不在同一个chunkserver上，也就是分布在不同的chunkserver上。</p>
-<p>GFS采用的是单主架构，client通过filename和offset向master索要chunk信息，master返回对应的chunk在哪个chunkserver上，然后client再和chunkserver交互。</p>
-<p>每个chunkserver直接使用linux的文件系统。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/05/31/database/GFS/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/05/31/database/SLOG/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
-      <meta itemprop="name" content="singheart">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="singheart's blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | singheart's blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/05/31/database/SLOG/" class="post-title-link" itemprop="url">SLOG</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-05-31 18:41:25" itemprop="dateCreated datePublished" datetime="2022-05-31T18:41:25+08:00">2022-05-31</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-07-28 16:11:57" itemprop="dateModified" datetime="2024-07-28T16:11:57+08:00">2024-07-28</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/database/" itemprop="url" rel="index"><span itemprop="name">database</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="背景">背景</h1>
-<h2 id="geo-replicated-dbms">Geo-replicated DBMS</h2>
-<p>SLOG假设一个数据库系统是跑在横跨世界各地的数据中心的系统，这种系统我们通常称之为Geo-replicated
-Database Management
-System(DBMS)，它将数据复制多份在各地的资料中心中。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/05/31/database/SLOG/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/05/31/database/isolation_level/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
-      <meta itemprop="name" content="singheart">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="singheart's blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | singheart's blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/05/31/database/isolation_level/" class="post-title-link" itemprop="url">丢失修改、不可重复度、读脏数据</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-05-31 18:41:25" itemprop="dateCreated datePublished" datetime="2022-05-31T18:41:25+08:00">2022-05-31</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-02-17 10:21:22" itemprop="dateModified" datetime="2023-02-17T10:21:22+08:00">2023-02-17</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/database/" itemprop="url" rel="index"><span itemprop="name">database</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="背景">背景</h1>
-<p>数据库并发如果不做任何的控制，会破坏事务ACID特性的隔离性和一致性，如丢失修改、不可重复读、幻影现象和读“脏数据”等问题。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/05/31/database/isolation_level/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/05/31/database/mysql_snapshot_isolation/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
-      <meta itemprop="name" content="singheart">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="singheart's blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | singheart's blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/05/31/database/mysql_snapshot_isolation/" class="post-title-link" itemprop="url">mysql上验证快照隔离</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-05-31 18:41:25" itemprop="dateCreated datePublished" datetime="2022-05-31T18:41:25+08:00">2022-05-31</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-02-17 10:21:22" itemprop="dateModified" datetime="2023-02-17T10:21:22+08:00">2023-02-17</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/database/" itemprop="url" rel="index"><span itemprop="name">database</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <blockquote>
-<p>本文在mysql上验证快照隔离的特性。参考<a
-target="_blank" rel="noopener" href="http://t.zoukankan.com/xwdreamer-p-2297081.html">文章</a>。</p>
-</blockquote>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/05/31/database/mysql_snapshot_isolation/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/05/31/database/sortledton/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
-      <meta itemprop="name" content="singheart">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="singheart's blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | singheart's blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/05/31/database/sortledton/" class="post-title-link" itemprop="url">sortledton</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-05-31 18:41:25" itemprop="dateCreated datePublished" datetime="2022-05-31T18:41:25+08:00">2022-05-31</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-07-28 16:06:46" itemprop="dateModified" datetime="2024-07-28T16:06:46+08:00">2024-07-28</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/database/" itemprop="url" rel="index"><span itemprop="name">database</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="introduction">1. introduction</h1>
-<p>​
-动态数据集上的图处理在许多应用领域越发重要，如推荐系统和欺诈检测等。现今，许多场景下都需要进行大规模的图计算，如图分析(analytics),图模式匹配(graph
-pattern matching, GPM),
-图遍历(tranversals).而这些图计算的数据集是动态变化的，随时都在进行更新。
-创建这样一个系统仍然是一个未解决的问题，其根源就是没有底层数据结构既能保证高效率的事务更新，又能有效处理各种各样的图工作负载（比如模式匹配、图遍历就是不同的工作负载）。这篇文章就是要解决这个问题。
-为支持分析工作负载(如page
-rank)和图遍历(单源最短路径)需要支持快速扫描。为了支持模式匹配(如triangle
-counting)，数据结构需要有序to enable fast
-intersections。为了保证更新速度，该数据结构需要支持动态更新。为了保证并发，需要实现多版本。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/05/31/database/sortledton/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/05/31/linux/minecraft_server/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
-      <meta itemprop="name" content="singheart">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="singheart's blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | singheart's blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/05/31/linux/minecraft_server/" class="post-title-link" itemprop="url">MineCraft在linux上开服</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-05-31 18:41:25" itemprop="dateCreated datePublished" datetime="2022-05-31T18:41:25+08:00">2022-05-31</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-07-28 16:05:38" itemprop="dateModified" datetime="2024-07-28T16:05:38+08:00">2024-07-28</time>
+      <time title="修改时间：2024-07-28 20:16:58" itemprop="dateModified" datetime="2024-07-28T20:16:58+08:00">2024-07-28</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -750,17 +377,11 @@ intersections。为了保证更新速度，该数据结构需要支持动态更�
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="环境配置">环境配置</h1>
-<p>发行版为centos 7.6</p>
-<p>现在更新一下环境</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum update -y</span><br></pre></td></tr></table></figure>
-<p>然后查看一下是否有<code>screen</code>和<code>java</code></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">screen -version</span><br><span class="line">java -version</span><br></pre></td></tr></table></figure>
-<p>安装<code>screen</code>和<code>java</code></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">yum install screen</span><br><span class="line">wget https://download.oracle.com/java/17/latest/jdk-17_linux-x64_bin.rpm</span><br><span class="line">rpm -i jdk-17_linux-x64_bin.rpm</span><br></pre></td></tr></table></figure>
+          <p>在大多数操作系统中，操作系统内核负责管理物理内存和虚拟内存。应用程序通常与虚拟内存进行交互，而不是直接与物理内存交互。这意味着，当你在程序中申请内存时（例如，使用C/C++中的<code>malloc</code>或<code>new</code>），你实际上是在申请虚拟内存空间。操作系统负责将这些虚拟内存映射到物理内存上，而且这种映射是动态的，可以发生改变。如果需要，操作系统会将不活跃的内存页交换（swap）到磁盘上。</p>
+<p>尽管直接控制物理内存不是通常程序所做的，但在某些特定场景下，如需要确保数据处理的实时性，避免交换带来的延迟，你可能希望申请的内存常驻物理内存。在Linux系统中，可以通过以下几种方式来实现：</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2022/05/31/linux/minecraft_server/#more" rel="contents">
+              <a class="btn" href="/2023/06/27/linux/%E5%B0%86%E5%86%85%E5%AD%98%E9%94%81%E5%AE%9A%E5%9C%A8%E7%89%A9%E7%90%86%E5%86%85%E5%AD%98/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -791,7 +412,7 @@ intersections。为了保证更新速度，该数据结构需要支持动态更�
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/05/31/cpp/std-list%E8%AF%A6%E8%A7%A3/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/06/27/linux/%E8%BF%9B%E7%A8%8B%E9%97%B4%E5%90%8C%E6%AD%A5%E7%9A%84%E6%96%B9%E5%BC%8F/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
@@ -809,7 +430,7 @@ intersections。为了保证更新速度，该数据结构需要支持动态更�
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/05/31/cpp/std-list%E8%AF%A6%E8%A7%A3/" class="post-title-link" itemprop="url">std::list详解</a>
+          <a href="/2023/06/27/linux/%E8%BF%9B%E7%A8%8B%E9%97%B4%E5%90%8C%E6%AD%A5%E7%9A%84%E6%96%B9%E5%BC%8F/" class="post-title-link" itemprop="url">进程间同步的方式</a>
         </h2>
 
         <div class="post-meta-container">
@@ -820,14 +441,14 @@ intersections。为了保证更新速度，该数据结构需要支持动态更�
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-05-31 16:31:23" itemprop="dateCreated datePublished" datetime="2022-05-31T16:31:23+08:00">2022-05-31</time>
+      <time title="创建时间：2023-06-27 20:47:24" itemprop="dateCreated datePublished" datetime="2023-06-27T20:47:24+08:00">2023-06-27</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-07-28 15:50:53" itemprop="dateModified" datetime="2024-07-28T15:50:53+08:00">2024-07-28</time>
+      <time title="修改时间：2024-07-28 20:44:53" itemprop="dateModified" datetime="2024-07-28T20:44:53+08:00">2024-07-28</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -835,7 +456,191 @@ intersections。为了保证更新速度，该数据结构需要支持动态更�
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/cpp/" itemprop="url" rel="index"><span itemprop="name">cpp</span></a>
+          <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="管道">管道</h1>
+<p><strong>匿名管道</strong></p>
+<p>如果学过 Linux 命令，那对管道肯定不陌生，Linux 管道使用竖线 |
+连接多个命令，这被称为管道符。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ command1 | command2</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023/06/27/linux/%E8%BF%9B%E7%A8%8B%E9%97%B4%E5%90%8C%E6%AD%A5%E7%9A%84%E6%96%B9%E5%BC%8F/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/06/22/linux/objdum-readelf-ar%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+      <meta itemprop="name" content="singheart">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2023/06/22/linux/objdum-readelf-ar%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/" class="post-title-link" itemprop="url">objdum-readelf-ar简单使用</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-06-22 11:07:08" itemprop="dateCreated datePublished" datetime="2023-06-22T11:07:08+08:00">2023-06-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-06-26 12:43:43" itemprop="dateModified" datetime="2023-06-26T12:43:43+08:00">2023-06-26</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="file">file</h1>
+<p>file能够查看文件的类型</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">singheart@FX504GE:~/Project/assembly$ file libadd.so </span><br><span class="line">libadd.so: ELF 64-bit LSB shared object, x86-64, version 1 (SYSV), dynamically linked, BuildID[sha1]=4f628c334595143b6f98886acebd9f8df5a964fa, not stripped</span><br><span class="line">singheart@FX504GE:~/Project/assembly$ file a.o </span><br><span class="line">a.o: ELF 64-bit LSB relocatable, x86-64, version 1 (SYSV), not stripped</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023/06/22/linux/objdum-readelf-ar%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/06/15/data_structure/IEEE754/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+      <meta itemprop="name" content="singheart">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2023/06/15/data_structure/IEEE754/" class="post-title-link" itemprop="url">IEEE754</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2023-06-15 15:07:37 / 修改时间：20:17:09" itemprop="dateCreated datePublished" datetime="2023-06-15T15:07:37+08:00">2023-06-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/data-structure/" itemprop="url" rel="index"><span itemprop="name">data_structure</span></a>
         </span>
     </span>
 
@@ -850,20 +655,22 @@ intersections。为了保证更新速度，该数据结构需要支持动态更�
     
     <div class="post-body" itemprop="articleBody">
           <blockquote>
-<p>本文转载自<a
-target="_blank" rel="noopener" href="https://blog.csdn.net/u014779536/article/details/111301635">CSDN超级大洋葱806</a></p>
+<p>转载自<a target="_blank" rel="noopener" href="https://blog.csdn.net/gao_zhennan/article/details/120717424#t8">https://blog.csdn.net/gao_zhennan/article/details/120717424#t8</a></p>
 </blockquote>
-<h1 id="stdlist简介">std::list简介</h1>
+<h1 id="x01-浮点数在内存中的存储方式">0x01 浮点数在内存中的存储方式</h1>
+<h2 id="什么是ieee754标准">1、什么是IEEE754标准</h2>
+<p>我们知道, 计算机内部实际上只能存储或识别二进制.</p>
+<p>在计算机中, 我们日常所使用的文档, 图片, 数字等, 在储存时,
+实际上都要以二进制的形式存放在内存或硬盘中,
+内存或硬盘就好像是一个被划分为许多小格子的容器,
+其中每个小格子都只能盛放0或1...</p>
 <figure>
-<img src="http://img.singhe.art/std::lilst.jpeg" alt="img" />
+<img src="https://pic3.zhimg.com/v2-01aebebb171185b9d1eb1de7bca6d3ca_b.jpg" alt="img">
 <figcaption aria-hidden="true">img</figcaption>
 </figure>
-<p><code>std::list</code>的定义在头文件<code>&lt;list&gt;</code>中。</p>
-<p>模板类list是一个容器，list是由双向链表来实现的，每个节点存储1个元素。list支持前后两种移动方向。</p>
-<p>优势： 任何位置执行插入和删除动作都非常快。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2022/05/31/cpp/std-list%E8%AF%A6%E8%A7%A3/#more" rel="contents">
+              <a class="btn" href="/2023/06/15/data_structure/IEEE754/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -894,7 +701,7 @@ target="_blank" rel="noopener" href="https://blog.csdn.net/u014779536/article/de
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/05/31/cpp/explicit%E5%85%B3%E9%94%AE%E5%AD%97/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/06/13/linux/%E4%BB%8E%E7%99%BE%E8%8D%89%E5%9B%AD%E5%88%B0%E4%B8%89%E5%91%B3%E4%B9%A6%E5%B1%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
@@ -912,7 +719,7 @@ target="_blank" rel="noopener" href="https://blog.csdn.net/u014779536/article/de
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/05/31/cpp/explicit%E5%85%B3%E9%94%AE%E5%AD%97/" class="post-title-link" itemprop="url">explicit关键字</a>
+          <a href="/2023/06/13/linux/%E4%BB%8E%E7%99%BE%E8%8D%89%E5%9B%AD%E5%88%B0%E4%B8%89%E5%91%B3%E4%B9%A6%E5%B1%8B/" class="post-title-link" itemprop="url">从百草园到三味书屋</a>
         </h2>
 
         <div class="post-meta-container">
@@ -923,14 +730,14 @@ target="_blank" rel="noopener" href="https://blog.csdn.net/u014779536/article/de
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-05-31 11:33:07" itemprop="dateCreated datePublished" datetime="2022-05-31T11:33:07+08:00">2022-05-31</time>
+      <time title="创建时间：2023-06-13 20:07:32" itemprop="dateCreated datePublished" datetime="2023-06-13T20:07:32+08:00">2023-06-13</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-07-28 15:49:37" itemprop="dateModified" datetime="2024-07-28T15:49:37+08:00">2024-07-28</time>
+      <time title="修改时间：2024-07-28 16:21:04" itemprop="dateModified" datetime="2024-07-28T16:21:04+08:00">2024-07-28</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -938,7 +745,7 @@ target="_blank" rel="noopener" href="https://blog.csdn.net/u014779536/article/de
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/cpp/" itemprop="url" rel="index"><span itemprop="name">cpp</span></a>
+          <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
         </span>
     </span>
 
@@ -952,14 +759,11 @@ target="_blank" rel="noopener" href="https://blog.csdn.net/u014779536/article/de
     
     
     <div class="post-body" itemprop="articleBody">
-          <blockquote>
-<p>本文参考自<a
-target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/137947734">知乎</a></p>
-</blockquote>
-<p>C++中explicit常用于构造函数前，防止因隐式转换而导致错误的发生。本文将通过构造函数带有和不带有explicit两个例子，从而说明explicit的作用</p>
+          <h1 id="x00-引言">0x00 引言</h1>
+<p>最近看论文看到使用SIMD指令加速，从指令集到AT&amp;T汇编再到linux系统调用一路折腾，这里就做一个小小的记录。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2022/05/31/cpp/explicit%E5%85%B3%E9%94%AE%E5%AD%97/#more" rel="contents">
+              <a class="btn" href="/2023/06/13/linux/%E4%BB%8E%E7%99%BE%E8%8D%89%E5%9B%AD%E5%88%B0%E4%B8%89%E5%91%B3%E4%B9%A6%E5%B1%8B/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -990,7 +794,7 @@ target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/137947734">知
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/04/18/openGauss/opengauss%E4%B9%8Bfile-fdw%E5%AE%9E%E8%B7%B5/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/06/11/rust/rust-c-call-each-other/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
@@ -1008,7 +812,7 @@ target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/137947734">知
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/04/18/openGauss/opengauss%E4%B9%8Bfile-fdw%E5%AE%9E%E8%B7%B5/" class="post-title-link" itemprop="url">opengauss之file-fdw实践</a>
+          <a href="/2023/06/11/rust/rust-c-call-each-other/" class="post-title-link" itemprop="url">rust-c-call-each-other</a>
         </h2>
 
         <div class="post-meta-container">
@@ -1019,14 +823,14 @@ target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/137947734">知
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-04-18 10:28:40" itemprop="dateCreated datePublished" datetime="2022-04-18T10:28:40+08:00">2022-04-18</time>
+      <time title="创建时间：2023-06-11 17:56:21" itemprop="dateCreated datePublished" datetime="2023-06-11T17:56:21+08:00">2023-06-11</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-02-17 10:21:22" itemprop="dateModified" datetime="2023-02-17T10:21:22+08:00">2023-02-17</time>
+      <time title="修改时间：2024-07-28 20:04:29" itemprop="dateModified" datetime="2024-07-28T20:04:29+08:00">2024-07-28</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1034,7 +838,7 @@ target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/137947734">知
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/openGauss/" itemprop="url" rel="index"><span itemprop="name">openGauss</span></a>
+          <a href="/categories/rust/" itemprop="url" rel="index"><span itemprop="name">rust</span></a>
         </span>
     </span>
 
@@ -1048,16 +852,15 @@ target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/137947734">知
     
     
     <div class="post-body" itemprop="articleBody">
-          <blockquote>
-<p>本文转载自<a
-target="_blank" rel="noopener" href="https://blog.csdn.net/penriver/article/details/122260524">CSDN-架构师忠哥</a></p>
+          <h1 id="rust调用c语言代码">Rust调用C语言代码</h1>
+<blockquote>
+<p>参考自<a
+target="_blank" rel="noopener" href="https://blog.csdn.net/phthon1997/article/details/126469708">https://blog.csdn.net/phthon1997/article/details/126469708</a></p>
 </blockquote>
-<h1 id="file_fdw介绍">file_fdw介绍</h1>
-<p><code>fdw (Foreign Data Wrapper)</code>是一种外部访问接口，被用来访问存储在数据库外部的数据，这些数据可以是外部的pg数据库，也可以<code>oracle</code>、<code>mysql</code>等数据库，甚至可以是文件。</p>
-<p>本文讲解如何通过<code>file_fdw</code>，访问外部的数据文件</p>
+<h2 id="创建项目">创建项目</h2>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2022/04/18/openGauss/opengauss%E4%B9%8Bfile-fdw%E5%AE%9E%E8%B7%B5/#more" rel="contents">
+              <a class="btn" href="/2023/06/11/rust/rust-c-call-each-other/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -1088,7 +891,7 @@ target="_blank" rel="noopener" href="https://blog.csdn.net/penriver/article/deta
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/04/10/linux/tar%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/06/09/linux/false-sharing/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
@@ -1106,7 +909,7 @@ target="_blank" rel="noopener" href="https://blog.csdn.net/penriver/article/deta
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/04/10/linux/tar%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/" class="post-title-link" itemprop="url">tar使用总结</a>
+          <a href="/2023/06/09/linux/false-sharing/" class="post-title-link" itemprop="url">false sharing</a>
         </h2>
 
         <div class="post-meta-container">
@@ -1117,14 +920,14 @@ target="_blank" rel="noopener" href="https://blog.csdn.net/penriver/article/deta
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-04-10 13:21:23" itemprop="dateCreated datePublished" datetime="2022-04-10T13:21:23+08:00">2022-04-10</time>
+      <time title="创建时间：2023-06-09 20:10:45" itemprop="dateCreated datePublished" datetime="2023-06-09T20:10:45+08:00">2023-06-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-02-17 10:21:22" itemprop="dateModified" datetime="2023-02-17T10:21:22+08:00">2023-02-17</time>
+      <time title="修改时间：2023-06-11 17:55:42" itemprop="dateModified" datetime="2023-06-11T17:55:42+08:00">2023-06-11</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1147,16 +950,323 @@ target="_blank" rel="noopener" href="https://blog.csdn.net/penriver/article/deta
     
     <div class="post-body" itemprop="articleBody">
           <blockquote>
-<p>tar是归档文件，.bz2或者.gzip是压缩格式。 # 1. 解压&amp;提取 ## 1.1
-对于tar.gz结尾的压缩包 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -zxvf *.tar.gz</span><br></pre></td></tr></table></figure> 参数解读 -
-<code>-z</code>:使用gzip来处理压缩包。 -
-<code>-x</code>:extract，提取文件。 -
-<code>-v</code>:verbose，显示提取细节 -
-<code>f</code>:file，指定文件</p>
+<p>本文转载自<a
+target="_blank" rel="noopener" href="https://blog.csdn.net/qq_28119741/article/details/102815659">https://blog.csdn.net/qq_28119741/article/details/102815659</a></p>
 </blockquote>
+<h1 id="什么是false-sharing">什么是false sharing</h1>
+<p>这里需要解决这几个问题</p>
+<p>（1）什么是cpu缓存行</p>
+<p>（2）什么是内存屏障</p>
+<p>（3）什么是伪共享</p>
+<p>（4）如何避免伪共享</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2022/04/10/linux/tar%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/#more" rel="contents">
+              <a class="btn" href="/2023/06/09/linux/false-sharing/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/06/07/database/multi-clock-snapshot-isolation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+      <meta itemprop="name" content="singheart">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2023/06/07/database/multi-clock-snapshot-isolation/" class="post-title-link" itemprop="url">multi-clock snapshot isolation</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-06-07 11:07:01" itemprop="dateCreated datePublished" datetime="2023-06-07T11:07:01+08:00">2023-06-07</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-07-28 16:12:08" itemprop="dateModified" datetime="2024-07-28T16:12:08+08:00">2024-07-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/database/" itemprop="url" rel="index"><span itemprop="name">database</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="section"></h1>
+<h1 id="motivatione">Motivatione</h1>
+<p>a previous single-layer NVM database N2DB[14] used the snapshot
+isolation from PostgreSQL[17]. Its snapshot generation process involves
+taking a lock and scanning a global active transaction list, which
+blocks concurrent transactions and is not scalable</p>
+<h1 id="background">Background</h1>
+<h2 id="concurrency-control-for-nvm-databases">2.3 Concurrency control
+for NVM databases</h2>
+<p>The snapshot isolation concurrency control implementation used in
+traditional MVCC databases is not well suited for NVM because of two
+reasons. (1) The concurrency control implementations of traditional
+databases mainly focus on their in-memory part without discussing
+durability and crash consistency. They leave those to another dedicated
+recovery protocol, such as ARIES or write-ahead logging. The situation
+is different in NVM databases because a single copy of data is used for
+both runtime access and durability. Ensuring crash consistency should
+unavoidably be part of the concurrency control itself. (2) Concurrency
+control methods from a two-layer architecture have suboptimal
+performance when directly applied to a single-layer NVM database.
+FOEDUS[28] points out that centralized components, such as lock manager
+and logs in traditional concurrency control implementations, will cause
+performance bottlenecks in a multicore NVM database. A previous NVM
+database N2DB[14] adopted the concurrency control from PostgreSQL[17] to
+implement snapshot isolation. The concurrency control scheme from
+PostgreSQL uses the currently completed transactions in the system to
+represent a snapshot. When generating a snapshot, it has to take a lock
+and scan the global active transaction list. This approach blocks
+concurrent transactions and is not scalable. N2DB also adopted the
+commit log in NVM to persistently store transaction status for crash
+consistency. The commit log is an array-like structure and is
+write-shared by all threads, which limits its scalability. Zen[29] also
+points out that traditional concurrency control methods often need to
+modify the tuple metadata not only by tuple writes but also by tuple
+reads, which incurs expensive NVM writes.</p>
+<h1 id="multi-clock-concurrency-control">Multi-Clock Concurrency
+Control</h1>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/05/31/cpp/getopt/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+      <meta itemprop="name" content="singheart">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2023/05/31/cpp/getopt/" class="post-title-link" itemprop="url">getopt详解</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2023-05-31 11:54:23 / 修改时间：12:01:03" itemprop="dateCreated datePublished" datetime="2023-05-31T11:54:23+08:00">2023-05-31</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/cpp/" itemprop="url" rel="index"><span itemprop="name">cpp</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <blockquote>
+<p>转载自<a
+target="_blank" rel="noopener" href="https://blog.csdn.net/c1523456/article/details/79173776#commentBox">csdn</a></p>
+</blockquote>
+<h1 id="简介">简介</h1>
+<p>getopt函数是命令行参数解析函数，在头文件<code>getopt.h</code>中，这里对齐用法做一个简单的介绍。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023/05/31/cpp/getopt/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/05/31/cpp/glog_learn/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+      <meta itemprop="name" content="singheart">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2023/05/31/cpp/glog_learn/" class="post-title-link" itemprop="url">glog</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-05-31 11:54:23" itemprop="dateCreated datePublished" datetime="2023-05-31T11:54:23+08:00">2023-05-31</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-06-11 17:55:42" itemprop="dateModified" datetime="2023-06-11T17:55:42+08:00">2023-06-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/cpp/" itemprop="url" rel="index"><span itemprop="name">cpp</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="glog">glog</h1>
+<p>glog是谷歌开源的C++日志库，这里对glog进行一个简单的学习记录。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023/05/31/cpp/glog_learn/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -1180,7 +1290,7 @@ target="_blank" rel="noopener" href="https://blog.csdn.net/penriver/article/deta
 
 
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 </div>
@@ -1243,7 +1353,7 @@ target="_blank" rel="noopener" href="https://blog.csdn.net/penriver/article/deta
 
   
 
-  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
 <script src="/js/third-party/math/mathjax.js"></script>
 
 
