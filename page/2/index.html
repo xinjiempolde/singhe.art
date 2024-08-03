@@ -153,7 +153,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">74</span>
+          <span class="site-state-item-count">71</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -198,540 +198,6 @@
 
 
     <div class="main-inner index posts-expand">
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/07/28/rust/rust%E4%B8%ADArc%E5%92%8CMutex/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
-      <meta itemprop="name" content="singheart">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="singheart's blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | singheart's blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/07/28/rust/rust%E4%B8%ADArc%E5%92%8CMutex/" class="post-title-link" itemprop="url">rust中ARC和Mutex</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-      
-
-      <time title="创建时间：2024-07-28 20:04:21 / 修改时间：20:14:02" itemprop="dateCreated datePublished" datetime="2024-07-28T20:04:21+08:00">2024-07-28</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/rust/" itemprop="url" rel="index"><span itemprop="name">rust</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>简单地来说，Arc就是为了让变量能够再线程间共享，可以通过clone(并不会真正地深拷贝)的方式将数据的所有权给其他线程。但是如果数据要在多个线程之间修改的话，为了保证一致性，需要上锁，可供选择的方式有Mutex和RwLock等等。</p>
-<p>RwLock.write()返回的是一个RwLockWriteGuard，我们可以解引用访问其内容，也可以通过解引用修改其内容。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/07/28/rust/rust%E6%A8%A1%E5%9D%97%E7%BB%93%E6%9E%84/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
-      <meta itemprop="name" content="singheart">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="singheart's blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | singheart's blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/07/28/rust/rust%E6%A8%A1%E5%9D%97%E7%BB%93%E6%9E%84/" class="post-title-link" itemprop="url">rust模块结构</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-      
-
-      <time title="创建时间：2024-07-28 20:04:21 / 修改时间：20:10:19" itemprop="dateCreated datePublished" datetime="2024-07-28T20:04:21+08:00">2024-07-28</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/rust/" itemprop="url" rel="index"><span itemprop="name">rust</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <blockquote>
-<p>转载自</p>
-<ul>
-<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/li-peng/p/13587910.html">rust
-模块组织结构 - li-peng - 博客园 (cnblogs.com)</a></li>
-</ul>
-</blockquote>
-<p><code>rust</code>有自己的规则和约定用来组织模块，比如一个包最多可以有一个库<code>crate</code>，任意多个二进制<code>crate</code>、导入文件夹内的模块的两种约定方式...
-知道这些约定，就可以快速了解<code>rust</code>的模块系统。
-先把一些术语说明一下：</p>
-<ul>
-<li><code>包</code>是cargo的一个功能，当执行<code>cargo new xxxx</code>的时候就是创建了一个包。</li>
-<li><code>crate</code>是二进制或者库项目。<code>rust</code>约定在<code>Cargo.toml</code>的同级目录下包含<code>src</code>目录并且包含<code>main.rs</code>文件，就是与包同名的<strong>二进制<code>crate</code></strong>，如果包目录中包含<code>src/lib.rs</code>，就是与包同名的<strong>库<code>crate</code></strong>。包内可以有多<code>crate</code>，多个<code>crates</code>就是一个模块的树形结构。如果一个包内同时包含<code>src/main.rs</code>和<code>src/lib.rs</code>，那么他就有两个<code>crate</code>，如果想有多个二进制<code>crate</code>，<code>rust</code>约定需要将文件放在<code>src/bin</code>目录下，每个文件就是一个单独的<code>crate</code>。</li>
-<li><code>crate根</code>用来描述如何构建<code>crate</code>的文件。比如<code>src/main.rs</code>或者<code>src/lib.rs</code>就是<code>crate根</code>。<strong><code>crate根</code>文件将由<code>Cargo</code>传递给<code>rustc</code>来实际构建库或者二进制项目。</strong></li>
-<li>带有<code>Cargo.toml</code>文件的包用来描述如何构建<code>crate</code>，一个包可以最多有一个库<code>crate</code>，任意多个二进制<code>crate</code>。</li>
-</ul>
-<p><a target="_blank" rel="noopener" href="https://github.com/lpxxn/rust_module">github
-代码地址</a></p>
-<h1 id="模块">模块</h1>
-<p>模块以<code>mod</code>开头，下面创建了一个<code>say</code>模块</p>
-<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">mod</span> say &#123;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hello</span>() &#123;</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;Hello, world!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>需要注意的是模块内，所有的项（函数、方法、结构体、枚举、模块和常量）默认都是私有的，可以用<code>pub</code>将项变为公有，上面的代码里<code>pub fn hello()</code>就是把函数<code>hello()</code>变为公有的。
-子模块可以通过<code>super</code>访问父模块中所有的代码，包括私有代码。但是父模块中的代码不能访问子模块中的私有代码。</p>
-<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">mod</span> say &#123;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hello</span>() &#123;</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;Hello, world!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">fn</span> <span class="title function_">hello_2</span>() &#123;</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;hello&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">mod</span> hi &#123;</span><br><span class="line">        <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hi_1</span>() &#123;</span><br><span class="line">            super::<span class="title function_ invoke__">hello_2</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hi_2</span>() &#123;</span><br><span class="line">            <span class="built_in">println!</span>(<span class="string">&quot;hi there&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="同一文件内的模块">同一文件内的模块</h2>
-<p>同一文件内的模块，最外层的<code>mod say</code>不用设置为<code>pub</code>就可以访问，但是<code>mod say</code>下面的要设置成<code>pub</code>才可以访问。</p>
-<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">fn</span> <span class="title function_">main</span>() &#123;</span><br><span class="line">    <span class="comment">// 相对路径</span></span><br><span class="line">    say::<span class="title function_ invoke__">hello</span>();</span><br><span class="line">    <span class="comment">// 绝对路径调用</span></span><br><span class="line">    crate::say::<span class="title function_ invoke__">hello</span>();</span><br><span class="line">    </span><br><span class="line">    say::hi::<span class="title function_ invoke__">hi_1</span>();</span><br><span class="line">    say::hi::<span class="title function_ invoke__">hi_2</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">mod</span> say &#123;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hello</span>() &#123;</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;Hello, world!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">fn</span> <span class="title function_">hello_2</span>() &#123;</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;hello&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">mod</span> hi &#123;</span><br><span class="line">        <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hi_1</span>() &#123;</span><br><span class="line">            super::<span class="title function_ invoke__">hello_2</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hi_2</span>() &#123;</span><br><span class="line">            <span class="built_in">println!</span>(<span class="string">&quot;hi there&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>调用模块内的方法，可以使用绝对路径以<code>crate</code>开头，也就是从<code>crate根</code>开始查找，<code>say</code>模块定义在<code>crate根 src/main.rs</code>中，所以就可以这么调用<code>crate::say::hello();</code>绝对路径类似于<code>Shell</code>中使用<code>/</code>从文件系统根开始查找文件。
-相对路径以模块名开始<code>say</code>，他定义于<code>main()</code>函数相同的模块中，类似<code>Shell</code>在当前目录开始查找指定文件<code>say/hello</code>。</p>
-<p><code>mod hi</code>是一个嵌套模块，使用时要写比较长<code>say::hi::hi_2();</code>，可以使用<code>use</code>将名称引入作用域。</p>
-<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> crate::say::hi;</span><br><span class="line"></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">main</span>() &#123;</span><br><span class="line">    <span class="comment">// 相对路径</span></span><br><span class="line">    say::<span class="title function_ invoke__">hello</span>();</span><br><span class="line">    <span class="comment">// 绝对路径调用</span></span><br><span class="line">    crate::say::<span class="title function_ invoke__">hello</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 不使用 use</span></span><br><span class="line">    say::hi::<span class="title function_ invoke__">hi_1</span>();</span><br><span class="line">    say::hi::<span class="title function_ invoke__">hi_2</span>();</span><br><span class="line">    <span class="comment">// 使用 use 后就可以这么调用</span></span><br><span class="line">    hi::<span class="title function_ invoke__">hi_1</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="使用pub-use-重导出名称">使用<code>pub use</code> 重导出名称</h2>
-<p>不同的模块之前使用<code>use</code>引入，默认也是私有的。如果希望调用的模块内<code>use</code>引用的模块，就要用<code>pub</code>公开，也叫<strong>重导出</strong></p>
-<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">fn</span> <span class="title function_">main</span>() &#123;</span><br><span class="line">    <span class="comment">// 重导出名称</span></span><br><span class="line">    people::hi::<span class="title function_ invoke__">hi_1</span>();</span><br><span class="line">    people::<span class="title function_ invoke__">hello</span>();</span><br><span class="line">    <span class="comment">// 但是不能 </span></span><br><span class="line">    <span class="comment">// people::say::hello();</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">mod</span> say &#123;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hello</span>() &#123;</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;Hello, world!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">fn</span> <span class="title function_">hello_2</span>() &#123;</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;hello&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">mod</span> hi &#123;</span><br><span class="line">        <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hi_1</span>() &#123;</span><br><span class="line">            super::<span class="title function_ invoke__">hello_2</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hi_2</span>() &#123;</span><br><span class="line">            <span class="built_in">println!</span>(<span class="string">&quot;hi there&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">mod</span> people &#123;</span><br><span class="line">    <span class="comment">// 重导出名称</span></span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">use</span> crate::say::hi;</span><br><span class="line">    <span class="keyword">use</span> crate::say;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hello</span>() &#123;</span><br><span class="line">        say::<span class="title function_ invoke__">hello</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>如果想都导出自己和嵌入的指定包可以用<code>self</code>，例<code>mod people_2</code>
-把模块<code>people</code>和嵌套模块<code>info</code>全部导出来了。</p>
-<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> crate::say::hi;</span><br><span class="line"></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">main</span>() &#123;</span><br><span class="line">    <span class="comment">// 相对路径</span></span><br><span class="line">    say::<span class="title function_ invoke__">hello</span>();</span><br><span class="line">    <span class="comment">// 绝对路径调用</span></span><br><span class="line">    crate::say::<span class="title function_ invoke__">hello</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 不使用 use</span></span><br><span class="line">    say::hi::<span class="title function_ invoke__">hi_1</span>();</span><br><span class="line">    say::hi::<span class="title function_ invoke__">hi_2</span>();</span><br><span class="line">    <span class="comment">// 使用 use 后就可以这么调用</span></span><br><span class="line">    hi::<span class="title function_ invoke__">hi_1</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 重导出名称</span></span><br><span class="line">    people::hi::<span class="title function_ invoke__">hi_1</span>();</span><br><span class="line">    people::<span class="title function_ invoke__">hello</span>();</span><br><span class="line">    <span class="comment">// 但是不能 </span></span><br><span class="line">    <span class="comment">// people::say::hello();</span></span><br><span class="line"></span><br><span class="line">    people_2::people::<span class="title function_ invoke__">hello</span>();</span><br><span class="line">    people_2::info::<span class="title function_ invoke__">name</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">mod</span> say &#123;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hello</span>() &#123;</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;Hello, world!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">fn</span> <span class="title function_">hello_2</span>() &#123;</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;hello&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">mod</span> hi &#123;</span><br><span class="line">        <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hi_1</span>() &#123;</span><br><span class="line">            super::<span class="title function_ invoke__">hello_2</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hi_2</span>() &#123;</span><br><span class="line">            <span class="built_in">println!</span>(<span class="string">&quot;hi there&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">mod</span> people &#123;</span><br><span class="line">    <span class="comment">// 重导出名称</span></span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">use</span> crate::say::hi;</span><br><span class="line">    <span class="keyword">use</span> crate::say;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hello</span>() &#123;</span><br><span class="line">        say::<span class="title function_ invoke__">hello</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">mod</span> info &#123;</span><br><span class="line">        <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">name</span>() &#123;</span><br><span class="line">            <span class="built_in">println!</span>(<span class="string">&quot;zhangsang&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">mod</span> people_2 &#123;</span><br><span class="line">    <span class="comment">// 重导出名称</span></span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">use</span> crate::people::&#123;<span class="keyword">self</span>, info&#125;;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hello</span>() &#123;</span><br><span class="line">        info::<span class="title function_ invoke__">name</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h1 id="不同文件夹的引用">不同文件夹的引用</h1>
-<h2 id="方式一">方式一</h2>
-<p>看一下目录结构： <img
-src="https://img2020.cnblogs.com/blog/342595/202008/342595-20200831092952337-240410311.png"
-alt="img" />
-<code>rust</code>的约定，在目录下使用<code>mod.rs</code>将模块导出。
-看一下user.rs的代码：</p>
-<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#[derive(Debug)]</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">struct</span> <span class="title class_">User</span> &#123;</span><br><span class="line">    name: <span class="type">String</span>,</span><br><span class="line">    age: <span class="type">i32</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">impl</span> <span class="title class_">User</span> &#123;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">new_user</span>(name: <span class="type">String</span>, age: <span class="type">i32</span>) <span class="punctuation">-&gt;</span> User &#123;</span><br><span class="line">        User&#123;</span><br><span class="line">            name,</span><br><span class="line">            age</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">name</span>(&amp;<span class="keyword">self</span>) <span class="punctuation">-&gt;</span> &amp;<span class="type">str</span> &#123;</span><br><span class="line">        &amp;<span class="keyword">self</span>.name</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">add</span>(x: <span class="type">i32</span>, y: <span class="type">i32</span>) <span class="punctuation">-&gt;</span> <span class="type">i32</span> &#123;</span><br><span class="line">    x + y </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>然后在<code>mod.rs</code>里导出：</p>
-<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">mod</span> user;</span><br></pre></td></tr></table></figure>
-<p>在<code>main.rs</code>调用</p>
-<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">mod</span> user_info;</span><br><span class="line"><span class="keyword">use</span> user_info::user::User;</span><br><span class="line"></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">main</span>() &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">u1</span> = User::<span class="title function_ invoke__">new_user</span>(<span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;tom&quot;</span>), <span class="number">5</span>);</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">&quot;user name: &#123;&#125;&quot;</span>, u1.<span class="title function_ invoke__">name</span>());</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">&quot;1+2: &#123;&#125;&quot;</span>, user_info::user::<span class="title function_ invoke__">add</span>(<span class="number">1</span>, <span class="number">2</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="方式二">方式二</h2>
-<p>看一下目录结构 <img
-src="https://img2020.cnblogs.com/blog/342595/202008/342595-20200831093032927-706165161.png"
-alt="img" />
-和上面的不同之前是。这种方式是<code>user_info</code>目录里没有<code>mod.rs</code>，但是在外面有一个<code>user_info.rs</code>
-在<code>user_info.rs</code>中使用<code>pub mod user;</code>是告诉<code>Rust</code>在另一个与模块同名的文件夹内(user_info文件夹)内加载模块<code>user</code>。这也是<code>rust</code>的一个约定，但比较推荐用上面的方式。
-代码和上面是一样的。 user.rs</p>
-<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#[derive(Debug)]</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">struct</span> <span class="title class_">User</span> &#123;</span><br><span class="line">    name: <span class="type">String</span>,</span><br><span class="line">    age: <span class="type">i32</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">impl</span> <span class="title class_">User</span> &#123;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">new_user</span>(name: <span class="type">String</span>, age: <span class="type">i32</span>) <span class="punctuation">-&gt;</span> User &#123;</span><br><span class="line">        User&#123;</span><br><span class="line">            name,</span><br><span class="line">            age</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">name</span>(&amp;<span class="keyword">self</span>) <span class="punctuation">-&gt;</span> &amp;<span class="type">str</span> &#123;</span><br><span class="line">        &amp;<span class="keyword">self</span>.name</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">add</span>(x: <span class="type">i32</span>, y: <span class="type">i32</span>) <span class="punctuation">-&gt;</span> <span class="type">i32</span> &#123;</span><br><span class="line">    x + y </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>user_info.rs里导出</p>
-<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">mod</span> user;</span><br></pre></td></tr></table></figure>
-<p>在<code>main.rs</code>调用</p>
-<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">mod</span> user_info;</span><br><span class="line"><span class="keyword">use</span> user_info::user::User;</span><br><span class="line"></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">main</span>() &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">u1</span> = User::<span class="title function_ invoke__">new_user</span>(<span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;tom&quot;</span>), <span class="number">5</span>);</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">&quot;user name: &#123;&#125;&quot;</span>, u1.<span class="title function_ invoke__">name</span>());</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">&quot;1+2: &#123;&#125;&quot;</span>, user_info::user::<span class="title function_ invoke__">add</span>(<span class="number">1</span>, <span class="number">2</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h1 id="使用外部包">使用外部包</h1>
-<p>使用外部包，一般就是从<code>crates.io</code>下载，当然也可以自己指写下载地点，或者使用我们本地的库，或者自建的的仓库。</p>
-<h2 id="一般方式">一般方式</h2>
-<p>在<code>Cargo.toml</code>的<code>dependencies</code>下写要导入的依赖库</p>
-<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[dependencies]</span></span><br><span class="line"><span class="attr">regex</span> = <span class="string">&quot;0.1.41&quot;</span></span><br></pre></td></tr></table></figure>
-<p>运行<code>cargo build</code>会从<code>crates.io</code>下载依赖库。
-使用的时候，直接使用<code>use</code>引入</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">use regex::Regex;</span><br><span class="line"></span><br><span class="line">fn main() &#123;</span><br><span class="line">    let re = Regex::new(<span class="string">r&quot;^\d&#123;4&#125;-\d&#123;2&#125;-\d&#123;2&#125;$&quot;</span>).unwrap();</span><br><span class="line">    println!(<span class="string">&quot;Did our date match? &#123;&#125;&quot;</span>, re.is_match(<span class="string">&quot;2014-01-01&quot;</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="指定库地址">指定库地址</h2>
-<p>除了<code>crates.io</code>下载依赖库，也可以自己指定地址，也可以指定<code>branch</code>
-<code>tag</code> <code>commit</code>，比如下面这个</p>
-<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[dependencies]</span></span><br><span class="line"><span class="comment"># 可以和包不同名，也可以同名</span></span><br><span class="line"><span class="attr">my_rust_lib_1</span>=&#123;package=<span class="string">&quot;my_lib_1&quot;</span>,git=<span class="string">&quot;ssh://git@github.com/lpxxn/my_rust_lib_1.git&quot;</span>,tag=<span class="string">&quot;v0.0.2&quot;</span>&#125;</span><br></pre></td></tr></table></figure>
-<p>就是从<code>github.com/lpxxn/my_rust_lib_1</code>上下载包。也可以使用<code>https</code></p>
-<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">my_rust_lib_1</span>=&#123;package=<span class="string">&quot;my_lib_1&quot;</span>,git=<span class="string">&quot;https://github.com/lpxxn/my_rust_lib_1.git&quot;</span>,branch=<span class="string">&quot;master&quot;</span>&#125;</span><br></pre></td></tr></table></figure>
-<p>执行<code>cargo build</code>就会自动下载，使用的时候也是一样的。</p>
-<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> my_rust_lib_1;</span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">main</span>() &#123;</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">&quot;Hello, world!&quot;</span>);</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, my_rust_lib_1::<span class="title function_ invoke__">add</span>(<span class="number">1</span>, <span class="number">2</span>));</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">u</span> = my_rust_lib_1::User::<span class="title function_ invoke__">new_user</span>(<span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;tom&quot;</span>), <span class="number">2</span>);</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">&quot;user: &#123;:#?&#125;&quot;</span>, u);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="使用本地的库">使用本地的库</h2>
-<p>我们新建一个二进制库项目</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cargo <span class="keyword">new</span> pkg_demo_3</span><br></pre></td></tr></table></figure>
-<p>然后在<code>pkg_demo_3</code>内建一个库项目</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cargo <span class="keyword">new</span> <span class="comment">--lib utils</span></span><br></pre></td></tr></table></figure>
-<p>然后就可以在 <code>utils</code>里写我们的库代码了
-看一下现在的目录结构 <img
-src="https://img2020.cnblogs.com/blog/342595/202008/342595-20200831093104024-66370552.png"
-alt="img" />
-在<code>utils</code>库的<code>user.rs</code>里还是我们上面的代码</p>
-<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#[derive(Debug)]</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">struct</span> <span class="title class_">User</span> &#123;</span><br><span class="line">    name: <span class="type">String</span>,</span><br><span class="line">    age: <span class="type">i32</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">impl</span> <span class="title class_">User</span> &#123;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">new_user</span>(name: <span class="type">String</span>, age: <span class="type">i32</span>) <span class="punctuation">-&gt;</span> User &#123;</span><br><span class="line">        User&#123;</span><br><span class="line">            name,</span><br><span class="line">            age</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">name</span>(&amp;<span class="keyword">self</span>) <span class="punctuation">-&gt;</span> &amp;<span class="type">str</span> &#123;</span><br><span class="line">        &amp;<span class="keyword">self</span>.name</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">add</span>(x: <span class="type">i32</span>, y: <span class="type">i32</span>) <span class="punctuation">-&gt;</span> <span class="type">i32</span> &#123;</span><br><span class="line">    x + y </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>在<code>lib.rs</code>里对<code>user</code>模块导出</p>
-<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">mod</span> user;</span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">use</span> user::User;</span><br></pre></td></tr></table></figure>
-<p>然后在我们的二进制库的<code>Cargo.toml</code>引入库</p>
-<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[dependencies]</span></span><br><span class="line"><span class="attr">utils</span> = &#123; path = <span class="string">&quot;utils&quot;</span>, version = <span class="string">&quot;0.1.0&quot;</span> &#125;</span><br></pre></td></tr></table></figure>
-<p><code>path</code>就是库项目的路径
-<code>main.rs</code>使用<code>use</code>引入就可以使用了</p>
-<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> utils::User;</span><br><span class="line"></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">main</span>() &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">u</span> = User::<span class="title function_ invoke__">new_user</span>(<span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;tom&quot;</span>), <span class="number">5</span>);</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">&quot;user: &#123;:#?&#125;&quot;</span>, u);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="自建私有库">自建私有库</h2>
-<p>除了<code>crates.io</code>也可以自建<code>registrie</code>。这个有时间再重新写一篇帖子单独说，可以先看一下官方文档。
-<a
-target="_blank" rel="noopener" href="https://doc.rust-lang.org/cargo/reference/registries.html#registries">官方文档:registrie</a>
-<a
-target="_blank" rel="noopener" href="https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html">依赖官方文档</a>
-<a target="_blank" rel="noopener" href="https://github.com/lpxxn/rust_module">帖子 github
-代码地址</a></p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/07/28/rust/rust%E8%87%AA%E5%BC%95%E7%94%A8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
-      <meta itemprop="name" content="singheart">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="singheart's blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | singheart's blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/07/28/rust/rust%E8%87%AA%E5%BC%95%E7%94%A8/" class="post-title-link" itemprop="url">rust自引用</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-      
-
-      <time title="创建时间：2024-07-28 20:04:21 / 修改时间：20:09:07" itemprop="dateCreated datePublished" datetime="2024-07-28T20:04:21+08:00">2024-07-28</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/rust/" itemprop="url" rel="index"><span itemprop="name">rust</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <blockquote>
-<p>参考：</p>
-<ul>
-<li><a
-target="_blank" rel="noopener" href="https://rust.e.lntu.edu.cn/rust-course/advance/circle-self-ref/self-referential.html">结构体中的自引用
-- Rust语言圣经(Rust Course) (lntu.edu.cn)</a></li>
-</ul>
-</blockquote>
-<p>什么是自引用，如下面代码所示：</p>
-<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">SelfRef</span>&lt;<span class="symbol">&#x27;a</span>&gt; &#123;</span><br><span class="line">    value: <span class="type">String</span>,</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 该引用指向上面的value</span></span><br><span class="line">    pointer_to_value: &amp;<span class="symbol">&#x27;a</span> <span class="type">str</span>,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">main</span>()&#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">s</span> = <span class="string">&quot;aaa&quot;</span>.<span class="title function_ invoke__">to_string</span>();</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">v</span> = SelfRef &#123;</span><br><span class="line">        value: s,</span><br><span class="line">        pointer_to_value: &amp;s</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2024/07/28/rust/rust%E8%87%AA%E5%BC%95%E7%94%A8/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/07/28/cpp/C++%E5%90%8D%E7%A7%B0%E4%BF%AE%E9%A5%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
-      <meta itemprop="name" content="singheart">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="singheart's blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | singheart's blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/07/28/cpp/C++%E5%90%8D%E7%A7%B0%E4%BF%AE%E9%A5%B0/" class="post-title-link" itemprop="url">C++名称修饰</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-      
-
-      <time title="创建时间：2024-07-28 19:49:11 / 修改时间：20:06:18" itemprop="dateCreated datePublished" datetime="2024-07-28T19:49:11+08:00">2024-07-28</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/cpp/" itemprop="url" rel="index"><span itemprop="name">cpp</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <figure>
-<img src="https://img.singhe.art/20200321173317697.png"
-alt="在这里插入图片描述" />
-<figcaption aria-hidden="true">在这里插入图片描述</figcaption>
-</figure>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2024/07/28/cpp/C++%E5%90%8D%E7%A7%B0%E4%BF%AE%E9%A5%B0/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/07/28/cpp/malloc%E8%AF%A6%E8%A7%A3/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
-      <meta itemprop="name" content="singheart">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="singheart's blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | singheart's blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/07/28/cpp/malloc%E8%AF%A6%E8%A7%A3/" class="post-title-link" itemprop="url">malloc详解</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-      
-
-      <time title="创建时间：2024-07-28 19:49:11 / 修改时间：20:14:48" itemprop="dateCreated datePublished" datetime="2024-07-28T19:49:11+08:00">2024-07-28</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/cpp/" itemprop="url" rel="index"><span itemprop="name">cpp</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="procpid">/proc/pid</h1>
-<p>对于每个进程，<code>/proc</code>都有一个以进程ID（PID）命名的子目录，如<code>/proc/1863</code>，其中包含了特定于该进程的信息。</p>
-<p>以<code>/proc/1863</code>为例，这是一个特定于PID为1863的进程的目录。下面是<code>/proc/[pid]</code>目录中一些重要文件或子目录的作用：</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2024/07/28/cpp/malloc%E8%AF%A6%E8%A7%A3/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
 
     
 
@@ -1312,6 +778,493 @@ toast 以及 am。</p>
 <h1 id="pg_filenode.map">pg_filenode.map</h1>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">int</span> int32;</span><br><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">int</span> uint32; <span class="comment">/* == 32 bits */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">char</span> uint8;   <span class="comment">/* == 8 bits */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">short</span> uint16; <span class="comment">/* == 16 bits */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">long</span> <span class="type">int</span> uint64;</span><br><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">int</span> Oid;</span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MAX_MAPPINGS 62</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">RelMapping</span> &#123;</span><br><span class="line">    Oid         mapoid;         <span class="comment">/* OID of a catalog */</span></span><br><span class="line">    Oid         mapfilenode;    <span class="comment">/* its filenode number */</span></span><br><span class="line">&#125; RelMapping;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">RelMapFile</span> &#123;</span><br><span class="line">    int32 magic;        <span class="comment">/* always RELMAPPER_FILEMAGIC */</span></span><br><span class="line">    int32 num_mappings; <span class="comment">/* number of valid RelMapping entries */</span></span><br><span class="line">    RelMapping mappings[MAX_MAPPINGS];</span><br><span class="line">    int32 crc; <span class="comment">/* CRC of all above */</span></span><br><span class="line">    int32 pad; <span class="comment">/* to make the struct size be 512 exactly */</span></span><br><span class="line">&#125; RelMapFile;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 读取文件</span></span><br><span class="line">  RelMapFile *mapfile = (RelMapFile *)<span class="built_in">malloc</span>(<span class="built_in">sizeof</span>(RelMapFile));</span><br><span class="line">  FILE *file = <span class="built_in">fopen</span>(<span class="string">&quot;/home/singheart/project/cmake/pg_page/pg_filenode.map&quot;</span>, <span class="string">&quot;r&quot;</span>);</span><br><span class="line">  <span class="built_in">fread</span>(mapfile, <span class="built_in">sizeof</span>(RelMapFile), <span class="number">1</span>, file);</span><br><span class="line">  <span class="built_in">fclose</span>(file);</span><br><span class="line"></span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;magic: %d\n&quot;</span>, mapfile-&gt;magic);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;Oid    fileid\n&quot;</span>);</span><br><span class="line">  <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; MAX_MAPPINGS; ++i) &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%d -&gt; %d\n&quot;</span>, mapfile-&gt;mappings[i].mapoid, mapfile-&gt;mappings[i].mapfilenode);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/06/27/openGauss/centos7.6%E5%AE%89%E8%A3%85postgresql9.2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+      <meta itemprop="name" content="singheart">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/06/27/openGauss/centos7.6%E5%AE%89%E8%A3%85postgresql9.2/" class="post-title-link" itemprop="url">centos7.6安装postreSQL9.2</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-06-27 20:47:24" itemprop="dateCreated datePublished" datetime="2024-06-27T20:47:24+08:00">2024-06-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-07-28 23:26:40" itemprop="dateModified" datetime="2024-07-28T23:26:40+08:00">2024-07-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/openGauss/" itemprop="url" rel="index"><span itemprop="name">openGauss</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="安装步骤">安装步骤</h1>
+<h2 id="添加yum-配置">1. 添加yum 配置</h2>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y http://download.postgresql.org/pub/repos/yum/9.2/redhat/rhel-7-x86_64/pgdg-centos92-9.2-3.noarch.rpm</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2024/06/27/openGauss/centos7.6%E5%AE%89%E8%A3%85postgresql9.2/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/06/27/openGauss/PostgreSQL%E4%B8%ADtoast/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+      <meta itemprop="name" content="singheart">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/06/27/openGauss/PostgreSQL%E4%B8%ADtoast/" class="post-title-link" itemprop="url">postgreSQL中TOAST类型</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-06-27 20:47:24" itemprop="dateCreated datePublished" datetime="2024-06-27T20:47:24+08:00">2024-06-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-08-03 16:53:39" itemprop="dateModified" datetime="2024-08-03T16:53:39+08:00">2024-08-03</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/openGauss/" itemprop="url" rel="index"><span itemprop="name">openGauss</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>本文参考：</p>
+<ul>
+<li><a
+href="https://link.zhihu.com/?target=https%3A//cloud.tencent.com/developer/article/1004455">PostgreSQL
+TOAST 技术理解</a></li>
+<li>《PostgreSQL修炼之道》</li>
+</ul>
+<h2 id="一toast是什么"><strong>一、TOAST是什么？</strong></h2>
+<p>TOAST是<strong>“The Oversized-Attribute Storage
+Technique”（超尺寸属性存储技术）</strong>的缩写，主要用于存储一个大字段的值。</p>
+<p>要理解TOAST，我们要先理解<strong>页（BLOCK）</strong>的概念。在PG中，页是数据在文件存储中的基本单位，其大小是固定的且只能在编译期指定，之后无法修改，默认的大小为8KB。同时，PG不允许一行数据跨页存储。那么对于超长的行数据，PG就会启动TOAST，将大的字段压缩或切片成多个物理行存到另一张系统表中（<strong>TOAST表</strong>），这种存储方式叫<strong>行外存储</strong>。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2024/06/27/openGauss/PostgreSQL%E4%B8%ADtoast/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/06/27/openGauss/postgresql%E5%BB%BA%E8%A1%A8%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+      <meta itemprop="name" content="singheart">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/06/27/openGauss/postgresql%E5%BB%BA%E8%A1%A8%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90/" class="post-title-link" itemprop="url">postgreSQL建表流程分析</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-06-27 20:47:24" itemprop="dateCreated datePublished" datetime="2024-06-27T20:47:24+08:00">2024-06-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-07-28 23:28:45" itemprop="dateModified" datetime="2024-07-28T23:28:45+08:00">2024-07-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/openGauss/" itemprop="url" rel="index"><span itemprop="name">openGauss</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="表的种类">表的种类</h1>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2024/06/27/openGauss/postgresql%E5%BB%BA%E8%A1%A8%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/06/21/linux/gdb%E8%B0%83%E8%AF%95Java%E7%A8%8B%E5%BA%8F%E5%B4%A9%E6%BA%83/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+      <meta itemprop="name" content="singheart">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/06/21/linux/gdb%E8%B0%83%E8%AF%95Java%E7%A8%8B%E5%BA%8F%E5%B4%A9%E6%BA%83/" class="post-title-link" itemprop="url">gdb调试Java程序崩溃</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-06-21 16:25:09" itemprop="dateCreated datePublished" datetime="2024-06-21T16:25:09+08:00">2024-06-21</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-07-28 16:28:33" itemprop="dateModified" datetime="2024-07-28T16:28:33+08:00">2024-07-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <blockquote>
+<p>参考<a
+target="_blank" rel="noopener" href="https://senlinzhan.github.io/2017/12/31/coredump/">在Linux生成core
+dump文件</a></p>
+</blockquote>
+<h1 id="x00-背景">0x00 背景</h1>
+<p>Java程序调用C语言生成的动态链接库(.so)，动态链接库有问题Crash了导致Java程序也Crash了，如何调试动态链接库哪里出现了问题。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2024/06/21/linux/gdb%E8%B0%83%E8%AF%95Java%E7%A8%8B%E5%BA%8F%E5%B4%A9%E6%BA%83/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/12/20/linux/write-vs-fwrite/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+      <meta itemprop="name" content="singheart">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2023/12/20/linux/write-vs-fwrite/" class="post-title-link" itemprop="url">write_vs_fwrite</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-12-20 16:09:57" itemprop="dateCreated datePublished" datetime="2023-12-20T16:09:57+08:00">2023-12-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-07-28 15:51:16" itemprop="dateModified" datetime="2024-07-28T15:51:16+08:00">2024-07-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <blockquote>
+<p>参考<a
+target="_blank" rel="noopener" href="https://www.zhihu.com/question/546404062/answer/2605567064?utm_psn=1720524853226872832">C++中write和fwrite哪个效率更高？
+- 知乎 (zhihu.com)</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://blog.csdn.net/m0_61167558/article/details/127561314">Linux
+文件IO学习之open函数深入了解_linux open函数-CSDN博客</a></p>
+</blockquote>
+<h1 id="x00-background">0x00 Background</h1>
+<p><code>write</code>和<code>fwrite</code>都用于文件写入，知其然更要知其所以然，既然有这么多种设计，就一定各有各的考量，那么它们之间有什么不同呢？</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023/12/20/linux/write-vs-fwrite/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 

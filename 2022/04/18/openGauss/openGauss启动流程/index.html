@@ -22,25 +22,27 @@
 
     <meta name="description" content="main(main.cpp) -&gt; PostmasterMain(postmaster.cpp) 先执行MOTIterateForeignScan，然后进行XACT_EVENT_COMMIT，最后会XACT_EVENT_RECORD_COMMIT For MOT, XACT_EVENT_COMMIT will just do the OCC validation。Actual commit">
 <meta property="og:type" content="article">
-<meta property="og:title" content="singheart&#39;s blog">
-<meta property="og:url" content="http://example.com/2024/07/28/openGauss/openGauss%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B/index.html">
+<meta property="og:title" content="openGauss启动流程">
+<meta property="og:url" content="http://example.com/2022/04/18/openGauss/openGauss%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B/index.html">
 <meta property="og:site_name" content="singheart&#39;s blog">
 <meta property="og:description" content="main(main.cpp) -&gt; PostmasterMain(postmaster.cpp) 先执行MOTIterateForeignScan，然后进行XACT_EVENT_COMMIT，最后会XACT_EVENT_RECORD_COMMIT For MOT, XACT_EVENT_COMMIT will just do the OCC validation。Actual commit">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-07-28T12:49:21.871Z">
-<meta property="article:modified_time" content="2024-03-07T10:05:38.000Z">
+<meta property="article:published_time" content="2022-04-18T02:28:40.000Z">
+<meta property="article:modified_time" content="2024-08-03T08:52:38.992Z">
 <meta property="article:author" content="singheart">
+<meta property="article:tag" content="openGauss">
+<meta property="article:tag" content="数据库">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="http://example.com/2024/07/28/openGauss/openGauss%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B/">
+<link rel="canonical" href="http://example.com/2022/04/18/openGauss/openGauss%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2024/07/28/openGauss/openGauss%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B/","path":"2024/07/28/openGauss/openGauss启动流程/","title":""}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2022/04/18/openGauss/openGauss%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B/","path":"2022/04/18/openGauss/openGauss启动流程/","title":"openGauss启动流程"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title> | singheart's blog</title>
+<title>openGauss启动流程 | singheart's blog</title>
   
 
 
@@ -158,7 +160,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">74</span>
+          <span class="site-state-item-count">71</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -213,7 +215,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/07/28/openGauss/openGauss%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/04/18/openGauss/openGauss%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
@@ -226,12 +228,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | singheart's blog">
+      <meta itemprop="name" content="openGauss启动流程 | singheart's blog">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          
+          openGauss启动流程
         </h1>
 
         <div class="post-meta-container">
@@ -242,14 +244,14 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2024-07-28 20:49:21" itemprop="dateCreated datePublished" datetime="2024-07-28T20:49:21+08:00">2024-07-28</time>
+      <time title="创建时间：2022-04-18 10:28:40" itemprop="dateCreated datePublished" datetime="2022-04-18T10:28:40+08:00">2022-04-18</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-03-07 18:05:38" itemprop="dateModified" datetime="2024-03-07T18:05:38+08:00">2024-03-07</time>
+      <time title="修改时间：2024-08-03 16:52:38" itemprop="dateModified" datetime="2024-08-03T16:52:38+08:00">2024-08-03</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -319,18 +321,22 @@ alt="在这里插入图片描述" />
     
 
     <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/openGauss/" rel="tag"># openGauss</a>
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag"># 数据库</a>
+          </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2024/07/28/openGauss/postgresql%E5%88%9B%E5%BB%BAdatabase%E6%B5%81%E7%A8%8B/" rel="prev" title="">
-                  <i class="fa fa-chevron-left"></i> 
+                <a href="/2022/04/10/linux/tar%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/" rel="prev" title="tar使用总结">
+                  <i class="fa fa-chevron-left"></i> tar使用总结
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2024/07/28/openGauss/openGauss%E4%B8%AD%E5%8F%AF%E8%83%BD%E7%94%A8%E5%88%B0%E7%9A%84%E5%91%BD%E4%BB%A4/" rel="next" title="">
-                   <i class="fa fa-chevron-right"></i>
+                <a href="/2022/04/18/openGauss/openGauss%E4%B8%AD%E5%8F%AF%E8%83%BD%E7%94%A8%E5%88%B0%E7%9A%84%E5%91%BD%E4%BB%A4/" rel="next" title="opengauss中可能用到的命令">
+                  opengauss中可能用到的命令 <i class="fa fa-chevron-right"></i>
                 </a>
             </div>
           </div>
@@ -410,7 +416,7 @@ alt="在这里插入图片描述" />
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
 
-<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"xinjiempolde","repo":"xinjiempolde.github.io","client_id":"89019d63999840fdbf7f","client_secret":"48d2133d88acfafada6414ec6eee5a9d9febcbc8","admin_user":"xinjiempolde","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"2121d4f165d450be8bc52d1495b095a3"}</script>
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"xinjiempolde","repo":"xinjiempolde.github.io","client_id":"89019d63999840fdbf7f","client_secret":"48d2133d88acfafada6414ec6eee5a9d9febcbc8","admin_user":"xinjiempolde","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"d8ad7f188ca1a399d5b21a441a8c98ba"}</script>
 <script src="/js/third-party/comments/gitalk.js"></script>
 
 <script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/haruto.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
