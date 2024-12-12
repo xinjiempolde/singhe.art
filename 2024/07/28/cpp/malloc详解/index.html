@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0-rc1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.11.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="&#x2F;proc&#x2F;pid 对于每个进程，&#x2F;proc都有一个以进程ID（PID）命名的子目录，如&#x2F;proc&#x2F;1863，其中包含了特定于该进程的信息。 以&#x2F;proc&#x2F;1863为例，这是一个特定于PID为1863的进程的目录。下面是&#x2F;proc&#x2F;[pid]目录中一些重要文件或子目录的作用：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="malloc详解">
+<meta property="og:url" content="http://example.com/2024/07/28/cpp/malloc%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:site_name" content="singheart&#39;s blog">
+<meta property="og:description" content="&#x2F;proc&#x2F;pid 对于每个进程，&#x2F;proc都有一个以进程ID（PID）命名的子目录，如&#x2F;proc&#x2F;1863，其中包含了特定于该进程的信息。 以&#x2F;proc&#x2F;1863为例，这是一个特定于PID为1863的进程的目录。下面是&#x2F;proc&#x2F;[pid]目录中一些重要文件或子目录的作用：">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img.singhe.art/image-20240410151830672.png">
+<meta property="article:published_time" content="2024-07-28T11:49:11.000Z">
+<meta property="article:modified_time" content="2024-12-11T13:03:57.698Z">
+<meta property="article:author" content="singheart">
+<meta property="article:tag" content="cpp">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img.singhe.art/image-20240410151830672.png">
+
+
+<link rel="canonical" href="http://example.com/2024/07/28/cpp/malloc%E8%AF%A6%E8%A7%A3/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2024/07/28/cpp/malloc%E8%AF%A6%E8%A7%A3/","path":"2024/07/28/cpp/malloc详解/","title":"malloc详解"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>malloc详解 | singheart's blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">singheart's blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">多读书，多思考</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#procpid"><span class="nav-number">1.</span> <span class="nav-text">&#x2F;proc&#x2F;pid</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E7%94%B3%E8%AF%B7"><span class="nav-number">2.</span> <span class="nav-text">内存申请</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%89%A9%E7%90%86%E5%86%85%E5%AD%98%E4%B8%8E%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98"><span class="nav-number">3.</span> <span class="nav-text">物理内存与虚拟内存</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#brk%E6%8C%87%E9%92%88"><span class="nav-number">4.</span> <span class="nav-text">brk指针</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84"><span class="nav-number">5.</span> <span class="nav-text">内存映射</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="singheart"
+      src="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+  <p class="site-author-name" itemprop="name">singheart</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xinjiempolde" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xinjiempolde" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/07/28/cpp/malloc%E8%AF%A6%E8%A7%A3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+      <meta itemprop="name" content="singheart">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="malloc详解 | singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          malloc详解
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-07-28 19:49:11" itemprop="dateCreated datePublished" datetime="2024-07-28T19:49:11+08:00">2024-07-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-12-11 21:03:57" itemprop="dateModified" datetime="2024-12-11T21:03:57+08:00">2024-12-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/cpp/" itemprop="url" rel="index"><span itemprop="name">cpp</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="procpid">/proc/pid</h1>
+<p>对于每个进程，<code>/proc</code>都有一个以进程ID（PID）命名的子目录，如<code>/proc/1863</code>，其中包含了特定于该进程的信息。</p>
+<p>以<code>/proc/1863</code>为例，这是一个特定于PID为1863的进程的目录。下面是<code>/proc/[pid]</code>目录中一些重要文件或子目录的作用：</p>
+<span id="more"></span>
+<ul>
+<li><code>cmdline</code>：包含了启动该进程的命令行命令。</li>
+<li><code>cwd</code>：是一个符号链接，指向该进程的当前工作目录。</li>
+<li><code>environ</code>：包含了进程的环境变量列表。</li>
+<li><code>exe</code>：是一个符号链接，指向启动该进程的可执行文件。</li>
+<li><code>fd</code>：是一个目录，包含了该进程打开的所有文件描述符的符号链接。</li>
+<li><code>maps</code>：提供了内存映射信息，包括库文件等。</li>
+<li><code>mem</code>：提供了对该进程虚拟内存的访问。</li>
+<li><code>status</code>：包含了该进程的状态信息，如进程ID、线程数、内存使用等。
+<ul>
+<li>VmPeak /
+VmSize：最大/当前进程正在占用的内存总大小。听起来不错，但实际上，这并不是一个好的评估内存的数据的办法。因为它包含了
+1）申请但实际上未使用的内存。（malloc一段地址空间，但不使用它）
+2）共享库使用的代码段地址空间，会被多个进程的VmSize同时统计。即存在重复统计的问题。</li>
+<li>VmHWM /
+VmRss：最大时/当前应用程序正在使用的物理内存的大小。没有被交换到swap的内存。是评估进程内存使用量的重要依据。</li>
+<li>VmData：包含initialized
+data+bss+heap。通常不准确，原因是heap的大小不准确。系统常常出于优化性能的考虑，多申请栈空间。</li>
+<li>VmExe：代码段中不包含lib的部分，即进程可执行文件的部分</li>
+<li>VmLib： 代码段中lib的部分。</li>
+</ul></li>
+<li><code>task</code>：是一个目录，包含了该进程所有线程的信息，每个线程都有自己的PID目录。</li>
+</ul>
+<h1 id="内存申请">内存申请</h1>
+<p>当我们使用 C/C++ 编写程序时，如果需要使用内存，就必须先调用
+<code>malloc</code> 函数来申请一块内存。但是，<code>malloc</code>
+真的是申请了内存吗？</p>
+<p>我们通过下面例子来观察 <code>malloc</code>
+到底是不是真的申请了内存：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">void</span> *ptr;</span><br><span class="line">    ptr = <span class="built_in">malloc</span>(<span class="number">1024</span> * <span class="number">1024</span> * <span class="number">1024</span>); <span class="comment">// malloc 1GB</span></span><br><span class="line">    <span class="type">int</span> a;</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;a);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure>
+<img src="https://img.singhe.art/image-20240410151830672.png"
+alt="image-20240410151830672" />
+<figcaption aria-hidden="true">image-20240410151830672</figcaption>
+</figure>
+<p>图中的 <code>VmRSS</code>
+表示进程使用的物理内存大小，但我们明明申请了 1GB
+的内存，为什么只显示使用 404KB 的内存呢？这里就涉及到
+<code>虚拟内存</code> 和 <code>物理内存</code> 的概念了。</p>
+<h1 id="物理内存与虚拟内存">物理内存与虚拟内存</h1>
+<p>下面先来介绍一下 <code>物理内存</code> 与 <code>虚拟内存</code>
+的概念：</p>
+<ul>
+<li><code>物理内存</code>：也就是安装在计算机中的内存条，比如安装了 2GB
+大小的内存条，那么物理内存地址的范围就是 0 ~ 2GB。</li>
+<li><code>虚拟内存</code>：虚拟的内存地址。由于 CPU
+只能使用物理内存地址，所以需要将虚拟内存地址转换为物理内存地址才能被 CPU
+使用，这个转换过程由
+<code>MMU（Memory Management Unit，内存管理单元）</code>
+来完成。<code>虚拟内存</code> 大小不受 <code>物理内存</code>
+大小的限制，在 32 位的操作系统中，每个进程的虚拟内存空间大小为 0 ~
+4GB。</li>
+</ul>
+<p>程序中使用的内存地址都是虚拟内存地址，也就是说，我们通过
+<code>malloc</code>
+函数申请的内存都是虚拟内存。实际上，内核会为每个进程管理其虚拟内存空间，并且会把虚拟内存空间划分为多个区域，如图所示：</p>
+<figure>
+<img
+src="https://pic4.zhimg.com/80/v2-4710dcd77e35523345965f9d3aba0dab_1440w.webp"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>我们来分析一下这些区域的作用：</p>
+<ul>
+<li><code>代码段</code>：用于存放程序的可执行代码。</li>
+<li><code>数据段</code>：用于存放程序的全局变量和静态变量。</li>
+<li><code>堆空间</code>：用于存放由 <code>malloc</code>
+申请的内存。</li>
+<li><code>栈空间</code>：用于存放函数的参数和局部变量。</li>
+<li><code>内核空间</code>：存放 Linux 内核代码和数据。</li>
+</ul>
+<h1 id="brk指针">brk指针</h1>
+<p>由此可知，通过 <code>malloc</code> 函数申请的内存地址是由
+<code>堆空间</code> 分配的（其实还有可能从 <code>mmap</code>
+区分配，这种情况暂时忽略）。在内核中，使用一个名为 <code>brk</code>
+的指针来表示进程的 <code>堆空间</code> 的顶部，如图所示：</p>
+<figure>
+<img
+src="https://pic3.zhimg.com/80/v2-f84c20dd688accf3608532a5904dbf76_1440w.webp"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>所以，通过移动 <code>brk</code>
+指针就可以达到申请（向上移动）和释放（向下移动）堆空间的内存。例如申请
+1024 字节时，只需要把 <code>brk</code> 向上移动 1024
+字节即可，如图所示：</p>
+<figure>
+<img
+src="https://pic4.zhimg.com/80/v2-9e3484ac80904eafbf0cfb4758767a4f_1440w.webp"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>事实上，<code>malloc</code> 函数就是通过移动 <code>brk</code>
+指针来实现申请和释放内存的，Linux 提供了一个名为 <code>brk()</code>
+的系统调用来移动 <code>brk</code> 指针。</p>
+<h1 id="内存映射">内存映射</h1>
+<p>现在我们知道，<code>malloc</code> 函数只是移动 <code>brk</code>
+指针，但并没有申请物理内存。前面我们介绍虚拟内存和物理内存的时候介绍过，虚拟内存地址必须映射到物理内存地址才能被使用。如
+图所示：</p>
+<figure>
+<img
+src="https://pic2.zhimg.com/80/v2-51615028ceb171463172ff50c8ec0d0d_1440w.webp"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>如果对没有进行映射的虚拟内存地址进行读写操作，那么将会发生
+<code>缺页异常</code>。Linux 内核会对 <code>缺页异常</code>
+进行修复，修复过程如下：</p>
+<ul>
+<li>获取触发 <code>缺页异常</code>
+的虚拟内存地址（读写哪个虚拟内存地址导致的）。</li>
+<li>查看此虚拟内存地址是否被申请（是否在 <code>brk</code>
+指针内），如果不在 <code>brk</code> 指针内，将会导致 Segmention Fault
+错误（也就是常见的coredump），进程将会异常退出。</li>
+<li>如果虚拟内存地址在 <code>brk</code>
+指针内，那么将此虚拟内存地址映射到物理内存地址上，完成
+<code>缺页异常</code> 修复过程，并且返回到触发异常的地方进行运行。</li>
+</ul>
+<p>从上面的过程可以看出，不对申请的虚拟内存地址进行读写操作是不会触发申请新的物理内存。所以，这就解释了为什么申请
+1GB 的内存，但实际上只使用了 404 KB 的物理内存。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/cpp/" rel="tag"># cpp</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/07/28/cpp/forward%E5%92%8Cmove/" rel="prev" title="forward和move">
+                  <i class="fa fa-chevron-left"></i> forward和move
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/07/28/cpp/C++%E5%90%8D%E7%A7%B0%E4%BF%AE%E9%A5%B0/" rel="next" title="C++名称修饰">
+                  C++名称修饰 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">singheart</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div><script color="0,0,255" opacity="0.5" zIndex="-1" count="99" src="https://cdn.jsdelivr.net/npm/canvas-nest.js@1/dist/canvas-nest.js"></script>
+
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"xinjiempolde","repo":"xinjiempolde.github.io","client_id":"89019d63999840fdbf7f","client_secret":"48d2133d88acfafada6414ec6eee5a9d9febcbc8","admin_user":"xinjiempolde","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"36ecafbc7ed9f4ada210f9d26b4361e0"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/haruto.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>

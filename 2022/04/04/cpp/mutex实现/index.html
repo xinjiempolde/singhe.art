@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0-rc1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.11.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="参考  pthread包的mutex实现分析___pthread_mutex_s-CSDN博客 从C++mutex到futex - 别杀那头猪 - 博客园 (cnblogs.com)   理论上讲，mutex可用初始值&#x3D;1的信号量表示，只需一个整数表示其状态：0表示未占用，1表示占用。那么，mutex的资源占用就只是一个int型了？">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mutex实现">
+<meta property="og:url" content="http://example.com/2022/04/04/cpp/mutex%E5%AE%9E%E7%8E%B0/index.html">
+<meta property="og:site_name" content="singheart&#39;s blog">
+<meta property="og:description" content="参考  pthread包的mutex实现分析___pthread_mutex_s-CSDN博客 从C++mutex到futex - 别杀那头猪 - 博客园 (cnblogs.com)   理论上讲，mutex可用初始值&#x3D;1的信号量表示，只需一个整数表示其状态：0表示未占用，1表示占用。那么，mutex的资源占用就只是一个int型了？">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-04-04T12:46:11.000Z">
+<meta property="article:modified_time" content="2024-12-11T13:03:57.698Z">
+<meta property="article:author" content="singheart">
+<meta property="article:tag" content="cpp">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2022/04/04/cpp/mutex%E5%AE%9E%E7%8E%B0/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2022/04/04/cpp/mutex%E5%AE%9E%E7%8E%B0/","path":"2022/04/04/cpp/mutex实现/","title":"mutex实现"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>mutex实现 | singheart's blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">singheart's blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">多读书，多思考</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="singheart"
+      src="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+  <p class="site-author-name" itemprop="name">singheart</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xinjiempolde" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xinjiempolde" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/04/04/cpp/mutex%E5%AE%9E%E7%8E%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+      <meta itemprop="name" content="singheart">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="mutex实现 | singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mutex实现
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-04-04 20:46:11" itemprop="dateCreated datePublished" datetime="2022-04-04T20:46:11+08:00">2022-04-04</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-12-11 21:03:57" itemprop="dateModified" datetime="2024-12-11T21:03:57+08:00">2024-12-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/cpp/" itemprop="url" rel="index"><span itemprop="name">cpp</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <blockquote>
+<p>参考</p>
+<ul>
+<li><a
+target="_blank" rel="noopener" href="https://blog.csdn.net/tlxamulet/article/details/79047717">pthread包的mutex实现分析___pthread_mutex_s-CSDN博客</a></li>
+<li><a
+target="_blank" rel="noopener" href="https://www.cnblogs.com/HeyLUMouMou/p/17481385.html">从C++mutex到futex
+- 别杀那头猪 - 博客园 (cnblogs.com)</a></li>
+</ul>
+</blockquote>
+<p>理论上讲，mutex可用初始值=1的信号量表示，只需一个整数表示其状态：0表示未占用，1表示占用。那么，mutex的资源占用就只是一个int型了？</p>
+<span id="more"></span>
+<p>当然不是，我们可以看一下pthread包中mutex的定义：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">union</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">struct</span> <span class="title class_">__pthread_mutex_s</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="type">int</span> __lock;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> __count;</span><br><span class="line">    <span class="type">int</span> __owner;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> __nusers;</span><br><span class="line">    <span class="comment">/* KIND must stay at this position in the structure to maintain</span></span><br><span class="line"><span class="comment">       binary compatibility.  */</span></span><br><span class="line">    <span class="type">int</span> __kind;</span><br><span class="line">    <span class="type">int</span> __spins;</span><br><span class="line">    <span class="type">__pthread_list_t</span> __list;</span><br><span class="line">  &#125; __data;</span><br><span class="line">  ......</span><br><span class="line">&#125; <span class="type">pthread_mutex_t</span>;</span><br></pre></td></tr></table></figure>
+<p>这是x86-64处理器下的mutex定义（32位处理器下的定义基本类似），占用32字节的空间。几个比较关键的成员定义如下：
+<code>__lock mutex</code>：锁状态，0表示未占用，1表示占用
+<code>__count</code> : 用于可重入锁，记录owner线程持有锁的次数
+<code>__owner owner</code>: 线程ID <code>__kind</code>:
+记录mutex的类型，有以下几个取值：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">　PTHREAD_MUTEX_TIMED_NP，这是缺省值，也就是普通锁。</span><br><span class="line"></span><br><span class="line">　PTHREAD_MUTEX_RECURSIVE_NP，可重入锁，允许同一个线程对同一个锁成功获得多次，并通过多次unlock解锁。</span><br><span class="line"></span><br><span class="line">　PTHREAD_MUTEX_ERRORCHECK_NP，检错锁，如果同一个线程重复请求同一个锁，则返回EDEADLK，否则与PTHREAD_MUTEX_TIMED_NP类型相同。</span><br><span class="line"></span><br><span class="line">　PTHREAD_MUTEX_ADAPTIVE_NP，自适应锁，自旋锁与普通锁的混合。</span><br></pre></td></tr></table></figure>
+<p>pthread_mutex_init就是初始化上述的pthread_mutex_t内存结构。</p>
+<p>pthread_mutex_lock处理了几种类型的mutex，细节请看https://github.com/lattera/glibc/blob/master/nptl/pthread_mutex_lock.c。先看普通锁，就是调用LLL_MUTEX_LOCK宏获得锁。LLL_MUTEX_LOCK宏定义我们稍后再看。：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (__builtin_expect (type, PTHREAD_MUTEX_TIMED_NP)</span><br><span class="line">      == PTHREAD_MUTEX_TIMED_NP)</span><br><span class="line">    &#123;</span><br><span class="line">    simple:</span><br><span class="line">      <span class="comment">/* Normal mutex.  */</span></span><br><span class="line">      <span class="built_in">LLL_MUTEX_LOCK</span> (mutex);</span><br><span class="line">      <span class="built_in">assert</span> (mutex-&gt;__data.__owner == <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>这是可重入锁：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">else</span> <span class="keyword">if</span> (__builtin_expect (type == PTHREAD_MUTEX_RECURSIVE_NP, <span class="number">1</span>))</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="comment">/* Recursive mutex.  */</span></span><br><span class="line"></span><br><span class="line">      <span class="comment">/* Check whether we already hold the mutex.  */</span></span><br><span class="line">      <span class="keyword">if</span> (mutex-&gt;__data.__owner == id)</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="comment">/* Just bump the counter.  */</span></span><br><span class="line">      <span class="keyword">if</span> (__builtin_expect (mutex-&gt;__data.__count + <span class="number">1</span> == <span class="number">0</span>, <span class="number">0</span>))</span><br><span class="line">        <span class="comment">/* Overflow of the counter.  */</span></span><br><span class="line">        <span class="keyword">return</span> EAGAIN;</span><br><span class="line"></span><br><span class="line">      ++mutex-&gt;__data.__count;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">/* We have to get the mutex.  */</span></span><br><span class="line">      <span class="built_in">LLL_MUTEX_LOCK</span> (mutex);</span><br><span class="line"></span><br><span class="line">      <span class="built_in">assert</span> (mutex-&gt;__data.__owner == <span class="number">0</span>);</span><br><span class="line">      mutex-&gt;__data.__count = <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>当发现owner就是自身，只是简单的自增__count成员即返回。否则，调用LLL_MUTEX_LOCK宏获得锁，若能成功获得，设置__count
+= 1，否则挂起。</p>
+<p>这是检错锁，会侦测一个线程重复申请锁的情况，如遇到，报EDEADLK，从而避免这种最简单的死锁情形。若无死锁情形，goto
+simple语句会跳到普通锁的处理流程。：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">      <span class="built_in">assert</span> (type == PTHREAD_MUTEX_ERRORCHECK_NP);</span><br><span class="line">      <span class="comment">/* Check whether we already hold the mutex.  */</span></span><br><span class="line">      <span class="keyword">if</span> (__builtin_expect (mutex-&gt;__data.__owner == id, <span class="number">0</span>))</span><br><span class="line">    <span class="keyword">return</span> EDEADLK;</span><br><span class="line">      <span class="keyword">goto</span> simple;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>这是自适应锁：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">else</span> <span class="keyword">if</span> (__builtin_expect (type == PTHREAD_MUTEX_ADAPTIVE_NP, <span class="number">1</span>))</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">if</span> (! __is_smp)</span><br><span class="line">    <span class="keyword">goto</span> simple;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (<span class="built_in">LLL_MUTEX_TRYLOCK</span> (mutex) != <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="type">int</span> cnt = <span class="number">0</span>;</span><br><span class="line">      <span class="type">int</span> max_cnt = <span class="built_in">MIN</span> (MAX_ADAPTIVE_COUNT,</span><br><span class="line">                 mutex-&gt;__data.__spins * <span class="number">2</span> + <span class="number">10</span>);</span><br><span class="line">      <span class="keyword">do</span></span><br><span class="line">        &#123;</span><br><span class="line">          <span class="keyword">if</span> (cnt++ &gt;= max_cnt)</span><br><span class="line">          &#123;</span><br><span class="line">            <span class="built_in">LLL_MUTEX_LOCK</span> (mutex);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">          &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> BUSY_WAIT_NOP</span></span><br><span class="line">          BUSY_WAIT_NOP;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span> (<span class="built_in">LLL_MUTEX_TRYLOCK</span> (mutex) != <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">      mutex-&gt;__data.__spins += (cnt - mutex-&gt;__data.__spins) / <span class="number">8</span>;</span><br><span class="line">    &#125;</span><br><span class="line">      <span class="built_in">assert</span> (mutex-&gt;__data.__owner == <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>从代码看，这种锁分两个阶段。第一阶段是自旋锁（spin
+lock），忙等待一段时间后，若还不能获得锁，则转变成普通锁。
+所谓“忙等待”，在x86处理器下是重复执行nop指令，nop是x86的小延迟函数：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Delay in spinlock loop.  */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BUSY_WAIT_NOP   asm (<span class="string">&quot;rep; nop&quot;</span>)</span></span><br></pre></td></tr></table></figure>
+<p>获取锁的核心是LLL_MUTEX_LOCK宏，我们来看其定义：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># <span class="keyword">define</span> LLL_MUTEX_LOCK(mutex) \</span></span><br><span class="line"><span class="meta">  lll_lock ((mutex)-&gt;__data.__lock, PTHREAD_MUTEX_PSHARED (mutex))</span></span><br></pre></td></tr></table></figure>
+<p>PTHREAD_MUTEX_PSHARED宏表示该锁是进程锁还是线程锁，0表示线程锁，128表示进程锁，因mutex使用的核心算法既可适用于进程也可适用于线程。
+从宏定义可知，获取锁的动作就是尝试修改锁的状态字段：__lock</p>
+<p>lll_lock定义如下，我们只看线程锁部分的代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> lll_lock(futex, private) \</span></span><br><span class="line"><span class="meta">  (void)                                      \</span></span><br><span class="line"><span class="meta">    (&#123; int ignore1, ignore2;                              \</span></span><br><span class="line"><span class="meta">       <span class="keyword">if</span> (__builtin_constant_p (private) &amp;&amp; (private) == LLL_PRIVATE)        \</span></span><br><span class="line"><span class="meta">     __asm __volatile (<span class="string">&quot;cmpxchgl %1, %2\n\t&quot;</span>                   \</span></span><br><span class="line"><span class="meta">               <span class="string">&quot;jnz _L_lock_%=\n\t&quot;</span>                   \</span></span><br><span class="line"><span class="meta">               <span class="string">&quot;.subsection 1\n\t&quot;</span>                    \</span></span><br><span class="line"><span class="meta">               <span class="string">&quot;.type _L_lock_%=,@function\n&quot;</span>             \</span></span><br><span class="line"><span class="meta">               <span class="string">&quot;_L_lock_%=:\n&quot;</span>                    \</span></span><br><span class="line"><span class="meta">               <span class="string">&quot;1:\tleal %2, %%ecx\n&quot;</span>                 \</span></span><br><span class="line"><span class="meta">               <span class="string">&quot;2:\tcall __lll_lock_wait_private\n&quot;</span>           \</span></span><br><span class="line"><span class="meta">               <span class="string">&quot;3:\tjmp 18f\n&quot;</span>                    \</span></span><br><span class="line"><span class="meta">               <span class="string">&quot;4:\t.size _L_lock_%=, 4b-1b\n\t&quot;</span>              \</span></span><br><span class="line"><span class="meta">               <span class="string">&quot;.previous\n&quot;</span>                      \</span></span><br><span class="line"><span class="meta">               LLL_STUB_UNWIND_INFO_3                 \</span></span><br><span class="line"><span class="meta">               <span class="string">&quot;18:&quot;</span>                          \</span></span><br><span class="line"><span class="meta">               : <span class="string">&quot;=a&quot;</span> (ignore1), <span class="string">&quot;=c&quot;</span> (ignore2), <span class="string">&quot;=m&quot;</span> (futex)     \</span></span><br><span class="line"><span class="meta">               : <span class="string">&quot;0&quot;</span> (0), <span class="string">&quot;1&quot;</span> (1), <span class="string">&quot;m&quot;</span> (futex),           \</span></span><br><span class="line"><span class="meta">                 <span class="string">&quot;i&quot;</span> (MULTIPLE_THREADS_OFFSET)            \</span></span><br><span class="line"><span class="meta">               : <span class="string">&quot;memory&quot;</span>);                       \</span></span><br><span class="line"><span class="meta">       <span class="keyword">else</span> </span></span><br></pre></td></tr></table></figure>
+<dl>
+<dt>这是gcc里嵌入汇编的语法，其中：</dt>
+<dd>
+“=a” (ignore1), “=c” (ignore2), “=m” (futex)
+是输出的寄存器列表，这里的意思表示ignore1使用EAX寄存器，ignore2使用ECX寄存器，futex使用的存储器。
+另外，每个操作数会有一个Number与之对应。如果我们一共使用了n个操作数，那么输出操作里的第一个操作数就是0号，之后递增，所以，%0代表ignore1，%1代表ignore2，%2代表futex。
+</dd>
+<dd>
+<p>“0” (0), “1” (1), “m” (futex)
+是输入寄存器，”0”表示%0操作数，其值为0，亦即设置ignore1=0，同理ignore2=1</p>
+</dd>
+</dl>
+<p>这样cmpxchgl %1, %2等价于： cmpxchgl ignore2 futex
+ignore2就是CAS里的新值N，N=1，futex是当前值V，但E又是什么呢？原来cmpxchgl使用了一个隐藏参数EAX代表E，前面已分析出来，EAX是ignore1，其值为0。则现在一切都清晰了，cmpxchgl检查futex（也就是__lock成员）是否为0（表示锁未占用），如是，赋值1（表示锁被占用），同时ZF标志位设置为1（ZF=1，JZ跳转，JNZ不跳转）；否则（说明锁已被占用），ZF标志位为0，JNZ跳转。</p>
+<p>归纳起来就是：先使用CAS判断_lock是否占用，若未占用，直接返回。否则，通过__lll_lock_wait_private调用SYS_futex系统调用迫使线程进入沉睡。
+上述过程就是所谓的FUTEX同步机制，CAS是用户态的指令，若无竞争，简单修改锁状态即返回，非常高效，只有发现竞争，才通过系统调用陷入内核态。所以，FUTEX是一种用户态和内核态混合的同步机制，它保证了低竞争情况下的锁获取效率。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/cpp/" rel="tag"># cpp</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/04/04/cpp/usleep%E5%92%8Cyield/" rel="prev" title="usleep和yield">
+                  <i class="fa fa-chevron-left"></i> usleep和yield
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/04/04/cpp/C++%E9%87%8D%E8%BD%BD%E8%BF%90%E7%AE%97%E7%AC%A6/" rel="next" title="C++重载运算符>>和<<">
+                  C++重载运算符>>和<< <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">singheart</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div><script color="0,0,255" opacity="0.5" zIndex="-1" count="99" src="https://cdn.jsdelivr.net/npm/canvas-nest.js@1/dist/canvas-nest.js"></script>
+
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"xinjiempolde","repo":"xinjiempolde.github.io","client_id":"89019d63999840fdbf7f","client_secret":"48d2133d88acfafada6414ec6eee5a9d9febcbc8","admin_user":"xinjiempolde","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"690f11a75fb3490baf7963110eb74da3"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/haruto.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>

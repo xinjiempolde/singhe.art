@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0-rc1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.11.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="前言：使用telnet模拟HTTP请求访问页面，及其使用telnet发送邮件  一、运行环境  ubuntu 16.04 telnet">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用telnet模拟HTTP和SMTP协议">
+<meta property="og:url" content="http://example.com/2022/04/04/linux/%E4%BD%BF%E7%94%A8telnet%E6%A8%A1%E6%8B%9FHTTP%E5%92%8CSMTP%E5%8D%8F%E8%AE%AE/index.html">
+<meta property="og:site_name" content="singheart&#39;s blog">
+<meta property="og:description" content="前言：使用telnet模拟HTTP请求访问页面，及其使用telnet发送邮件  一、运行环境  ubuntu 16.04 telnet">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://img.singhe.art/FpJoWxvW8X2d-MVv3f2liOcC___z">
+<meta property="og:image" content="http://img.singhe.art/FmnKKUHbO5bmYODrtxHlwe80Zcft">
+<meta property="og:image" content="http://img.singhe.art/FlWSiNNbPEevOvqMhsS8QbL48Td4">
+<meta property="article:published_time" content="2022-04-04T12:34:49.000Z">
+<meta property="article:modified_time" content="2024-12-11T13:03:57.700Z">
+<meta property="article:author" content="singheart">
+<meta property="article:tag" content="计算机网络">
+<meta property="article:tag" content="telnet">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://img.singhe.art/FpJoWxvW8X2d-MVv3f2liOcC___z">
+
+
+<link rel="canonical" href="http://example.com/2022/04/04/linux/%E4%BD%BF%E7%94%A8telnet%E6%A8%A1%E6%8B%9FHTTP%E5%92%8CSMTP%E5%8D%8F%E8%AE%AE/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2022/04/04/linux/%E4%BD%BF%E7%94%A8telnet%E6%A8%A1%E6%8B%9FHTTP%E5%92%8CSMTP%E5%8D%8F%E8%AE%AE/","path":"2022/04/04/linux/使用telnet模拟HTTP和SMTP协议/","title":"使用telnet模拟HTTP和SMTP协议"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>使用telnet模拟HTTP和SMTP协议 | singheart's blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">singheart's blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">多读书，多思考</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80%E8%BF%90%E8%A1%8C%E7%8E%AF%E5%A2%83"><span class="nav-number">1.</span> <span class="nav-text">一、运行环境</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%8C%E6%A8%A1%E6%8B%9Fhttp%E8%AF%B7%E6%B1%82"><span class="nav-number">2.</span> <span class="nav-text">二、模拟HTTP请求</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%B7%E5%9C%A8%E6%B5%8F%E8%A7%88%E5%99%A8%E4%B8%AD%E5%85%88%E8%AE%BF%E9%97%AEhttpcs144.keithw.orghello%E6%9F%A5%E7%9C%8B%E5%86%85%E5%AE%B9"><span class="nav-number">2.1.</span> <span class="nav-text">2.1
+请在浏览器中先访问http:&#x2F;&#x2F;cs144.keithw.org&#x2F;hello查看内容</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%88%91%E4%BB%AC%E5%8F%AF%E4%BB%A5%E9%80%9A%E8%BF%87telnet%E5%81%9A%E5%88%B0%E5%90%8C%E6%A0%B7%E7%9A%84%E4%BA%8B%E6%83%85"><span class="nav-number">2.2.</span> <span class="nav-text">2.2
+我们可以通过telnet做到同样的事情</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E4%BD%BF%E7%94%A8telnet%E5%8F%91%E9%80%81%E9%82%AE%E4%BB%B6"><span class="nav-number">2.2.1.</span> <span class="nav-text">三、使用telnet发送邮件</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9B%9B%E5%8F%91%E9%80%81%E5%B8%A6%E6%9C%89%E9%99%84%E4%BB%B6%E7%9A%84%E9%82%AE%E4%BB%B6"><span class="nav-number">3.</span> <span class="nav-text">四、发送带有附件的邮件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%94%E7%BB%93%E8%AF%AD"><span class="nav-number">4.</span> <span class="nav-text">五、结语</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="singheart"
+      src="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+  <p class="site-author-name" itemprop="name">singheart</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xinjiempolde" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xinjiempolde" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/04/04/linux/%E4%BD%BF%E7%94%A8telnet%E6%A8%A1%E6%8B%9FHTTP%E5%92%8CSMTP%E5%8D%8F%E8%AE%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+      <meta itemprop="name" content="singheart">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="使用telnet模拟HTTP和SMTP协议 | singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用telnet模拟HTTP和SMTP协议
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-04-04 20:34:49" itemprop="dateCreated datePublished" datetime="2022-04-04T20:34:49+08:00">2022-04-04</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-12-11 21:03:57" itemprop="dateModified" datetime="2024-12-11T21:03:57+08:00">2024-12-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <blockquote>
+<p>前言：使用telnet模拟HTTP请求访问页面，及其使用telnet发送邮件</p>
+</blockquote>
+<h1 id="一运行环境">一、运行环境</h1>
+<ul>
+<li>ubuntu 16.04</li>
+<li>telnet</li>
+</ul>
+<span id="more"></span>
+<h1 id="二模拟http请求">二、模拟HTTP请求</h1>
+<p>参考<a target="_blank" rel="noopener" href="https://cs144.github.io/assignments/lab0.pdf">CS144
+lab0</a></p>
+<h2 id="请在浏览器中先访问httpcs144.keithw.orghello查看内容">2.1
+请在浏览器中先访问http://cs144.keithw.org/hello查看内容</h2>
+<h2 id="我们可以通过telnet做到同样的事情">2.2
+我们可以通过telnet做到同样的事情</h2>
+<ol type="1">
+<li><p>在终端中输入<code>telnet cs144.keithw.org http</code>,
+你能够看到以下内容(需要注意的事情是这里输入的网址并不包含<code>/hello</code>路径)。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">~$ telnet 148.163.153.234 smtp</span><br><span class="line">Trying 148.163.153.234...</span><br><span class="line">Connected to 148.163.153.234.</span><br><span class="line">Escape character is &#x27;^]&#x27;.</span><br></pre></td></tr></table></figure></li>
+<li><p>在终端输入<code>GET /hello HTTP/1.1</code>，并按下回车。</p></li>
+<li><p>继续在终端输入<code>Host: cs144.keithw.org</code>，并按下回车。</p></li>
+<li><p>继续输入<code>Connection: close</code>，并按下回车。</p></li>
+<li><p><strong>不输入任何内容</strong>，并按下回车。</p></li>
+<li><p>然后你就会看到服务器发来的页面信息。</p></li>
+</ol>
+<figure>
+<img src="http://img.singhe.art/FpJoWxvW8X2d-MVv3f2liOcC___z"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<h3 id="三使用telnet发送邮件">三、使用telnet发送邮件</h3>
+<blockquote>
+<p>以下内容参考https://www.cnblogs.com/LYFer233/p/15215991.html</p>
+</blockquote>
+<p>由于无法使用斯坦福的邮箱，这里使用QQ邮箱作为示例，各个邮箱采用SMTP所以流程都大同小异。</p>
+<ol type="1">
+<li><p>在终端输入<code>telnet smtp.qq.com smtp</code>，并按下回车，显示以下内容</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">➜~ telnet smtp.qq.com smtp</span><br><span class="line">Trying 14.18.175.202...</span><br><span class="line">Connected to smtp.qq.com.</span><br><span class="line">Escape character is &#x27;^]&#x27;.</span><br><span class="line">220 newxmesmtplogicsvrszc8.qq.com XMail Esmtp QQ Mail Server.</span><br></pre></td></tr></table></figure></li>
+<li><p>在终端输入<code>HELO qq.com</code>，并按下回车，给服务器打个招呼，得到以下内容。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">HELO qq.com</span><br><span class="line">250-newxmesmtplogicsvrszc8.qq.com-9.46.31.207-101844334</span><br><span class="line">250-SIZE 73400320</span><br><span class="line">250 OK</span><br></pre></td></tr></table></figure></li>
+<li><p>登录你的QQ邮箱，依次进入：设置-&gt;账户-&gt;POP3/IMAP/SMTP/Exchange/CardDAV/CalDAV服务，然后开启IMPA/SMTP选项，生成邮箱授权码。</p>
+<figure>
+<img src="http://img.singhe.art/FmnKKUHbO5bmYODrtxHlwe80Zcft"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure></li>
+<li><p>接下来进行登录，在终端输入<code>auth login</code>，进行登录，需要输入你的邮箱的base64编码按下回车，然后输入你邮箱的授权码的base64编码，按下回车。可以在<a
+target="_blank" rel="noopener" href="https://www.base64encoder.io/">https://www.base64encoder.io</a>进行base64编码。</p>
+<p>如出现<code>235 Authentication successful</code>，则说明登录成功。</p></li>
+<li><p>接下来输入发信人邮箱。在终端输入<code>mail from： &lt;xinjiempolde@qq.com&gt;</code></p></li>
+<li><p>然后输入收信人邮箱。在终端输入<code>rcpt to： &lt;xinjiempolde@qq.com</code>,这里以自己给自己发送邮件作为示例。</p></li>
+<li><p>然后在终端输入<code>data</code>，告诉服务器我们要输入内容了，并收到以下提示。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">data</span><br><span class="line">354 End data with &lt;CR&gt;&lt;LF&gt;.&lt;CR&gt;&lt;LF&gt;.</span><br></pre></td></tr></table></figure></li>
+<li><p>输入邮箱的头信息、主题、内容等。注意以<code>.</code>和一行空行结束。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">from: xinjiempolde@qq.com</span><br><span class="line">to: xinjiempolde@qq.com</span><br><span class="line">subject: telnet learning</span><br><span class="line"></span><br><span class="line">this is a test for learning smtp with telnet.</span><br><span class="line">.</span><br></pre></td></tr></table></figure></li>
+<li><p>输入<code>quit</code>结束并发送邮件</p></li>
+</ol>
+<p>完整的流程截图如下：</p>
+<figure>
+<img src="http://img.singhe.art/FlWSiNNbPEevOvqMhsS8QbL48Td4"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<h1 id="四发送带有附件的邮件">四、发送带有附件的邮件</h1>
+<blockquote>
+<p>本节内容参考<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/46619234">telnet
+收发邮件，带附件</a></p>
+</blockquote>
+<p>古老的<code>SMTP</code>，也就是<code>Simple Mail Transfer Protocol</code>，只支持传输ASCII文本，不能支持其他附件的传输。如果要传输附件的话，需要在SMTP的基础上使用<code>MINE</code>。</p>
+<p>其他邮箱可能稍有不同，这里以QQ邮箱为例，完整流程如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">telnet smtp.qq.com smtp</span><br><span class="line">helo qq.com</span><br><span class="line">auth login</span><br><span class="line">发送方邮件名的base64编码</span><br><span class="line">邮箱授权码的base64编码</span><br><span class="line">mail from:&lt;邮箱地址&gt; 注意有&lt;&gt;</span><br><span class="line">rcpt to:&lt;接收方邮箱地址&gt;</span><br><span class="line">data</span><br><span class="line">from: &lt;你的邮箱地址&gt;</span><br><span class="line">to: &lt;接收方邮箱地址&gt;</span><br><span class="line">MIME-Version: 1.0</span><br><span class="line">Content-Type: multipart/mixed; boundary=&quot;a&quot;</span><br><span class="line">subject: test for transferring file 注意下方一定要有空行</span><br><span class="line"></span><br><span class="line">--a</span><br><span class="line">this is a test mail</span><br><span class="line">--a</span><br><span class="line">Content-Transfer-Encoding: base64</span><br><span class="line">Content-type:application/octet-stream; name=&quot;back.jpg&quot;</span><br><span class="line"></span><br><span class="line">(这里是back.jpg的base64编码，可以通过base64 back.jpg &gt; back.txt获取base64编码)</span><br><span class="line">--a--</span><br><span class="line">.</span><br><span class="line">quit</span><br></pre></td></tr></table></figure>
+<h1 id="五结语">五、结语</h1>
+<p>HTTP和SMTP都是在应用层，使用TCP协议进行传输，且都是通过ASCII码的形式进行请求和响应，因此，我们能够通过telnet这一工具进行实验。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag"># 计算机网络</a>
+              <a href="/tags/telnet/" rel="tag"># telnet</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/04/04/linux/socket%E7%BC%96%E7%A8%8B%E7%A4%BA%E4%BE%8B/" rel="next" title="socket编程示例">
+                  socket编程示例 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">singheart</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div><script color="0,0,255" opacity="0.5" zIndex="-1" count="99" src="https://cdn.jsdelivr.net/npm/canvas-nest.js@1/dist/canvas-nest.js"></script>
+
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"xinjiempolde","repo":"xinjiempolde.github.io","client_id":"89019d63999840fdbf7f","client_secret":"48d2133d88acfafada6414ec6eee5a9d9febcbc8","admin_user":"xinjiempolde","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"9e1e5684e261197b8bea451b400e633e"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/haruto.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>

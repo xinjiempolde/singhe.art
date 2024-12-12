@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0-rc1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.11.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="参考：  postgreSQL可变数据类型 - 知乎 (zhihu.com) Postgresql Varlena 结构 | 学习笔记 (zhmin.github.io)   0x00 可变长类型 0. Datum 的 typlen 的约定 如果Datum 类型是 “byVal”，则Datum表示一个值。如果Datum 类型不是”byVal“，则Datum 表示一个指针： typlen &gt;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="postgreSQL可变数据类型">
+<meta property="og:url" content="http://example.com/2024/06/27/openGauss/PostgreSQL%E5%8F%AF%E5%8F%98%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/index.html">
+<meta property="og:site_name" content="singheart&#39;s blog">
+<meta property="og:description" content="参考：  postgreSQL可变数据类型 - 知乎 (zhihu.com) Postgresql Varlena 结构 | 学习笔记 (zhmin.github.io)   0x00 可变长类型 0. Datum 的 typlen 的约定 如果Datum 类型是 “byVal”，则Datum表示一个值。如果Datum 类型不是”byVal“，则Datum 表示一个指针： typlen &gt;">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-06-27T12:47:24.000Z">
+<meta property="article:modified_time" content="2024-12-11T13:03:57.700Z">
+<meta property="article:author" content="singheart">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2024/06/27/openGauss/PostgreSQL%E5%8F%AF%E5%8F%98%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2024/06/27/openGauss/PostgreSQL%E5%8F%AF%E5%8F%98%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/","path":"2024/06/27/openGauss/PostgreSQL可变数据类型/","title":"postgreSQL可变数据类型"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>postgreSQL可变数据类型 | singheart's blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">singheart's blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">多读书，多思考</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#x00-%E5%8F%AF%E5%8F%98%E9%95%BF%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.</span> <span class="nav-text">0x00 可变长类型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#datum-%E7%9A%84-typlen-%E7%9A%84%E7%BA%A6%E5%AE%9A"><span class="nav-number">1.1.</span> <span class="nav-text">0. Datum 的 typlen 的约定</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%AF%E5%8F%98%E9%95%BF%E7%B1%BB%E5%9E%8Bvarlena"><span class="nav-number">1.2.</span> <span class="nav-text">1. 可变长类型varlena</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#varattrib_1b-small"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.1 varattrib_1b （small）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#varattrib_4bflat"><span class="nav-number">1.2.2.</span> <span class="nav-text">1.2 varattrib_4b（flat）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#varattrib_1b_e-toast"><span class="nav-number">1.2.3.</span> <span class="nav-text">1.3 varattrib_1b_e (toast)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#toast-%E6%8C%87%E9%92%88"><span class="nav-number">1.3.</span> <span class="nav-text">2. TOAST 指针</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#varatt_external%E8%A1%8C%E5%A4%96%E5%AD%98%E5%82%A8toast%E6%8C%87%E9%92%88"><span class="nav-number">1.3.1.</span> <span class="nav-text">（1）varatt_external（行外存储TOAST指针）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#varatt_indirect%E6%8C%87%E5%90%91varlena%E7%9A%84toast%E6%8C%87%E9%92%88"><span class="nav-number">1.3.2.</span> <span class="nav-text">（2）varatt_indirect（指向varlena的TOAST指针）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#varatt_expanded-%E5%86%85%E5%AD%98%E6%89%A9%E5%B1%95%E5%AD%98%E5%82%A8%E7%9A%84toast%E6%8C%87%E9%92%88"><span class="nav-number">1.3.3.</span> <span class="nav-text">（3）varatt_expanded
+（内存扩展存储的TOAST指针）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#varlena%E5%92%8Ctoast%E6%8C%87%E9%92%88%E5%85%B3%E7%B3%BB%E6%80%BB%E7%BB%93"><span class="nav-number">1.4.</span> <span class="nav-text">3. Varlena和TOAST指针关系总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%A7%E6%89%BF%E7%BB%93%E6%9E%84%E5%85%B3%E7%B3%BB"><span class="nav-number">1.4.1.</span> <span class="nav-text">3.1 继承结构关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84%E5%85%B3%E7%B3%BB"><span class="nav-number">1.4.2.</span> <span class="nav-text">3.2 存储结构关系</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%AF%E5%8F%98%E9%95%BF%E7%B1%BB%E5%9E%8B%E7%9A%84%E6%93%8D%E4%BD%9C"><span class="nav-number">1.5.</span> <span class="nav-text">4. 可变长类型的操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%9A%E7%94%A8%E7%9A%84%E5%AE%8F"><span class="nav-number">1.5.1.</span> <span class="nav-text">4.1 通用的宏</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B1%BB%E5%9E%8B%E7%9B%B8%E5%85%B3%E7%9A%84%E5%AE%8F"><span class="nav-number">1.5.2.</span> <span class="nav-text">4.2 类型相关的宏</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E5%AD%98expanded%E7%9A%84%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.6.</span> <span class="nav-text">5. 内存expanded的数据类型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#expandedobjectmethods"><span class="nav-number">1.6.1.</span> <span class="nav-text">5.1 ExpandedObjectMethods</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%88%A4%E6%96%AD%E4%B8%80%E4%B8%AAvarlena%E7%B1%BB%E5%9E%8B%E6%98%AF%E4%B8%8D%E6%98%AFexpandedobjectheader"><span class="nav-number">1.6.2.</span> <span class="nav-text">5.2
+如何判断一个varlena类型是不是ExpandedObjectHeader</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#expandedobjectheader-%E5%92%8C-varatt_expanded-%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="nav-number">1.6.3.</span> <span class="nav-text">5.3
+ExpandedObjectHeader 和 varatt_expanded 的关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#expandedobjectheader-%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="nav-number">1.6.4.</span> <span class="nav-text">5.4 ExpandedObjectHeader
+的例子</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="singheart"
+      src="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+  <p class="site-author-name" itemprop="name">singheart</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xinjiempolde" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xinjiempolde" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/06/27/openGauss/PostgreSQL%E5%8F%AF%E5%8F%98%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+      <meta itemprop="name" content="singheart">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="postgreSQL可变数据类型 | singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          postgreSQL可变数据类型
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-06-27 20:47:24" itemprop="dateCreated datePublished" datetime="2024-06-27T20:47:24+08:00">2024-06-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-12-11 21:03:57" itemprop="dateModified" datetime="2024-12-11T21:03:57+08:00">2024-12-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/openGauss/" itemprop="url" rel="index"><span itemprop="name">openGauss</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <blockquote>
+<p>参考：</p>
+<ul>
+<li><a
+target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/614890090">postgreSQL可变数据类型 -
+知乎 (zhihu.com)</a></li>
+<li><a
+target="_blank" rel="noopener" href="https://zhmin.github.io/posts/postgresql-varlena/">Postgresql
+Varlena 结构 | 学习笔记 (zhmin.github.io)</a></li>
+</ul>
+</blockquote>
+<h1 id="x00-可变长类型">0x00 可变长类型</h1>
+<h2 id="datum-的-typlen-的约定">0. Datum 的 typlen 的约定</h2>
+<p>如果Datum 类型是 “byVal”，则Datum表示一个值。如果Datum
+类型不是”byVal“，则Datum 表示一个指针：</p>
+<p>typlen &gt; 0， Datum 就指向固定长度字节流，比如int类型 typlen ==
+-1， Datum 指向一个变长 varlena 结构体，比如char，varchar类型 typlen ==
+-2， Datum 指向一个C语言风格的字符串；</p>
+<p>因此，查看所有的变长数据类型：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> typname <span class="keyword">FROM</span> pg_type <span class="keyword">WHERE</span> typlen <span class="operator">=</span> <span class="number">-1</span></span><br></pre></td></tr></table></figure>
+<span id="more"></span>
+<h2 id="可变长类型varlena">1. 可变长类型varlena</h2>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">varlena</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">char</span>		vl_len_[<span class="number">4</span>];		<span class="comment">/* Do not touch this field directly! */</span></span><br><span class="line">	<span class="type">char</span>		vl_dat[FLEXIBLE_ARRAY_MEMBER];	<span class="comment">/* Data content is here */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> VARHDRSZ		((int32) sizeof(int32))</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * These widely-used datatypes are just a varlena header and the data bytes.</span></span><br><span class="line"><span class="comment"> * There is no terminating null or anything like that --- the data length is</span></span><br><span class="line"><span class="comment"> * always VARSIZE_ANY_EXHDR(ptr).</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">varlena</span> bytea;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">varlena</span> text;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">varlena</span> BpChar;	<span class="comment">/* blank-padded char, ie SQL char(n) */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">varlena</span> VarChar; <span class="comment">/* var-length char, ie SQL varchar(n) */</span></span><br></pre></td></tr></table></figure>
+<p>为了可以存储任意的数据，跳出CString中需要使用<code>'\0'</code>来作为终结符的弊端，PG采用了Varlena数据类型，由于不再有终结符表示数组的结束，所以必须存在一个长度字段指出当前的数组长度大小（Redis中的SDS也是类似的设计），以及是否经过了TOAST（是否压缩，是否行外存储等）。因此Varlena在数据开头引入了一个header。</p>
+<p>注意<code>varlena</code>只是变长数据类型的基类，在具体使用中一般很少直接使用varlena类型。<code>varlena</code>还分为很多种子类，每种格式的定义都不相同。我们在使用之前，需要根据它的第一个字节，转换为它对应格式：</p>
+<ol type="1">
+<li>第一个字节等于<code>000 00001</code>（小端序）,
+那么就是<code>varattrib_1b_e</code>，用来存储和toast有关的 external
+数据</li>
+<li>第一个字节的最高位等于1，且后7bit不全为0，那么就是<code>varattrib_1b</code>，用来存储小数据</li>
+<li>第一个字节的最高位等于0，那么就是<code>varattrib_4b</code>，可以存储不超过1GB的数据</li>
+</ol>
+<p>另外需要注意的是，所有的Varlena类型中的vl_len_字段都是包括了header自身的大小，如果需要获得实际的数据大小需要减去header的长度。</p>
+<h3 id="varattrib_1b-small">1.1 varattrib_1b （small）</h3>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span></span><br><span class="line">&#123;</span><br><span class="line">	uint8		va_header;</span><br><span class="line">	<span class="type">char</span>		va_data[FLEXIBLE_ARRAY_MEMBER]; <span class="comment">/* Data begins here */</span></span><br><span class="line">&#125; varattrib_1b;</span><br></pre></td></tr></table></figure>
+<p>注意到<code>varattrib_1b</code>的<code>va_header</code>只有 8
+位，最高位是标记位，值为 1。剩余的 7
+位表示数据长度，所以<code>varattrib_1b</code>类型只是用于存储长度不超过127
+byte
+的小数据，<code>varattrib_1b</code>最常见的用法就是存放一个TOAST指针。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">-----------------------------------------</span><br><span class="line">   tag   |         length               |   </span><br><span class="line">-----------------------------------------</span><br><span class="line">  1 bit  |        7 bit                 |</span><br><span class="line">-----------------------------------------</span><br></pre></td></tr></table></figure>
+<h3 id="varattrib_4bflat">1.2 varattrib_4b（flat）</h3>
+<p>这种数据形式一般被称为"flat"的形式，即<strong>没有经过TOAST机制的行外存储</strong>，也就是说其<code>va_data</code>中存储就是实际的变长数据。</p>
+<p>对于未压缩的数据，使用<code>va_4byte</code>结构体存储，这是一个最原始的变长类型。观察<code>va_4byte</code>对象，其内部的定义和一个原始的<code>varlena</code>结构体一模一样，所以<code>varattrib_4b.va_4byte</code>是变长类型中唯一和TOAST没关系的类型。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * These structs describe the header of a varlena object that may have been</span></span><br><span class="line"><span class="comment"> * TOASTed.  Generally, don&#x27;t reference these structs directly, but use the</span></span><br><span class="line"><span class="comment"> * macros below.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * We use separate structs for the aligned and unaligned cases because the</span></span><br><span class="line"><span class="comment"> * compiler might otherwise think it could generate code that assumes</span></span><br><span class="line"><span class="comment"> * alignment while touching fields of a 1-byte-header varlena.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">union</span> &#123;</span><br><span class="line">    <span class="keyword">struct</span> <span class="comment">/* Normal varlena (4-byte length) */</span></span><br><span class="line">    &#123;</span><br><span class="line">        uint32 va_header;</span><br><span class="line">        <span class="type">char</span> va_data[FLEXIBLE_ARRAY_MEMBER];</span><br><span class="line">    &#125; va_4byte;</span><br><span class="line">    <span class="keyword">struct</span> <span class="comment">/* Compressed-in-line format */</span></span><br><span class="line">    &#123;</span><br><span class="line">        uint32 va_header;</span><br><span class="line">        uint32 va_rawsize;                   <span class="comment">/* Original data size (excludes header) */</span></span><br><span class="line">        <span class="type">char</span> va_data[FLEXIBLE_ARRAY_MEMBER]; <span class="comment">/* Compressed data */</span></span><br><span class="line">    &#125; va_compressed;</span><br><span class="line">&#125; varattrib_4b;</span><br></pre></td></tr></table></figure>
+<p>对于压缩的数据，使用<code>va_compressed</code>结构体存储，其内部存储了数据压缩之前的大小。<code>varattrib_4b</code>使用<code>union</code>来表示这两种情况。<code>varattrib_4b</code>的头部<code>va_header</code>是一个32bit大小的类型，其第一位为0，用于与<code>varattrib_1b</code>类型进行区分，而其<code>va_header</code>中的第二高位用于区分数据是否被压缩，为1，则表示存储的数据是压缩的。为0，则表示存储的数据是未压缩过的。剩下的
+30 位表示数据的长度，所以只能支持不超过 1GB (<span
+class="math inline">\(2^{30} - 1\)</span> bytes) 的数据。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">--------------------------------------------------</span><br><span class="line">    tag    |    compress    |      length        |</span><br><span class="line">--------------------------------------------------</span><br><span class="line">   1 bit   |    1 bit       |      30 bit        |</span><br><span class="line">-------------------------------------------------</span><br></pre></td></tr></table></figure>
+<h3 id="varattrib_1b_e-toast">1.3 varattrib_1b_e (toast)</h3>
+<p><code>varattrib_1b_e</code>就是我们所说的“TOAST
+指针”的父类，它并不存储数据，他的<code>va_data</code>数据段存放的是TOAST指针，可以是三种不同类型：
+<code>varatt_external</code>， <code>varatt_indirect</code>，
+<code>varatt_expanded</code>。这三种不同的TOAST指针具体在下一小节中会详细介绍。</p>
+<p>varattrib_1b_e结构的首部header的第一个字节永远是 0x80（大端序） or
+0x01 （小端序）</p>
+<p><code>varattrib_1b_e</code> 是
+<code>varattrib_1b</code>类型的一个子集，其和 <code>varattrib_1b</code>
+类型的唯一区别就是多了一个 <code>va_tag</code>
+字段，其可以指出在<code>va_data</code>数据段中到底存放了哪一种的TOAST指针。同时需要注意的是varattrib_1b_e
+类型和<code>varattrib_1b</code>一样，内部的字段都是未对齐的（因为va_data是一个char数组），因此如果需要访问对应的va_data字段，只能使用memcpy的方法，将其va_data范围内的数据copy到<code>varatt_external</code>，
+<code>varatt_indirect</code>，
+<code>varatt_expanded</code>结构体中，然后在对其进行访问，可以使用PG提供的宏<code>VARATT_EXTERNAL_GET_POINTER</code>实现这一点。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* TOAST pointers are a subset of varattrib_1b with an identifying tag byte */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span></span><br><span class="line">&#123;</span><br><span class="line">	uint8		va_header;		<span class="comment">/* Always 0x80 or 0x01 */</span></span><br><span class="line">	uint8		va_tag;			<span class="comment">/* Type of datum */</span></span><br><span class="line">	<span class="type">char</span>		va_data[FLEXIBLE_ARRAY_MEMBER]; <span class="comment">/* Type-specific data */</span></span><br><span class="line">&#125; varattrib_1b_e;</span><br></pre></td></tr></table></figure>
+<p>第二个字节<code>va_tag</code>表示类型，有下面四种。每种类型下，它的
+<code>va_data</code>存储的格式都不是一样的：</p>
+<p>// 不同种“Toast 指针”的种类标签</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">enum</span> <span class="title class_">vartag_external</span></span><br><span class="line">&#123;</span><br><span class="line"> VARTAG_INDIRECT = <span class="number">1</span>,     <span class="comment">// 属于 varatt_indirect 类型的TOAST指针</span></span><br><span class="line"> VARTAG_EXPANDED_RO = <span class="number">2</span>,  <span class="comment">// 属于 ExpandedObjectHeader 类型的 只读指针</span></span><br><span class="line"> VARTAG_EXPANDED_RW = <span class="number">3</span>,  <span class="comment">// 属于 ExpandedObjectHeader 类型的 读写指针</span></span><br><span class="line"> VARTAG_ONDISK = <span class="number">18</span>  	  <span class="comment">// 属于 varatt_external 类型的指针</span></span><br><span class="line">&#125; vartag_external;</span><br></pre></td></tr></table></figure>
+<p>下面展示一个创建 <code>varlena</code>数据的例子：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">result = (<span class="keyword">struct</span> varlena *) <span class="built_in">palloc</span>(length + VARHDRSZ); <span class="comment">// 分配堆内存</span></span><br><span class="line"><span class="built_in">SET_VARSIZE</span>(result, length + VARHDRSZ);   <span class="comment">// 设置头部</span></span><br><span class="line"><span class="built_in">memcpy</span>(<span class="built_in">VARDATA</span>(result), mydata, length); <span class="comment">// 写入数据</span></span><br></pre></td></tr></table></figure>
+<h2 id="toast-指针">2. TOAST 指针</h2>
+<p>刚才我们提到了varattrib_1b_e是所有TOAST指针的父类，而其下又有三种具体的，不同的类型TOAST指针，分别是<code>varatt_external</code>，
+<code>varatt_indirect</code>，
+<code>varatt_expanded</code>。需要注意的是，这里的“TOAST
+pointer”并不是c语言意义上的指针，而是表示的是指出被Toasted的数据实际存放位置的结构体。</p>
+<h3
+id="varatt_external行外存储toast指针">（1）varatt_external（行外存储TOAST指针）</h3>
+<p><code>struct varatt_external</code>是一个传统的：TOAST指针“（也就在官方文档中提到的基于物理存储的TOAST指针）。
+也就是说，其包含了行外存储在TOAST表中的Datum所需的信息。
+仅当<code>va_extsize &lt;va_rawsize-VARHDRSZ</code>时，才压缩数据。该结构不得包含任何padding，因为我们有时会使用<code>memcmp</code>比较这些结构体。</p>
+<p>请再次注意，由于<code>varatt_external</code>并未对齐地存储在实际的元组中，因此，在查看这些字段之前，需要将元组中的数据
+memcpy 到本地struct变量中，然后才可以查看里面的字段！ （我们之所以使用
+memcmp
+，是为了避免通过比较两个指针内部的字段值判断两个指针相等，而只检测两个TOAST指针（结构体）的值是否相等就可以了。）</p>
+<p>/* TOAST指针的实现*/</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * struct varatt_external is a traditional &quot;TOAST pointer&quot;, that is, the</span></span><br><span class="line"><span class="comment"> * information needed to fetch a Datum stored out-of-line in a TOAST table.</span></span><br><span class="line"><span class="comment"> * The data is compressed if and only if the external size stored in</span></span><br><span class="line"><span class="comment"> * va_extinfo is less than va_rawsize - VARHDRSZ.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * This struct must not contain any padding, because we sometimes compare</span></span><br><span class="line"><span class="comment"> * these pointers using memcmp.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * Note that this information is stored unaligned within actual tuples, so</span></span><br><span class="line"><span class="comment"> * you need to memcpy from the tuple into a local struct variable before</span></span><br><span class="line"><span class="comment"> * you can look at these fields!  (The reason we use memcmp is to avoid</span></span><br><span class="line"><span class="comment"> * having to do that just to detect equality of two TOAST pointers...)</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">varatt_external</span></span><br><span class="line">&#123;</span><br><span class="line">	int32		va_rawsize;		<span class="comment">/* Original data size (includes header) */</span></span><br><span class="line">	uint32		va_extinfo;		<span class="comment">/* External saved size (without header) and compression method */</span></span><br><span class="line">	Oid		va_valueid;		<span class="comment">/* Unique ID of value within TOAST table */</span></span><br><span class="line">	Oid		va_toastrelid;	        <span class="comment">/* RelID of TOAST table containing it */</span></span><br><span class="line">&#125; varatt_external;</span><br></pre></td></tr></table></figure>
+<h3
+id="varatt_indirect指向varlena的toast指针">（2）varatt_indirect（指向varlena的TOAST指针）</h3>
+<p><code>truct varatt_indirect</code>只是一个<code>varlena</code>指针，可以指向<code>varatt_external</code>，<code>varatt_expanded</code>，或者是<code>varattrib_1b</code>，<code>varattrib_4b</code>
+类型的原始数据。其指向的必须是存储在<strong>内存中</strong>而不是行外磁盘存储的toast关系中的Datum。
+创建者就需要完全负责被引用的空间的生存周期，
+只要该引用Datum指针存在。</p>
+<p>请注意，就像struct
+varatt_external一样，此结构未对齐地存储在任何包含元组中。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">varatt_indirect</span></span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">varlena</span> *pointer; <span class="comment">/* Pointer to in-memory varlena */</span></span><br><span class="line"></span><br><span class="line">&#125; varatt_indirect;</span><br></pre></td></tr></table></figure>
+<h3 id="varatt_expanded-内存扩展存储的toast指针">（3）varatt_expanded
+（内存扩展存储的TOAST指针）</h3>
+<p>struct varatt_expanded是一个“
+TOAST指针”，表示存储在<strong>内存中</strong>的行外数据，
+采用某种特定于类型的，不一定物理连续的格式，便于计算而不是存储。
+<code>src/include/utils/expandeddatum.h</code>中提供了
+<code>ExpandedObjectHeader</code>
+类型的操作API。在下面的expandeddatum的章节中会专门介绍这种数据类型。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">ExpandedObjectHeader</span> ExpandedObjectHeader;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">varatt_expanded</span> &#123;</span><br><span class="line"></span><br><span class="line">	ExpandedObjectHeader *eohptr;</span><br><span class="line"></span><br><span class="line">&#125; varatt_expanded;</span><br></pre></td></tr></table></figure>
+<h2 id="varlena和toast指针关系总结">3. Varlena和TOAST指针关系总结</h2>
+<h3 id="继承结构关系">3.1 继承结构关系</h3>
+<h3 id="存储结构关系">3.2 存储结构关系</h3>
+<h2 id="可变长类型的操作">4. 可变长类型的操作</h2>
+<p>上一小节介绍了三种可变长类型，在一般情况下，我们不能直接对这些结构体进行操作，因为数据并不是存放在一个栈上的结构体里面，这些结构体只是对存放的字节如何解释做出了定义，如果我们想要访问字段的值需要将Datum强制转换为可变长类型的指针，配合一系列的宏获取字段的值。</p>
+<p>下面是一些常见的宏：</p>
+<h3 id="通用的宏">4.1 通用的宏</h3>
+<p>通用的宏：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">VARSIZE_ANY</span>(PTR)  	返回任意varlena指针指向的可变对象的长度（包括header）</span><br><span class="line"><span class="built_in">VARSIZE_ANY_EXHDR</span>(PTR)   返回任意varlena指针指向的可变对象的数据长度（不包括header）</span><br><span class="line"><span class="built_in">VARDATA_ANY</span>(PTR)  	返回任意varlena指针指向的可变对象的起始数据地址（不支持external <span class="keyword">or</span> compressed-in-line Datum）</span><br><span class="line"><span class="built_in">VARATT_IS_EXTENDED</span>(PTR)  指针是否是扩展的类型，除了VARATT_IS_4B_U都是</span><br></pre></td></tr></table></figure>
+<p>设置varlena类型的长度</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">SET_VARSIZE</span>(PTR, len)</span><br><span class="line"><span class="built_in">SET_VARSIZE_SHORT</span>(PTR, len)</span><br><span class="line"><span class="built_in">SET_VARSIZE_COMPRESSED</span>(PTR, len)</span><br></pre></td></tr></table></figure>
+<p>查看header的第一个字节：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">VARATT_IS_COMPRESSED</span>(PTR)  <span class="comment">// 数据是否是压缩的</span></span><br></pre></td></tr></table></figure>
+<h3 id="类型相关的宏">4.2 类型相关的宏</h3>
+<p>varattrib_4b相关：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">VARDATA</span>(PTR)  	<span class="comment">// 获得varattrib_4b指针类型的数据起始地址</span></span><br><span class="line"><span class="built_in">VARSIZE</span>(PTR)	<span class="comment">// 获得varattrib_4b指针类型指向的可变对象的长度（包括header）</span></span><br></pre></td></tr></table></figure>
+<p>varattrib_1b相关：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">VARATT_IS_SHORT</span>(PTR) <span class="comment">// 指针是否是 varattrib_1b 的</span></span><br><span class="line"><span class="built_in">VARSIZE_SHORT</span>(PTR)	<span class="comment">// 同上</span></span><br><span class="line"><span class="built_in">VARDATA_SHORT</span>(PTR)	<span class="comment">// 同上</span></span><br></pre></td></tr></table></figure>
+<p>varattrib_1b_e相关：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">VARATT_IS_EXTERNAL</span>(PTR)  指针是否是 varattrib_1b_e 的</span><br><span class="line"><span class="built_in">SET_VARTAG_EXTERNAL</span>(PTR, tag)	设置 varattrib_1b_e 指针类型的va_tag字段</span><br><span class="line"><span class="built_in">VARTAG_EXTERNAL</span>(PTR)	获得 varattrib_1b_e 指针类型的va_tag字段的起始地址</span><br><span class="line"><span class="built_in">VARSIZE_EXTERNAL</span>(PTR)	同上</span><br><span class="line"><span class="built_in">VARDATA_EXTERNAL</span>(PTR)	同上</span><br><span class="line"><span class="built_in">VARATT_IS_EXTERNAL_ONDISK</span>(PTR)        指针是否是 <span class="function">VARTAG_ONDISK </span></span><br><span class="line"><span class="function"><span class="title">VARATT_IS_EXTERNAL_INDIRECT</span><span class="params">(PTR)</span>     指针是否是 VARTAG_INDIRECT </span></span><br><span class="line"><span class="function"><span class="title">VARATT_IS_EXTERNAL_EXPANDED_RO</span><span class="params">(PTR)</span>  指针是否是VARTAG_EXPANDED_RO</span></span><br><span class="line"><span class="function"><span class="title">VARATT_IS_EXTERNAL_EXPANDED_RW</span><span class="params">(PTR)</span>  指针是否是VARTAG_EXPANDED_RW</span></span><br></pre></td></tr></table></figure>
+<h2 id="内存expanded的数据类型">5. 内存expanded的数据类型</h2>
+<p>这部分的内容主要在<code>expandedaatum.h</code></p>
+<p>复杂的数据类型，尤其是诸如<code>array</code>和<code>record</code>之类的容器类型，通常在磁盘上具有紧凑的存储形式，但并利于修改。而且，当我们修改它们时可能会非常低效，因为我们不得不重新复制其余所有值。因此，PG提供了“扩展（expanded）”的概念，这一概念属于内存TOAST技术的一种，这种存储格式仅在<strong>内存</strong>中使用，内存扩展类型针对计算而非存储进行了更多优化。稍后我们会发现，<code>Array</code>类型的<code>expanded</code>结构是如何加速下标访问的。</p>
+<p>我们将出现在磁盘上的格式称为数据类型的“扁平（flattened）”表示形式，flattened的存储格式是连续的字节blob（块）。但是该类型也可以具有<code>expanded</code>表示形式用来加速内存中的计算，比如访问或者排序。如果一个数据类型支持<code>expanded</code>的表示类型，其必须提供将<code>expanded</code>的表示形式转换回<code>flat</code>形式的方法。</p>
+<p>PG中所有支持<code>expanded</code>的数据结构都必须包含<code>ExpandedObjectHeader</code>，其定义如下所示：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">ExpandedObjectHeader</span></span><br><span class="line">&#123;</span><br><span class="line"> <span class="comment">/* Phony varlena header Phony varlena标头 */</span></span><br><span class="line"> int32  vl_len_;  <span class="comment">/* 对于 ExpandedObjectHeader 对象来说，其vl_len域永远是 -1 */</span></span><br><span class="line"> <span class="type">const</span> ExpandedObjectMethods *eoh_methods;       <span class="comment">// 扩展对象需要实现函数指针结构体，一个是获取flat格式方法，一个是获取flat size的方法</span></span><br><span class="line"> MemoryContext eoh_context;        <span class="comment">// 包含此 header 和 辅助数据 的内存上下文</span></span><br><span class="line"> <span class="type">char</span>  eoh_rw_ptr[EXPANDED_POINTER_SIZE];	<span class="comment">// 读写指针（TOAST指针结构体）</span></span><br><span class="line"> <span class="type">char</span>  eoh_ro_ptr[EXPANDED_POINTER_SIZE];  <span class="comment">// 只读指针（TOAST指针结构体）</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="expandedobjectmethods">5.1 ExpandedObjectMethods</h3>
+<p>ExpandedObjectMethods中定义了两个需要编码数据结构的程序员实现的方法。所有支持expand的数据类型都需要实现ExpandedObjectMethods中给出的两个方法，<code>flatten_into</code>用于在<code>detoast</code>的时候将一个<code>expand</code>表示转换为<code>flat</code>的表示。而<code>get_flat_size</code>是方便获得一个<code>expand</code>表示展开成<code>flat</code>表示后的大小。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Struct of function pointers for an expanded object&#x27;s methods */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">ExpandedObjectMethods</span></span><br><span class="line">&#123;</span><br><span class="line"> EOM_get_flat_size_method get_flat_size;</span><br><span class="line"> EOM_flatten_into_method flatten_into;</span><br><span class="line">&#125; ExpandedObjectMethods;</span><br></pre></td></tr></table></figure>
+<h3 id="如何判断一个varlena类型是不是expandedobjectheader">5.2
+如何判断一个varlena类型是不是ExpandedObjectHeader</h3>
+<p>PG在设计ExpandedObjectHeader时，考虑到了对于只读函数，如果既能够处理同一种数据类型常规的
+”flat“
+的varlena输入（即<code>varattrib_4b</code>类型），也能够处理其扩展的ExpandedObjectHeader
+的输入，这是十分方便的。因此为了使得函数确定输入的varlena指针到底指向的是哪一种类型，
+ExpandedObjectHeader
+的第一个int32始终是-1（定义为宏：<code>EOH_HEADER_MAGIC</code>）。
+<code>-1</code>的二进制表示为<code>1111 11111</code>，其不会和<code>varattrib_4b</code>的header冲突。</p>
+<p>这一判断方法被宏：<code>VARATT_IS_EXPANDED_HEADER(PTR)</code>所封装，其返回true表示输入的指针指向的是一个ExpandedObjectHeader对象。</p>
+<p>举个例子来说，在Array类型的实现中，Array类型的编码人员设计了一个名为<code>AnyArrayType</code>的联合体，包含了这两种不同的array
+varlena类型。就简化了代码的处理逻辑，只需要以宏AARR_XXX开头的宏就可以同时处理这两种数据类型。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">union</span> <span class="title class_">AnyArrayType</span></span><br><span class="line">&#123;</span><br><span class="line"> ArrayType	flt;  	<span class="comment">// flat格式的array类型</span></span><br><span class="line"> ExpandedArrayHeader xpn;  <span class="comment">// expand格式的array类型</span></span><br><span class="line">&#125; AnyArrayType;</span><br><span class="line"><span class="comment">/** Macros for working with AnyArrayType inputs.  Beware multiple references!</span></span><br><span class="line"><span class="comment"> 为了篇幅删去了具体宏定义*/</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> AARR_NDIM(a)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> AARR_HASNULL(a)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> AARR_ELEMTYPE(a)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> AARR_DIMS(a) </span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> AARR_LBOUND(a)</span></span><br></pre></td></tr></table></figure>
+<h3 id="expandedobjectheader-和-varatt_expanded-的关系">5.3
+ExpandedObjectHeader 和 varatt_expanded 的关系</h3>
+<p>我们之前在TOAST
+指针中介绍过最后一种expand类型的TOAST指针<code>varatt_expanded</code>
+结构，其内部只有一个ExpandedObjectHeader指针。而<code>varatt_expanded</code>
+结构又是存放在结构体<code>varattrib_1b_e</code>
+的va_data字段。也就是说函数传入的参数一般是一个<code>varattrib_1b_e</code>
+指针（一个Datum）。</p>
+<p>所以为了获取实际的ExpandedObjectHeader指针，我们首先把Datum强制转换为<code>(varattrib_1b_e *)</code>指针，然后再利用宏<code>VARDATA_EXTERNAL</code>确定varattrib_1b_e
+结构中va_data域（指针域）的位置，然后使用memcpy将其拷贝到varatt_expanded结构体中，然后再从中提取出<code>（ExpandedObjectHeader *</code>）指针。参加如下的函数：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// expandeddatu.c</span></span><br><span class="line"><span class="comment">// 给定一个作为expanded对象引用的Datum，在将其转化为varatt_indirect后返回其内部的ExpandedObjectHeader指针</span></span><br><span class="line"><span class="function">ExpandedObjectHeader *</span></span><br><span class="line"><span class="function"><span class="title">DatumGetEOHP</span><span class="params">(Datum d)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"> varattrib_1b_e *datum = (varattrib_1b_e *) <span class="built_in">DatumGetPointer</span>(d);</span><br><span class="line"> varatt_expanded ptr;</span><br><span class="line"> <span class="built_in">Assert</span>(<span class="built_in">VARATT_IS_EXTERNAL_EXPANDED</span>(datum));</span><br><span class="line"> <span class="built_in">memcpy</span>(&amp;ptr, <span class="built_in">VARDATA_EXTERNAL</span>(datum), <span class="built_in">sizeof</span>(ptr));  <span class="comment">// dest &lt;=== src</span></span><br><span class="line"> <span class="built_in">Assert</span>(<span class="built_in">VARATT_IS_EXPANDED_HEADER</span>(ptr.eohptr));</span><br><span class="line"> <span class="keyword">return</span> ptr.eohptr;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="expandedobjectheader-的例子">5.4 ExpandedObjectHeader
+的例子</h3>
+<p>在Array类型中，array_expanded.c中定义了Array类型的扩展API和对应的header
+ExpandedArrayHeader，其和基类ExpandedObjectHeader的关系如下所示：</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/06/27/openGauss/PostgreSQL%E6%95%B0%E6%8D%AE%E8%A1%A8%E6%96%87%E4%BB%B6%E5%BA%95%E5%B1%82%E7%BB%93%E6%9E%84%E5%B8%83%E5%B1%80%E5%88%86%E6%9E%90/" rel="prev" title="postgreSQL底层存储结构">
+                  <i class="fa fa-chevron-left"></i> postgreSQL底层存储结构
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/06/27/openGauss/PostgreSQL%E4%B8%ADtoast/" rel="next" title="postgreSQL中TOAST类型">
+                  postgreSQL中TOAST类型 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">singheart</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div><script color="0,0,255" opacity="0.5" zIndex="-1" count="99" src="https://cdn.jsdelivr.net/npm/canvas-nest.js@1/dist/canvas-nest.js"></script>
+
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"xinjiempolde","repo":"xinjiempolde.github.io","client_id":"89019d63999840fdbf7f","client_secret":"48d2133d88acfafada6414ec6eee5a9d9febcbc8","admin_user":"xinjiempolde","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"f772d3f988d422598c8e0e5e39d6ffa2"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/haruto.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>

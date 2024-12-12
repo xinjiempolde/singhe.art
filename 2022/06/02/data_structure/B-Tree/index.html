@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0-rc1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.11.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="本文内容参考自YouTube Abdul Bari，若有错误还请指正。十分推荐观看原视频，讲得非常清晰易懂。  前言 本文将从硬盘的物理结构说起，介绍关系表中的数据如何在磁盘上进行存储和表示。并通过查询的例子，说明为什么要使用索引来加快查询。本文将从索引结构的设计角度，从m路查找树过渡到B树和B+树。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="B-Tree">
+<meta property="og:url" content="http://example.com/2022/06/02/data_structure/B-Tree/index.html">
+<meta property="og:site_name" content="singheart&#39;s blog">
+<meta property="og:description" content="本文内容参考自YouTube Abdul Bari，若有错误还请指正。十分推荐观看原视频，讲得非常清晰易懂。  前言 本文将从硬盘的物理结构说起，介绍关系表中的数据如何在磁盘上进行存储和表示。并通过查询的例子，说明为什么要使用索引来加快查询。本文将从索引结构的设计角度，从m路查找树过渡到B树和B+树。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://img.singhe.art/04fig01.gif">
+<meta property="og:image" content="http://img.singhe.art/multiple-level-index.png">
+<meta property="og:image" content="http://img.singhe.art/high-level.png">
+<meta property="og:image" content="http://img.singhe.art/%E4%BA%8C%E5%8F%89%E6%A0%91.png">
+<meta property="og:image" content="http://img.singhe.art/B+%E6%A0%91.png">
+<meta property="article:published_time" content="2022-06-02T10:43:49.000Z">
+<meta property="article:modified_time" content="2024-12-11T13:03:57.699Z">
+<meta property="article:author" content="singheart">
+<meta property="article:tag" content="B-Tree">
+<meta property="article:tag" content="database">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://img.singhe.art/04fig01.gif">
+
+
+<link rel="canonical" href="http://example.com/2022/06/02/data_structure/B-Tree/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2022/06/02/data_structure/B-Tree/","path":"2022/06/02/data_structure/B-Tree/","title":"B-Tree"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>B-Tree | singheart's blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">singheart's blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">多读书，多思考</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E7%BB%93%E6%9E%84"><span class="nav-number">2.</span> <span class="nav-text">磁盘结构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%A6%82%E4%BD%95%E5%AD%98%E5%82%A8%E5%9C%A8%E7%A3%81%E7%9B%98%E4%B8%8A"><span class="nav-number">3.</span> <span class="nav-text">表数据如何存储在磁盘上</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#m%E8%B7%AF%E6%9F%A5%E6%89%BE%E6%A0%91"><span class="nav-number">4.</span> <span class="nav-text">m路查找树</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#b%E6%A0%91"><span class="nav-number">5.</span> <span class="nav-text">B树</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#b%E6%A0%91-1"><span class="nav-number">6.</span> <span class="nav-text">B+树</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="singheart"
+      src="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+  <p class="site-author-name" itemprop="name">singheart</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xinjiempolde" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xinjiempolde" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/02/data_structure/B-Tree/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+      <meta itemprop="name" content="singheart">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="B-Tree | singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          B-Tree
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-06-02 18:43:49" itemprop="dateCreated datePublished" datetime="2022-06-02T18:43:49+08:00">2022-06-02</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-12-11 21:03:57" itemprop="dateModified" datetime="2024-12-11T21:03:57+08:00">2024-12-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/data-structure/" itemprop="url" rel="index"><span itemprop="name">data_structure</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <blockquote>
+<p>本文内容参考自<a
+target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=aZjYr87r1b8&amp;list=LL&amp;index=4&amp;t=1s">YouTube
+Abdul
+Bari</a>，若有错误还请指正。十分推荐观看原视频，讲得非常清晰易懂。</p>
+</blockquote>
+<h1 id="前言">前言</h1>
+<p>本文将从硬盘的物理结构说起，介绍关系表中的数据如何在磁盘上进行存储和表示。并通过查询的例子，说明为什么要使用索引来加快查询。本文将从索引结构的设计角度，从m路查找树过渡到B树和B+树。</p>
+<span id="more"></span>
+<h1 id="磁盘结构">磁盘结构</h1>
+<p>一块硬盘由多个磁盘片组成，每个磁盘片像一张CD光盘一样。和CD光盘不同的是，每个磁盘片都有两面，且每一面都能够存储数据，每一面均有一个读写头去读写数据。下图为由4个磁盘片和8个读写头组成的硬盘。</p>
+<figure>
+<img src="http://img.singhe.art/04fig01.gif"
+alt="graphics/04fig01.gif" />
+<figcaption aria-hidden="true">graphics/04fig01.gif</figcaption>
+</figure>
+<p>对于磁盘片的每一面，都会被划分成若干个同心圆，他们被称为磁道。而每一个磁道，又会被划分成多个扇区，每个扇区的大小通常为512B。下图为盘面的示意图，由图可知，一个盘面由4个磁道组成，而每一个磁道由7个扇区构成，每个扇区大小通常为512B。</p>
+<figure>
+<img
+src="http://img.singhe.art/%E7%A3%81%E7%9B%98%E7%BB%93%E6%9E%84.png"
+alt="磁盘结构" />
+<figcaption aria-hidden="true">磁盘结构</figcaption>
+</figure>
+<p>因此，如果我们知道了数据的盘面号、磁道号、扇区号，我们就能够准确定位数据所在扇区，并且能将该扇区512B的数据从磁盘读取到内存中。这种通过盘面号、磁道号、扇区号定位数据的方式称为CHS寻址。磁盘除了CHS寻址外，还有另一种寻址方式：LBA寻址。也就是说，你只需要告诉我你需要的扇区号，磁盘适配器便能从磁盘中读取所需的扇区。这种方式比CHS寻址更简洁更直观，因此本文采用扇区号的方式来代指磁盘块号。</p>
+<h1 id="表数据如何存储在磁盘上">表数据如何存储在磁盘上</h1>
+<p>假设我们要存储关系表<code>Employee</code>的数据，其结构如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> Empoyee(</span><br><span class="line">	id <span class="type">char</span>(<span class="number">10</span>),</span><br><span class="line">	name <span class="type">char</span>(<span class="number">50</span>),</span><br><span class="line">	department <span class="type">char</span>(<span class="number">10</span>),</span><br><span class="line">	phone <span class="type">char</span>(<span class="number">8</span>),</span><br><span class="line">	info <span class="type">char</span>(<span class="number">50</span>)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p>由此可知，id占用10字节，name占用50字节，department占用8字节，info占用50字节。则每插入一行数据会占用128字节的空间</p>
+<p>下面是要进行存储的表数据，一共有100行数据要进行存储：</p>
+<table>
+<thead>
+<tr class="header">
+<th>id</th>
+<th>name</th>
+<th>department</th>
+<th>phone</th>
+<th>info</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>John</td>
+<td>Facebook</td>
+<td>12345678</td>
+<td>this guy is so nice</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>Tom</td>
+<td>Google</td>
+<td>12352135</td>
+<td>good</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>Anid</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Khan</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+</tbody>
+</table>
+<p>由前文我们知道，一个磁盘块（即一个扇区）的大小为512字节，一行表数据会占用128字节，那么一个磁盘块能够存放4行表数据。那么对于100行表数据，我们需要25个磁盘块进行存储。</p>
+<p><img
+src="http://img.singhe.art/QQ%E5%9B%BE%E7%89%8720220602195617.png" /></p>
+<p>如果我们要进行<code>SELECT * FROM Employee WHERE id = 99</code>查询，由于没有索引信息，因此需要将磁盘块依次读入内存中，查找该磁盘块中是否含有该数据行，在最坏的情况下需要读取25个磁盘块。如果给id加上索引信息又会如何呢？</p>
+<p><img src="http://img.singhe.art/multiple-level-index.png" /></p>
+<p>我们现在给id加上索引信息，通过id就能够知道该行表数据在哪一个磁盘块上。假设id占10字节，磁盘块号占6字节，则一行索引信息占用16字节，一个512字节大小磁盘块能够容纳32行索引信息。那么100行表数据，100/32则至少需要4个额外的磁盘块来存储索引信息。当对id加上索引信息后，我们只需要将4个索引磁盘块读入内存中然后将id与99进行比对，就能够找到对应的磁盘块号，再将数据磁盘块后读入内存就完成了数据的查找。因此，id含有索引信息后共需要读入4+1=5个磁盘块。</p>
+<p>现在，如果我们要存储的数据行有1000行，那么需要250个数据块存储表数据，需要40个磁盘块存储索引信息。这就意味着我们又需要读取40个索引磁盘块进行查找了。那么该如何进行优化呢？与页表类似，我们可以对索引表再创建一个索引表。下图展示了该的过程。</p>
+<p><img src="http://img.singhe.art/high-level.png" /></p>
+<p>​</p>
+<p>对于40个索引磁盘块，我们只需要40/32=2个二级索引磁盘块来存储二级索引信息。当对1000行数据进行<code>SELECT * FROM Employee WHERE id = 18;</code>时，首要必须先读取二级索引磁盘块，它记载了某个id区间的行数据在哪个磁盘块。由于18大于1小于33，因此它的索引数据应该在1002号磁盘块。接着我们读取1002号磁盘块进入内存，通过比对id找到id=18数据行所指向的磁盘块，假设其磁盘块号为1220，那么我们只需要将1220号磁盘块读入内存就完成了数据的查找。我们一个读取了二级索引磁盘块1块、一级索引磁盘块一块、数据磁盘块一块，一共只读取了三块磁盘块。</p>
+<p>若将该多级索引结构向右旋转，便得到了一颗树的结构，我们希望在插入数据的时候，树的结构能够自动地合并、分裂维持索引信息的正确性，这便是B树和B+树的由来。</p>
+<h1 id="m路查找树">m路查找树</h1>
+<p>在介绍B树和B+树之前，我们先来了解二分查找树和m路查找树。</p>
+<figure>
+<img src="http://img.singhe.art/%E4%BA%8C%E5%8F%89%E6%A0%91.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>上述图片描述了一棵二分查找树(Binary Search Tree,
+BST)。加入我们要查找14，那么先和根节点进行比较，如果小于根节点向左子树查找，大于根节点向右子树查找。14&gt;13，因此向右查找。接着14&lt;15，向左子树查找。最终我们找到了需要的值14。</p>
+<p>而m路查找树就是每个节点可以有m个孩子节点，下图是一棵三路查找树。</p>
+<p><img
+src="http://img.singhe.art/3%E8%B7%AF%E6%9F%A5%E6%89%BE%E6%A0%91.png" /></p>
+<p>通过查找树，我们通常能在O(logn)的时间复杂度下找到我们需要的值。那么，这些查找树是如何与数据库中的索引对于起来的呢？一般来说，树的每个节点便对应一个磁盘块。每个节点中除了存储Key值外，也会存储Value的信息，也就是磁盘块号。当我们通过m路查询树找到了id的时候，我们也就找到了对应的磁盘块号。下图是示意图。</p>
+<p><img
+src="http://img.singhe.art/3%E8%B7%AF%E6%9F%A5%E6%89%BE%E6%A0%91%E7%A3%81%E7%9B%98%E5%BA%94%E7%94%A8.png" /></p>
+<p>但是m路查找树存在着问题。假如我们要插入Key：10、20、30.如果不加任何限制和约束，它会变成下图所示的结构。</p>
+<p><img
+src="http://img.singhe.art/3%E8%B7%AF%E6%9F%A5%E6%89%BE%E6%A0%91%E5%BC%8A%E7%AB%AF.png" /></p>
+<p>可以看出，没有限制和约束，m路查找树退化成了线性查找，时间复杂度为O(log(n))。为了解决这一问题，人们便提出B树，可以说，B树就是m路查找树加上相应的规则。</p>
+<h1 id="b树">B树</h1>
+<p>要使m路查找树成为m阶B树，需要满足以下条件：</p>
+<ul>
+<li>非根节点必须至少有<span class="math inline">\(\lceil
+\frac{m}{2}\rceil\)</span>个孩子节点</li>
+<li>根节点可以只有2个孩子节点</li>
+<li>叶子节点在同一层</li>
+<li>自底向上构建树</li>
+</ul>
+<p>这里通过例子来说明这些规则。假如我们要插入的Key序列为10，20，40，50，60，70，80，30，35那么我们构建的4阶B树过程如下图所示。</p>
+<p><img
+src="http://img.singhe.art/4%E8%B7%AF%E6%9F%A5%E6%89%BE%E6%9E%84%E9%80%A0%E4%B8%BE%E4%BE%8B.png" /></p>
+<h1 id="b树-1">B+树</h1>
+<p>B+树和B树区别不大，最主要的区别有如下两点：</p>
+<ol type="1">
+<li>B+树非叶子节点并不存储Value，而只存Key。要找到磁盘块信息必须找到叶子节点位置。这样做可以增加每个磁盘块容纳Key的数量，也能降低树的高度，减少IO的次数。</li>
+<li>叶子节点含有所有的Key，非叶子节点的Key也会复制一份到叶子结点中。并且通过链表的形式将叶子节点组织在一起。</li>
+</ol>
+<p><img src="http://img.singhe.art/B+%E6%A0%91.png" /></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/B-Tree/" rel="tag"># B-Tree</a>
+              <a href="/tags/database/" rel="tag"># database</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/05/31/database/GFS/" rel="prev" title="GFS">
+                  <i class="fa fa-chevron-left"></i> GFS
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/07/01/database/vmware_faul_tolerance/" rel="next" title="vmware fault tolerance">
+                  vmware fault tolerance <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">singheart</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div><script color="0,0,255" opacity="0.5" zIndex="-1" count="99" src="https://cdn.jsdelivr.net/npm/canvas-nest.js@1/dist/canvas-nest.js"></script>
+
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"xinjiempolde","repo":"xinjiempolde.github.io","client_id":"89019d63999840fdbf7f","client_secret":"48d2133d88acfafada6414ec6eee5a9d9febcbc8","admin_user":"xinjiempolde","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"eeb4150b09add24c331340095963804b"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/haruto.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>

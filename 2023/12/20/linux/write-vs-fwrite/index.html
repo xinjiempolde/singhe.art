@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0-rc1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.11.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="参考C++中write和fwrite哪个效率更高？ - 知乎 (zhihu.com) Linux 文件IO学习之open函数深入了解_linux open函数-CSDN博客  0x00 Background write和fwrite都用于文件写入，知其然更要知其所以然，既然有这么多种设计，就一定各有各的考量，那么它们之间有什么不同呢？">
+<meta property="og:type" content="article">
+<meta property="og:title" content="write_vs_fwrite">
+<meta property="og:url" content="http://example.com/2023/12/20/linux/write-vs-fwrite/index.html">
+<meta property="og:site_name" content="singheart&#39;s blog">
+<meta property="og:description" content="参考C++中write和fwrite哪个效率更高？ - 知乎 (zhihu.com) Linux 文件IO学习之open函数深入了解_linux open函数-CSDN博客  0x00 Background write和fwrite都用于文件写入，知其然更要知其所以然，既然有这么多种设计，就一定各有各的考量，那么它们之间有什么不同呢？">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img.singhe.art/image-20231220153731614.png">
+<meta property="og:image" content="https://img.singhe.art/image-20231220155510373.png">
+<meta property="og:image" content="https://img.singhe.art/image-20231220155307044.png">
+<meta property="og:image" content="https://img.singhe.art/image-20231220160212174.png">
+<meta property="og:image" content="https://img.singhe.art/image-20231220160806126.png">
+<meta property="article:published_time" content="2023-12-20T08:09:57.000Z">
+<meta property="article:modified_time" content="2024-12-11T13:03:57.700Z">
+<meta property="article:author" content="singheart">
+<meta property="article:tag" content="linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img.singhe.art/image-20231220153731614.png">
+
+
+<link rel="canonical" href="http://example.com/2023/12/20/linux/write-vs-fwrite/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2023/12/20/linux/write-vs-fwrite/","path":"2023/12/20/linux/write-vs-fwrite/","title":"write_vs_fwrite"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>write_vs_fwrite | singheart's blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">singheart's blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">多读书，多思考</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#x00-background"><span class="nav-number">1.</span> <span class="nav-text">0x00 Background</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#write"><span class="nav-number">1.1.</span> <span class="nav-text">write</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fwrite"><span class="nav-number">1.2.</span> <span class="nav-text">fwrite</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9%E6%AF%94"><span class="nav-number">1.3.</span> <span class="nav-text">对比</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#x01-write%E5%92%8Cfwrite%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E6%AC%A1%E6%95%B0%E5%AF%B9%E6%AF%94"><span class="nav-number">2.</span> <span class="nav-text">0x01
+write和fwrite系统调用次数对比</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#x02-o_direct%E5%AF%B9write%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">2.1.</span> <span class="nav-text">0x02 O_DIRECT对write的影响</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#x03-%E6%8C%89%E7%85%A74k%E5%86%99%E5%85%A532mb%E6%95%B0%E6%8D%AE"><span class="nav-number">3.</span> <span class="nav-text">0x03 按照4K写入32MB数据</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="singheart"
+      src="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+  <p class="site-author-name" itemprop="name">singheart</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xinjiempolde" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xinjiempolde" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/12/20/linux/write-vs-fwrite/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+      <meta itemprop="name" content="singheart">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="write_vs_fwrite | singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          write_vs_fwrite
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-12-20 16:09:57" itemprop="dateCreated datePublished" datetime="2023-12-20T16:09:57+08:00">2023-12-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-12-11 21:03:57" itemprop="dateModified" datetime="2024-12-11T21:03:57+08:00">2024-12-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <blockquote>
+<p>参考<a
+target="_blank" rel="noopener" href="https://www.zhihu.com/question/546404062/answer/2605567064?utm_psn=1720524853226872832">C++中write和fwrite哪个效率更高？
+- 知乎 (zhihu.com)</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://blog.csdn.net/m0_61167558/article/details/127561314">Linux
+文件IO学习之open函数深入了解_linux open函数-CSDN博客</a></p>
+</blockquote>
+<h1 id="x00-background">0x00 Background</h1>
+<p><code>write</code>和<code>fwrite</code>都用于文件写入，知其然更要知其所以然，既然有这么多种设计，就一定各有各的考量，那么它们之间有什么不同呢？</p>
+<span id="more"></span>
+<h2 id="write">write</h2>
+<p>如果不添加<code>O_DIRECT</code>标志，只以普通的方式进行读写(<strong>.O_RDONLY,O_WRONLY,O_RDWR</strong>)，那默认内核是会把文件的这个页面读进来缓存在内核里的，也即所谓的<code>page cache</code>。随后再发起新的write
+syscall写相同的页面时，只要写在page cache里就可以结束。</p>
+<figure>
+<img
+src="https://img.singhe.art/v2-03b3ccaf25fe5d3564f7a154b92bff45_1440w.webp"
+alt="write只需要写入到page cache就可以返回" />
+<figcaption aria-hidden="true">write只需要写入到page
+cache就可以返回</figcaption>
+</figure>
+<p>内核的这个<code>page cache</code>好处有很多，比如你的程序对IO还没到需要自己做用户态的读写缓存，那内核的这个机制就帮你省去了很多工作，毕竟page
+cache是在内存里的，而且可以拿来做read
+hit，相比于每次read/write都要访问磁盘，带来的性能优势还是很不错的，算是惠及大部分普通程序。</p>
+<p>如果添加<code>O_DIRECT</code>标志，那么后续对这个文件的所有read/write
+syscall都会bypass掉内核的page cache，也就是read/write直接发起disk
+io，数据将不会在内核中进行缓存。</p>
+<figure>
+<img
+src="https://img.singhe.art/v2-a1ecc102d248be9e67f989a048299cc9_1440w.webp"
+alt="O_DIRECT将绕过page cache" />
+<figcaption aria-hidden="true">O_DIRECT将绕过page cache</figcaption>
+</figure>
+<h2 id="fwrite">fwrite</h2>
+<p>fwrite是用户态的glibc库，相当于把write的系统调用封装了一下，关键一点在于，他在用户态又多加了一个buffer，，只有当你的fwrite写入量够多或者你主动fflush才会真的发起一个write
+syscall。所以fwrite的好处是对于小量的写，减少syscall的次数，毕竟如果你每写一个字节都要发起一个syscall，然后特权级切换到内核，这就太过耗时了。</p>
+<figure>
+<img
+src="https://img.singhe.art/v2-ea2dc2b18ba738a06de7f2a0a7824e38_1440w.webp"
+alt="fwrite在用户态也有缓存" />
+<figcaption aria-hidden="true">fwrite在用户态也有缓存</figcaption>
+</figure>
+<h2 id="对比">对比</h2>
+<p>buffer，或者缓存虽然有好处，但也有适用条件以及额外的开销：</p>
+<ul>
+<li>如果你的程序的文件读写几乎没有locality或者什么热点，加缓存不会带来cache
+hit方面的性能提升</li>
+<li>反而如果你写入的数据量很大，那用fwrite时，会发生你程序的buffer到glibc
+buffer一次拷贝，glibc buffer发起write syscall到page
+cache一次拷贝；而如果是普通write（或O_DIRECT的write），只会发生你程序的buffer到page
+cache（disk的buffer cache）一次拷贝。</li>
+</ul>
+<p>所以从性能的角度，fwrite并不适合大量写的场景。然而光从这个角度并不能看出O_DIRECT的有无带来什么作用。</p>
+<p>O_DIRECT适用于，数据读写性能、一致性、locality、写回时机等等对你的程序已经重要到全都要你自己管理，这时内核自带的page
+cache那种粗粒度、不太可控的设施已经不能满足你的需求了。</p>
+<p>没错，最典型的就是数据库应用。</p>
+<p>对数据库而言，依赖于page cache会带来非常多问题，比如：</p>
+<ul>
+<li>writeback.，也即写回磁盘同步的时机不可控。page
+cache可能在任何时候写回，包括你的事务做到一半，进程遭到调度，内核擅自把部分page
+cache上的内容写回磁盘，造成预期外的数据不一致。</li>
+<li>evict策略的不可控。即便你有一套自己的热度评价机制，哪个page是热点也是内核说了算，你很难干预内核不要evict掉page
+cache上的哪个页面，这会带来不可控的性能抖动。</li>
+<li>小量的写（数据内容更新）也要发起系统调用，带来不必要的特权级切换开销。</li>
+</ul>
+<h1 id="x01-write和fwrite系统调用次数对比">0x01
+write和fwrite系统调用次数对比</h1>
+<p>通过逐字节的写入32MB的数据到磁盘上，观察<code>write</code>和<code>fwrite</code>的系统调用的次数，来说明少量多次数据写入对<code>write</code>和<code>fwrite</code>带来的性能影响。</p>
+<p><code>write.c</code>代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="type">int</span> fd = <span class="built_in">open</span>(<span class="string">&quot;write_byte.data&quot;</span>, O_WRONLY | O_CREAT | O_TRUNC, <span class="number">0644</span>);</span><br><span class="line">  <span class="comment">// Check if the file is successfully opened.</span></span><br><span class="line">  <span class="keyword">if</span> (fd == <span class="number">-1</span>) &#123;</span><br><span class="line">      <span class="built_in">perror</span>(<span class="string">&quot;cannot open the file&quot;</span>);</span><br><span class="line">      <span class="built_in">exit</span>(<span class="number">-1</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">constexpr</span> <span class="type">int</span> data_size = <span class="number">1</span> &lt;&lt; <span class="number">25</span>;  <span class="comment">// 32MB</span></span><br><span class="line">  <span class="type">char</span> *data = <span class="keyword">new</span> <span class="type">char</span>[data_size+<span class="number">1</span>];</span><br><span class="line">  <span class="keyword">for</span> (<span class="type">long</span> i = <span class="number">0</span>; i &lt; data_size; ++i) &#123;</span><br><span class="line">    <span class="built_in">write</span>(fd, data + i, <span class="number">1</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">delete</span> []data;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里的<code>write</code>代码并未添加<code>O_DIRECT</code>标志，也就意味着<code>write</code>在内核中仍然有page
+cache缓存。</p>
+<p><code>fwrite.c</code>代码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdint.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">  <span class="type">const</span> <span class="type">char</span> *filename = <span class="string">&quot;fwrite_byte.data&quot;</span>;</span><br><span class="line">  FILE *file = fopen(filename, <span class="string">&quot;wb&quot;</span>);</span><br><span class="line">  <span class="comment">// Check if the file is successfully opened.</span></span><br><span class="line">  <span class="keyword">if</span> (file == <span class="literal">NULL</span>) &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;cannot open file %s&quot;</span>, filename);</span><br><span class="line">  &#125;</span><br><span class="line">  constexpr <span class="type">uint64_t</span> data_size = <span class="number">1LL</span> &lt;&lt; <span class="number">25</span>;  <span class="comment">// 32MB</span></span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;%lu\n&quot;</span>, data_size);</span><br><span class="line">  <span class="type">char</span> *data = new <span class="type">char</span>[data_size+<span class="number">1</span>];</span><br><span class="line">  <span class="keyword">for</span> (<span class="type">uint64_t</span> i = <span class="number">0</span>; i &lt; data_size; ++i) &#123;</span><br><span class="line">    fwrite(data + i, <span class="number">1</span>, <span class="number">1</span>, file);</span><br><span class="line">  &#125;</span><br><span class="line">  delete []data;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure>
+<img src="https://img.singhe.art/image-20231220153731614.png"
+alt="fwrite系统调用次数" />
+<figcaption aria-hidden="true">fwrite系统调用次数</figcaption>
+</figure>
+<figure>
+<img src="https://img.singhe.art/image-20231220155510373.png"
+alt="write系统调用次数" />
+<figcaption aria-hidden="true">write系统调用次数</figcaption>
+</figure>
+<p>通过<code>strace</code>跟踪系统调用，我们可以发现对于32MB数据逐字节写入，<code>fwrite</code>共调用了8192次<code>write</code>系统调用，而<code>write</code>却用了<span
+class="math inline">\(32 \times 1024 \times 1024 =
+33554432\)</span>次系统调用。也就是说<code>write</code>不管每次写入数据的大小，都会进行一次系统调用。而<code>fwrite</code>虽然是逐个字节的写入，但是它会在用户层积累，直到有4KB大小的数据后才会调用一次系统调用，节省了许多时间。通过<code>google c++ benchmark</code>跟踪运行时间也可以看出区别，write花了42s，而fwrie却只花了0.38s。</p>
+<figure>
+<img src="https://img.singhe.art/image-20231220155307044.png"
+alt="write和fwrite时间对比" />
+<figcaption aria-hidden="true">write和fwrite时间对比</figcaption>
+</figure>
+<h2 id="x02-o_direct对write的影响">0x02 O_DIRECT对write的影响</h2>
+<p>上文已说明，如果添加<code>O_DIRECT</code>标志，<code>write</code>将会绕过内核的page
+cache，而直接进行写入，那么写入延迟将会更大。从下面的结果也可以看出，不添加<code>O_DIRECT</code>逐字节写入32MB数据需要40s，而添加<code>O_DIRECT</code>标志则需要201s。</p>
+<figure>
+<img src="https://img.singhe.art/image-20231220160212174.png"
+alt="添加O_DIRECT" />
+<figcaption aria-hidden="true">添加O_DIRECT</figcaption>
+</figure>
+<h1 id="x03-按照4k写入32mb数据">0x03 按照4K写入32MB数据</h1>
+<p>如果<code>write</code>和<code>fwrite</code>都按照4096字节写入32MB，那么它们系统调用的次数都是相同的。不同的是，<code>fwrite</code>会在应用层也会添加一层缓存，那么就会多一层数据拷贝，在这种场景下，<code>write</code>将会比<code>fwrite</code>更快。</p>
+<figure>
+<img src="https://img.singhe.art/image-20231220160806126.png"
+alt="按照4096字节写入" />
+<figcaption aria-hidden="true">按照4096字节写入</figcaption>
+</figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/linux/" rel="tag"># linux</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2023/12/13/cpp/locks/" rel="prev" title="locks">
+                  <i class="fa fa-chevron-left"></i> locks
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/06/21/linux/gdb%E8%B0%83%E8%AF%95Java%E7%A8%8B%E5%BA%8F%E5%B4%A9%E6%BA%83/" rel="next" title="gdb调试Java程序崩溃">
+                  gdb调试Java程序崩溃 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">singheart</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div><script color="0,0,255" opacity="0.5" zIndex="-1" count="99" src="https://cdn.jsdelivr.net/npm/canvas-nest.js@1/dist/canvas-nest.js"></script>
+
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"xinjiempolde","repo":"xinjiempolde.github.io","client_id":"89019d63999840fdbf7f","client_secret":"48d2133d88acfafada6414ec6eee5a9d9febcbc8","admin_user":"xinjiempolde","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"2b91ce33bd0df3c59dedd0fda6e22e78"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/haruto.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>

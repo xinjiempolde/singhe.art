@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0-rc1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.11.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="转载自  干货 | PostgreSQL数据表文件底层结构布局分析 - 知乎 (zhihu.com)   1. 表文件 PostgreSQL提供了可靠、稳定、有序的数据存储、检索管理。即使在不知道其背后运行原理的情况下，也没有多大关系，因为我们只需要按部就班地执行建库、建表然后插入数据结构这几个流程，就可以如愿以偿地实现将我们的数据持久化于PostgreSQL数据库中。于是我们不得不好奇，这些数">
+<meta property="og:type" content="article">
+<meta property="og:title" content="postgreSQL底层存储结构">
+<meta property="og:url" content="http://example.com/2024/06/27/openGauss/PostgreSQL%E6%95%B0%E6%8D%AE%E8%A1%A8%E6%96%87%E4%BB%B6%E5%BA%95%E5%B1%82%E7%BB%93%E6%9E%84%E5%B8%83%E5%B1%80%E5%88%86%E6%9E%90/index.html">
+<meta property="og:site_name" content="singheart&#39;s blog">
+<meta property="og:description" content="转载自  干货 | PostgreSQL数据表文件底层结构布局分析 - 知乎 (zhihu.com)   1. 表文件 PostgreSQL提供了可靠、稳定、有序的数据存储、检索管理。即使在不知道其背后运行原理的情况下，也没有多大关系，因为我们只需要按部就班地执行建库、建表然后插入数据结构这几个流程，就可以如愿以偿地实现将我们的数据持久化于PostgreSQL数据库中。于是我们不得不好奇，这些数">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-06-27T12:47:24.000Z">
+<meta property="article:modified_time" content="2024-12-11T13:03:57.700Z">
+<meta property="article:author" content="singheart">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2024/06/27/openGauss/PostgreSQL%E6%95%B0%E6%8D%AE%E8%A1%A8%E6%96%87%E4%BB%B6%E5%BA%95%E5%B1%82%E7%BB%93%E6%9E%84%E5%B8%83%E5%B1%80%E5%88%86%E6%9E%90/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2024/06/27/openGauss/PostgreSQL%E6%95%B0%E6%8D%AE%E8%A1%A8%E6%96%87%E4%BB%B6%E5%BA%95%E5%B1%82%E7%BB%93%E6%9E%84%E5%B8%83%E5%B1%80%E5%88%86%E6%9E%90/","path":"2024/06/27/openGauss/PostgreSQL数据表文件底层结构布局分析/","title":"postgreSQL底层存储结构"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>postgreSQL底层存储结构 | singheart's blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">singheart's blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">多读书，多思考</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A1%A8%E6%96%87%E4%BB%B6"><span class="nav-number">1.</span> <span class="nav-text">1. 表文件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E8%94%9F%E7%9B%AE%E5%BD%95%E4%BD%8D%E7%BD%AE"><span class="nav-number">1.1.</span> <span class="nav-text">1.2 数据蔟目录位置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A1%A8%E6%96%87%E4%BB%B6%E4%BD%8D%E7%BD%AE"><span class="nav-number">1.2.</span> <span class="nav-text">1.3 表文件位置</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A1%A8%E6%96%87%E4%BB%B6%E7%9A%84%E5%86%85%E9%83%A8%E5%B8%83%E5%B1%80"><span class="nav-number">2.</span> <span class="nav-text">2. 表文件的内部布局</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A1%A8%E6%96%87%E4%BB%B6%E7%94%B1%E9%A1%B5%E7%BB%84%E6%88%90"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 表文件由页组成</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A1%B5%E7%9A%84%E5%86%85%E9%83%A8%E5%B8%83%E5%B1%80"><span class="nav-number">2.1.1.</span> <span class="nav-text">2.1.1 页的内部布局</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%A1%B5%E5%A4%B4%E9%83%A8%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="nav-number">2.1.1.1.</span> <span class="nav-text">2.1.1.1 页头部数据结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A1%8C%E6%8C%87%E9%92%88%E9%A1%B9%E6%8C%87%E9%92%88"><span class="nav-number">2.1.1.2.</span> <span class="nav-text">2.1.1.2 行指针(项指针)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%83%E7%BB%84%E7%BB%93%E6%9E%84"><span class="nav-number">2.1.1.3.</span> <span class="nav-text">2.1.1.3 元组结构</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pageinspect%E6%89%A9%E5%B1%95%E6%9F%A5%E7%9C%8B%E9%A1%B5%E5%86%85%E5%AE%B9"><span class="nav-number">2.1.2.</span> <span class="nav-text">2.1.2 pageinspect扩展查看页内容</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E8%A1%A8%E6%96%87%E4%BB%B6%E9%A1%B5%E5%A4%B4%E4%BF%A1%E6%81%AF"><span class="nav-number">2.1.2.1.</span> <span class="nav-text">2.1.2.1 查看表文件页头信息</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%B7%A5%E5%85%B7%E8%AF%BB%E5%88%86%E6%9E%90%E8%A1%A8%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 使用工具读分析表文件内容</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#hexdump%E5%88%86%E6%9E%90%E5%A0%86%E8%A1%A8%E6%96%87%E4%BB%B6"><span class="nav-number">2.2.1.</span> <span class="nav-text">2.2.1 hexdump分析堆表文件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pg_filedump"><span class="nav-number">2.3.</span> <span class="nav-text">2.2.2 pg_filedump</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="singheart"
+      src="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+  <p class="site-author-name" itemprop="name">singheart</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xinjiempolde" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xinjiempolde" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/06/27/openGauss/PostgreSQL%E6%95%B0%E6%8D%AE%E8%A1%A8%E6%96%87%E4%BB%B6%E5%BA%95%E5%B1%82%E7%BB%93%E6%9E%84%E5%B8%83%E5%B1%80%E5%88%86%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+      <meta itemprop="name" content="singheart">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="postgreSQL底层存储结构 | singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          postgreSQL底层存储结构
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-06-27 20:47:24" itemprop="dateCreated datePublished" datetime="2024-06-27T20:47:24+08:00">2024-06-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-12-11 21:03:57" itemprop="dateModified" datetime="2024-12-11T21:03:57+08:00">2024-12-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/openGauss/" itemprop="url" rel="index"><span itemprop="name">openGauss</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <blockquote>
+<p>转载自</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/471815579">干货 |
+PostgreSQL数据表文件底层结构布局分析 - 知乎 (zhihu.com)</a></li>
+</ul>
+</blockquote>
+<h1 id="表文件">1. 表文件</h1>
+<p>PostgreSQL提供了可靠、稳定、有序的数据存储、检索管理。即使在不知道其背后运行原理的情况下，也没有多大关系，因为我们只需要按部就班地执行建库、建表然后插入数据结构这几个流程，就可以如愿以偿地实现将我们的数据持久化于PostgreSQL数据库中。于是我们不得不好奇，这些数据最终落盘于磁盘上的哪个位置？又是以什么样的形式存储？存储的格式又是什么？在这几个疑问的驱动下，本文将通过源码结合数据入库实践操作的方式，来详细地对PostgreSQL底层数据的存储方式进行详细的解读。</p>
+<span id="more"></span>
+<p>PostgreSQL中的每个表(<code>TABLE</code>)都将由一个或多个堆文件表示。默认情况下，表的每个1GB块(<code>Block</code>)存储在一个单独的(堆)文件中。当该表文件已经达到1GB之后，用户再次插入数据时，<code>postgres</code>会重新创建一个新的堆文件，新文件名格式是：表Oid
++“.” +
+序号id(序号id从1开始一次递增)。示意图如下所示，其中<code>tudent</code>为<code>CREATE TABLE</code>创建的表名，该<code>student</code>表对应的堆文件名是16387。</p>
+<figure>
+<img
+src="https://pic4.zhimg.com/80/v2-dab28219c0b9c149c2edab1161483463_1440w.webp"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>在PostgreSQL中，数据库名和表文件名都是使用<code>Oid</code>来进行命名。该<code>Oid</code>是一个无符号整型(<code>unsigned int</code>)，定义在<code>postgres_ext.h</code>文件中。如下：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> * Object ID is a fundamental type in Postgres.</span><br><span class="line"> */</span><br><span class="line"> typedef unsigned int Oid;</span><br></pre></td></tr></table></figure>
+<p>当我们将数据存储在PostgreSQL中时，PostgreSQL会将用户插入(<code>INSERT INTO</code>)的数据依次存储于文件系统的常规文件中。对于这样的文件，我们称之为“<strong>堆文件</strong>(<code>Heap File</code>)”。在PostgreSQL中，可以将堆文件分为四种类型：“<strong>普通堆文件</strong>(<code>Ordinary Cataloged Heap</code>)、“<strong>临时堆文件</strong>(<code>Temporary Heap File</code>)、“<strong>序列堆文件</strong>(<code>Sequence File</code>)和“<strong>TOAST表堆文件</strong>(<code>TOAST FILE</code>)”。上面说的常规文件，即指普通堆文件。TOAST文件专门用于存储变长数据，本质上它也是属于普通堆文件。对于上面的这四种堆文件，虽然底层组织方式细节不大一样，但是结构上是相似的，所以我们这里将着重分析普通堆文件。</p>
+<h2 id="数据蔟目录位置">1.2 数据蔟目录位置</h2>
+<p>在研究表文件之前，我们先要知道postgres的数据蔟目录位置。因为所有的数据库、表、索引、配置文件等等都是存储在数据蔟目录下的，即<code>PGDATA</code>。如果你不确定当前环境上面PostgreSQL的数据蔟目录位置，没关系，你仅需要<code>psql</code>登录终端，然后执行
+<code>SHOW DATA_DIRECTORY</code>；命令即可得到。如下图所示，当前环境的数据蔟目录是：<code>/home/singheart/data</code>。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">test=#</span><br><span class="line">test=# SHOW DATA_DIRECTORY;</span><br><span class="line">    data_directory</span><br><span class="line">----------------------</span><br><span class="line">/home/singheart/data</span><br><span class="line">(1 row)</span><br><span class="line"></span><br><span class="line">test=#</span><br></pre></td></tr></table></figure>
+<h2 id="表文件位置"><strong>1.3 表文件位置</strong></h2>
+<p>​
+库为维度进行管理，即某个表总是属于某个库。因此，我们还需要找到我们创建的数据库(<code>CREATE DATABASE</code>;)以及该库下的所有表(<code>CREATE TABLE</code>)。PostgreSQL为我们提供了<code>pg_relation_filepath</code>，用于查找指定表名的相对(<code>$PGDATA</code>)文件路径。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">test=#</span><br><span class="line">test=# SELECT pg_relation_filepath(&#x27;student&#x27;);</span><br><span class="line"> pg_relation_filepath</span><br><span class="line">----------------------</span><br><span class="line"> base/16384/16387</span><br><span class="line">(1 row)</span><br><span class="line"></span><br><span class="line">test=#</span><br></pre></td></tr></table></figure>
+<p>如上图所示，其中16384是数据库(test)的Oid名；16387是student数据表名。其数据库和数据表的创建过程如下：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">postgres=# CREATE DATABASE test;</span><br><span class="line">CREATE DATABASE</span><br><span class="line">test=#</span><br><span class="line">test=# CREATE TABLE student(id  SERIAL PRIMARY KEY, name VARCHAR, age INT NOT NULL);</span><br><span class="line">CREATE TABLE</span><br></pre></td></tr></table></figure>
+<h1 id="表文件的内部布局">2. 表文件的内部布局</h1>
+<p>前面创建了名为student的数据表，到此为止，还没有向该表中插入(<code>INSERT INTO</code>)过数据。因此student表的总行数是0。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">test=# SELECT COUNT(*) FROM student;</span><br><span class="line"> count</span><br><span class="line">-------</span><br><span class="line">     0</span><br><span class="line">(1 row)</span><br></pre></td></tr></table></figure>
+<p>注：关系数据表中的行数据称为<strong>记录</strong>(<code>record</code>)，又称之为<strong>元组</strong>(<code>tuple</code>)，即行、记录、元组都是同一个概念。</p>
+<p>在表中没有数据时，很显然此时文件大小是0字节。如下图中红色字体所示：</p>
+<figure>
+<img
+src="https://pic3.zhimg.com/80/v2-37929a093475fe327a4a4824dc9fffb6_1440w.webp"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>现在我们向该表中插入一条数据，如下：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">test=# SELECT COUNT(*) FROM student;</span><br><span class="line"> count</span><br><span class="line">-------</span><br><span class="line">     0</span><br><span class="line">(1 row)</span><br><span class="line"></span><br><span class="line">test=# INSERT INTO student(name,age) VALUES (&#x27;lixiaogang5&#x27;, 27);</span><br><span class="line">INSERT 0 1</span><br><span class="line">test=# SELECT *FROM student;</span><br><span class="line"> id |    name     | age</span><br><span class="line">----+-------------+-----</span><br><span class="line">  1 | lixiaogang5 |  27</span><br><span class="line">(1 row)</span><br><span class="line"></span><br><span class="line">test=#</span><br></pre></td></tr></table></figure>
+<p>此时再次查看该student数据表文件时，可看到其文件大小是8KB(8192Byte)。很显然，我们刚插入的这条数据并没有这么大。因此可知，postgres在向表中插入数据时候是以8KB为单位进行数据存储管理的。第一次数据进来，无论数据多少，postgres都会在该文件中分配8KB的空间
+。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@Thor 16384]# ls -lh --full-time 16387</span><br><span class="line">-rw------- 1 postgres postgres 8.0K 2021-05-22 15:05:55.223806439 +0800 16387</span><br></pre></td></tr></table></figure>
+<h2 id="表文件由页组成">2.1 表文件由页组成</h2>
+<p>对于PostgreSQL数据库，在每个数据文件(堆文件、索引文件、FSM文件、VM文件等)内部，它分为固定长度的页(或块)。换言之，即一个1GB大小的表文件内部是有若干个固定的页组成。页的默认大小为8192字节(8KB)。单个表文件中的这些页(Page)从0开始进行顺序编号，这些编号也称为“块编号(<code>Block Numbers</code>)”。如果第一页空间已经被数据填满，则postgres会立刻重新在文件末尾(即已填满页的后面)添加一个新的空白页，用于继续存储数据，一直持续这个过程，直到当前表文件大小达到1GB位置。若文件达到1GB，则重新创建一个新的表文件，然后重复上面的这个过程。</p>
+<p>然后每个页的内部又由一个页文件头(<code>Page Header</code>)、若干行指针(<code>Line Pointer</code>)、若干个元组数据(Heaple
+Tuple)组成。单个文件大小1GB(默认，可以修改其大小)，因为堆(重点将普通堆)文件是由页组成，所以可知一个堆文件中有：1GB
+= (1024 * 1024) KB / 8KB(Page) = 131072个页。</p>
+<h3 id="页的内部布局">2.1.1 页的内部布局</h3>
+<p>堆表文件的内部页布局示意图如下：</p>
+<figure>
+<img
+src="https://pic3.zhimg.com/80/v2-9898188abe11ab5ac9b918a85d0f48d6_1440w.webp"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>下面分别对页中的“<strong>页头</strong>、<strong>行指针</strong>和<strong>堆元组</strong>”这三个重要数据进行介绍。</p>
+<h4 id="页头部数据结构">2.1.1.1 页头部数据结构</h4>
+<p>页头数据结构(<code>PageHeaderData</code>)声明于文件<code>bufpage.h</code>中，它包含了当前页的常规信息。其大小是24字节(byte)，且分配在页的开头位置。其声明格式如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">PageHeaderData</span></span><br><span class="line">&#123;</span><br><span class="line">     <span class="comment">/* XXX LSN is member of *any* block, not only page-organized ones */</span></span><br><span class="line">     PageXLogRecPtr  pd_lsn;    <span class="comment">/* LSN: next byte after last byte of xlog</span></span><br><span class="line"><span class="comment">            * record for last change to this page */</span></span><br><span class="line">     uint16   pd_checksum;  <span class="comment">/* checksum */</span></span><br><span class="line">     uint16   pd_flags;   <span class="comment">/* flag bits, see below */</span></span><br><span class="line">     LocationIndex  pd_lower;   <span class="comment">/* offset to start of free space */</span></span><br><span class="line">     LocationIndex  pd_upper;   <span class="comment">/* offset to end of free space */</span></span><br><span class="line">     LocationIndex  pd_special;   <span class="comment">/* offset to start of special space */</span></span><br><span class="line"> </span><br><span class="line">     uint16   pd_pagesize_version;</span><br><span class="line">     TransactionId  pd_prune_xid;      <span class="comment">/* oldest prunable XID, or zero if none */</span></span><br><span class="line">     ItemIdData  pd_linp[FLEXIBLE_ARRAY_MEMBER]; <span class="comment">/* line pointer array [行指针数组]*/</span></span><br><span class="line">&#125; PageHeaderData;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p><code>pd_lsn</code>变量存储由本页最后一次更改所写入的<code>XLOG</code>记录的<code>LSN</code>(即当前<code>WAL</code>位置)。它是一个8字节的无符号整数，与<code>WAL(Write-Ahead Logging)</code>机制有关。其中<code>PageXLogRecPtr</code>数据类型的声明如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">int</span> uint32; <span class="comment">/* == 32 bits */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span></span><br><span class="line">&#123;</span><br><span class="line"> uint32  xlogid;   <span class="comment">/* high bits */</span></span><br><span class="line"> uint32  xrecoff;  <span class="comment">/* low bits */</span></span><br><span class="line">&#125; PageXLogRecPtr;</span><br></pre></td></tr></table></figure></li>
+<li><p><code>pd_checksum</code>此变量存储此页的校验和值(请注意，9.3或更高版本支持此变量；在早期版本中，此部分存储了页面的<code>timelineId</code>)。如果<code>checksum</code>已启用，则为每个数据页计算校验和。检测到校验和失败将导致读取数据时出错，并将中止当前正在运行的事务。因此，这为直接在数据库服务器级别检测I/O或硬件问题带来了额外的控制。</p></li>
+<li><p><code>pd_flags</code>该成员用以设置位标志。对于PostgreSQL
+13.2版本，共支持以下几种标志：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//是否有未使用的行指针?</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PD_HAS_FREE_LINES 0x0001 </span></span><br><span class="line"></span><br><span class="line"><span class="comment">//没有足够的空间容纳新元组?</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PD_PAGE_FULL  0x0002</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//页面上的所有元组对每个人都可见?</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PD_ALL_VISIBLE  0x0004</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//所有有效pd_flags位的OR</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PD_VALID_FLAG_BITS 0x0007</span></span><br></pre></td></tr></table></figure></li>
+<li><p><code>pd_lower</code>指向空闲空间的开始位置。</p></li>
+<li><p><code>pd_upper</code>指向空闲空间的结尾。当向表中插入数据时，postgres会分配8KB(BLCKSZ)的内存空间。此时的8KB，除了页的头部数据占用的24字节外，其余的空间都是可用于存储元组的(当然行指针也有占用空间)。如下图所示，该图是刚好分配好8KB大小的内存空间和页头占用的结构示意图。由于此时没有元组插入表文件中，所以<code>pd_upper</code>指向可用空间的末尾，而<code>pd_lower</code>指向页头(<code>PageHeaderData</code>)之后的第一个空闲空间的起始位置。<code>pd_upper - pd_lower</code>是该页中剩余可用的空闲空间(下图粉红色的区间为可用的空闲空间)，随着元素的不断插入，<code>pd_upper</code>和<code>pd_lower</code>变量会不断地随着更新。</p>
+<figure>
+<img
+src="https://pic1.zhimg.com/80/v2-af17c30a22ea703a17a7e5caa48fb714_1440w.webp"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure></li>
+<li><p><code>pd_special</code>指向特殊空间的起始偏移量。该变量主要用于索引文件，对于表文件中的页，它指向页的末尾(因为对于普通的表文件，这个字段没有使用)。在索引文件的页中，它指向特殊空间的开始，这是仅有索引持有的数据区域，根据索引类型，如<code>B-tree</code>、<code>GiST</code>、<code>GiN</code>等，它包含特定的数据。</p></li>
+<li><p><code>pd_pagesize_version</code>页面大小及页面版本号。页面大小和页面版本号被打包成一个大一的uint16字段。这是由于历史原因，在PostgreSQL
+7.3之前，没有页面版本号的概念，这样可以让我们假设7.3之前的数据库页面版本号是0。我们将页面版本号的大小限制为256的倍数，并将低8位留给版本号。</p></li>
+<li><p><code>pd_prune_xid</code>可删除的旧XID，如果没有则为零。</p></li>
+<li><p><code>pd_linp</code>是极为重要的成员变量，它是一个零长度数组(<code>Arrays of Length Zero</code>)。当页中没有插入数据时候，它的数组元素个数是0，因此这个<code>pd_linp</code>也就是上图中所谓的“行指针”数组。它指向该页中的元组(也就是表记录)。其<code>pd_linp</code>的数据类型是：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">ItemIdData</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">unsigned</span> lp_off:<span class="number">15</span>,  <span class="comment">/* offset to tuple (from start of page) */</span></span><br><span class="line">    lp_flags:<span class="number">2</span>,          <span class="comment">/* state of line pointer, see below */</span></span><br><span class="line">    lp_len:<span class="number">15</span>;           <span class="comment">/* byte length of tuple */</span></span><br><span class="line">&#125; ItemIdData;</span><br></pre></td></tr></table></figure>
+<p>更多<code>pd_linp</code>成员的描述将在下面2.1.1.2小节中进行更加详细的描述。</p></li>
+</ul>
+<p>这里给出一个读取PageHeader并输出的C++程序：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">int</span> int32;</span><br><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">int</span> uint32; <span class="comment">/* == 32 bits */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">char</span> uint8;   <span class="comment">/* == 8 bits */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">short</span> uint16; <span class="comment">/* == 16 bits */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">long</span> <span class="type">int</span> uint64;</span><br><span class="line"> <span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">int</span> Oid;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> uint16 LocationIndex;</span><br><span class="line"><span class="keyword">typedef</span> uint32 ShortTransactionId;</span><br><span class="line"><span class="keyword">typedef</span> uint64 TransactionId;</span><br><span class="line"><span class="keyword">typedef</span> uint32 CommandId;</span><br><span class="line"><span class="keyword">typedef</span> uint16 OffsetNumber;</span><br><span class="line"> <span class="keyword">typedef</span> uint8 bits8;   <span class="comment">/* &gt;= 8 bits */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> FLEXIBLE_ARRAY_MEMBER <span class="comment">/**/</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// page相关定义</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span></span><br><span class="line">&#123;</span><br><span class="line"> uint32  xlogid;   <span class="comment">/* high bits */</span></span><br><span class="line"> uint32  xrecoff;  <span class="comment">/* low bits */</span></span><br><span class="line">&#125; PageXLogRecPtr;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">ItemIdData</span> &#123;</span><br><span class="line">    <span class="type">unsigned</span> lp_off : <span class="number">15</span>, <span class="comment">/* offset to tuple (from start of page) */</span></span><br><span class="line">        lp_flags : <span class="number">2</span>,     <span class="comment">/* state of item pointer, see below */</span></span><br><span class="line">        lp_len : <span class="number">15</span>;      <span class="comment">/* byte length of tuple */</span></span><br><span class="line">&#125; ItemIdData;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">PageHeaderData</span></span><br><span class="line">&#123;</span><br><span class="line">     <span class="comment">/* XXX LSN is member of *any* block, not only page-organized ones */</span></span><br><span class="line">     PageXLogRecPtr  pd_lsn;    <span class="comment">/* LSN: next byte after last byte of xlog</span></span><br><span class="line"><span class="comment">            * record for last change to this page */</span></span><br><span class="line">     uint16   pd_checksum;  <span class="comment">/* checksum or timelineId */</span></span><br><span class="line">     uint16   pd_flags;   <span class="comment">/* flag bits, see below */</span></span><br><span class="line">     LocationIndex  pd_lower;   <span class="comment">/* offset to start of free space */</span></span><br><span class="line">     LocationIndex  pd_upper;   <span class="comment">/* offset to end of free space */</span></span><br><span class="line">     LocationIndex  pd_special;   <span class="comment">/* offset to start of special space */</span></span><br><span class="line"> </span><br><span class="line">     uint16   pd_pagesize_version;</span><br><span class="line">     ShortTransactionId  pd_prune_xid;      <span class="comment">/* oldest prunable XID, or zero if none */</span></span><br><span class="line">     ItemIdData  pd_linp[FLEXIBLE_ARRAY_MEMBER]; <span class="comment">/* line pointer array [行指针数组]*/</span></span><br><span class="line">&#125; PageHeaderData;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// tuple的相关定义</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">HeapTupleFields</span></span><br><span class="line">&#123;</span><br><span class="line">     ShortTransactionId t_xmin;  <span class="comment">/* inserting xact ID */</span></span><br><span class="line">     ShortTransactionId t_xmax;  <span class="comment">/* deleting or locking xact ID */</span></span><br><span class="line"></span><br><span class="line">     <span class="keyword">union</span></span><br><span class="line">     &#123;</span><br><span class="line">        CommandId t_cid;  <span class="comment">/* inserting or deleting command ID, or both */</span></span><br><span class="line">        ShortTransactionId t_xvac; <span class="comment">/* old-style VACUUM FULL xact ID */</span></span><br><span class="line">     &#125;   t_field3;</span><br><span class="line">&#125; HeapTupleFields;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">DatumTupleFields</span> &#123;</span><br><span class="line">    int32 datum_len_; <span class="comment">/* varlena header (do not touch directly!) */</span></span><br><span class="line"></span><br><span class="line">    int32 datum_typmod; <span class="comment">/* -1, or identifier of a record type */</span></span><br><span class="line"></span><br><span class="line">    Oid datum_typeid; <span class="comment">/* composite type OID, or RECORDOID */</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * Note: field ordering is chosen with thought that Oid might someday</span></span><br><span class="line"><span class="comment">     * widen to 64 bits.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">&#125; DatumTupleFields;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">BlockIdData</span> &#123;</span><br><span class="line">    uint16 bi_hi;</span><br><span class="line">    uint16 bi_lo;</span><br><span class="line">&#125; BlockIdData;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">ItemPointerData</span> &#123;</span><br><span class="line">    BlockIdData ip_blkid;</span><br><span class="line">    OffsetNumber ip_posid;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">HeapTupleHeaderData</span></span><br><span class="line">&#123;</span><br><span class="line">     <span class="keyword">union</span></span><br><span class="line">     &#123;</span><br><span class="line">        HeapTupleFields  t_heap;</span><br><span class="line">        DatumTupleFields  t_datum;</span><br><span class="line">     &#125;   t_choice;</span><br><span class="line"></span><br><span class="line">     ItemPointerData t_ctid;  <span class="comment">/* current TID of this or newer tuple (or a</span></span><br><span class="line"><span class="comment">                               * speculative insertion token) */</span></span><br><span class="line">     <span class="comment">/* Fields below here must match MinimalTupleData! */</span></span><br><span class="line">      <span class="meta">#<span class="keyword">define</span> FIELDNO_HEAPTUPLEHEADERDATA_INFOMASK2 2</span></span><br><span class="line">     uint16  t_infomask2; <span class="comment">/* number of attributes + various flags */</span></span><br><span class="line"></span><br><span class="line">      <span class="meta">#<span class="keyword">define</span> FIELDNO_HEAPTUPLEHEADERDATA_INFOMASK 3</span></span><br><span class="line">     uint16  t_infomask;  <span class="comment">/* various flag bits, see below */</span></span><br><span class="line"></span><br><span class="line">      <span class="meta">#<span class="keyword">define</span> FIELDNO_HEAPTUPLEHEADERDATA_HOFF 4</span></span><br><span class="line">     uint8  t_hoff;   <span class="comment">/* sizeof header incl. bitmap, padding */</span></span><br><span class="line"></span><br><span class="line">     <span class="comment">/* ^ - 23 bytes - ^ */</span></span><br><span class="line">      <span class="meta">#<span class="keyword">define</span> FIELDNO_HEAPTUPLEHEADERDATA_BITS 5</span></span><br><span class="line">     bits8  t_bits[FLEXIBLE_ARRAY_MEMBER]; <span class="comment">/* bitmap of NULLs */</span></span><br><span class="line"></span><br><span class="line">     <span class="comment">/* MORE DATA FOLLOWS AT END OF STRUCT */</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">typedef</span> HeapTupleHeaderData* HeapTupleHeader;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">HeapTupleData</span></span><br><span class="line">&#123;</span><br><span class="line">     uint32    t_len;   <span class="comment">/* length of *t_data */</span></span><br><span class="line">     ItemPointerData  t_self;   <span class="comment">/* SelfItemPointer */</span></span><br><span class="line">     Oid     t_tableOid;  <span class="comment">/* table the tuple came from */</span></span><br><span class="line">     <span class="meta">#<span class="keyword">define</span> FIELDNO_HEAPTUPLEDATA_DATA 3</span></span><br><span class="line">     HeapTupleHeader  t_data;   <span class="comment">/* -&gt; tuple header and data */</span></span><br><span class="line">&#125; HeapTupleData;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 读取文件</span></span><br><span class="line">  FILE *fp = <span class="built_in">fopen</span>(<span class="string">&quot;/home/singheart/project/cmake/pg_page/16387&quot;</span>, <span class="string">&quot;rb&quot;</span>);</span><br><span class="line">  <span class="keyword">if</span> (fp == <span class="literal">NULL</span>) &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;open file failed\n&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 读取文件大小</span></span><br><span class="line">  <span class="built_in">fseek</span>(fp, <span class="number">0</span>, SEEK_END);</span><br><span class="line">  <span class="type">long</span> file_size = <span class="built_in">ftell</span>(fp);</span><br><span class="line">  <span class="built_in">fseek</span>(fp, <span class="number">0</span>, SEEK_SET);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;file size: %ld\n&quot;</span>, file_size);</span><br><span class="line">  <span class="comment">// 读取PageHeader信息</span></span><br><span class="line">  uint8 *buf = (uint8 *)<span class="built_in">malloc</span>(file_size);</span><br><span class="line">  <span class="built_in">fread</span>(buf, file_size, <span class="number">1</span>, fp);</span><br><span class="line">  PageHeaderData *header = (PageHeaderData *)buf;</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;lsn %d\n&quot;</span>, header-&gt;pd_lsn);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;checksum %d\n&quot;</span>, header-&gt;pd_checksum);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;flags %d\n&quot;</span>, header-&gt;pd_flags);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;lower %d\n&quot;</span>, header-&gt;pd_lower);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;higher %d\n&quot;</span>, header-&gt;pd_upper);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;page_size_version: %d\n&quot;</span>, header-&gt;pd_pagesize_version);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;special %d\n&quot;</span>, header-&gt;pd_special);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;prune_xid %d\n&quot;</span>, header-&gt;pd_prune_xid);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 读取所有Tuple信息</span></span><br><span class="line">  ItemIdData tuple1_info = header-&gt;pd_linp[<span class="number">1</span>];</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;lp_off %d, lp_flags %d, lp_len %d\n&quot;</span>, tuple1_info.lp_off, tuple1_info.lp_flags, tuple1_info.lp_len);</span><br><span class="line">  HeapTupleHeaderData *tuple_header = (HeapTupleHeaderData *)(buf + tuple1_info.lp_off);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;xmin %d\n&quot;</span>, tuple_header-&gt;t_choice.t_heap.t_xmin);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;xmax %d\n&quot;</span>, tuple_header-&gt;t_choice.t_heap.t_xmax);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;t_field3 %x\n&quot;</span>, tuple_header-&gt;t_choice.t_heap.t_field3.t_cid);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;c_tid (%d, %d)\n&quot;</span>, tuple_header-&gt;t_ctid.ip_blkid, tuple_header-&gt;t_ctid.ip_posid);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;t_infomask2 %d\n&quot;</span>, tuple_header-&gt;t_infomask2);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;t_infomask %d\n&quot;</span>, tuple_header-&gt;t_infomask);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;t_off %d\n&quot;</span>, tuple_header-&gt;t_hoff);</span><br><span class="line"></span><br><span class="line">  <span class="type">char</span> *tuple_real_data = (<span class="type">char</span> *)tuple_header + tuple_header-&gt;t_hoff;</span><br><span class="line">  <span class="type">int</span> size = tuple1_info.lp_len - tuple_header-&gt;t_hoff;</span><br><span class="line">  <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; size; i++) &#123;</span><br><span class="line">     <span class="keyword">if</span> (tuple_real_data[i] &gt;= <span class="string">&#x27;a&#x27;</span> &amp;&amp; tuple_real_data[i] &lt;= <span class="string">&#x27;z&#x27;</span> || tuple_real_data[i] &gt;= <span class="string">&#x27;A&#x27;</span> &amp;&amp; tuple_real_data[i] &lt;= <span class="string">&#x27;Z&#x27;</span> || tuple_real_data[i] &gt;= <span class="string">&#x27;0&#x27;</span> &amp;&amp; tuple_real_data[i] &lt;= <span class="string">&#x27;9&#x27;</span>)  &#123;</span><br><span class="line">           <span class="built_in">printf</span>(<span class="string">&quot;%c &quot;</span>,tuple_real_data[i]);</span><br><span class="line">           <span class="keyword">continue</span>;</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="built_in">printf</span>(<span class="string">&quot;%x &quot;</span>,tuple_real_data[i]);</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line"></span><br><span class="line">  <span class="built_in">fclose</span>(fp);</span><br><span class="line">  <span class="built_in">free</span>(buf);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="行指针项指针">2.1.1.2 行指针(项指针)</h4>
+<p>行指针的长度为4个字节，它形成一个简单的(ItemId，行指针)数组，该数组起着元组索引的作用。每个索引编号从1开始，称为“<strong>偏移数</strong>”。当将一个新的元组添加到页的时候，新的行指针也被添加到<code>pd_linp</code>数组中，以指向其对应的元组。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">ItemIdData</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">unsigned</span> lp_off:<span class="number">15</span>,  <span class="comment">/* offset to tuple (from start of page) */</span></span><br><span class="line">    lp_flags:<span class="number">2</span>,          <span class="comment">/* state of line pointer, see below */</span></span><br><span class="line">    lp_len:<span class="number">15</span>;           <span class="comment">/* byte length of tuple */</span></span><br><span class="line">&#125; ItemIdData;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> ItemIdData *ItemId;</span><br></pre></td></tr></table></figure>
+<p>当不断向页中插入数据时候，其元组、行指针以及可用空间的变化如下图所示：</p>
+<figure>
+<img
+src="https://pic3.zhimg.com/80/v2-c7caba2e44ffeefe280e8117ea66eb82_1440w.webp"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<h4 id="元组结构">2.1.1.3 元组结构</h4>
+<p>在2.1.1.1和2.1.1.2两个小节中分别对页(page)中的页头数据结构和行指针的功能细节进行了较为详细的描述，接下来会对页中的元组数据结构以及其内部布局等进行分析。</p>
+<p>对于表文件页中的元组可细分为“普通数据元组和TOAST元组”。<code>TOAST</code>(<code>The Oversized-Attribute Storage Technique</code>，超大属性存储技术)主要用于存储变长数据，当待插入元组的大小大于约为2KB(即页的1/4)时候，会自动启动TOAST技术来存储该元组。TOAST较普通元组稍加复杂些，这里主要针对普通元组文件进行说明。</p>
+<p>元组内部可以分为三部分，分别是：<strong>堆元组头部</strong>、<strong>位图</strong>和<strong>用户存储的数据</strong>。需要注意的是，line-pointer指向的是HeapTupleHeaderData，
+示意图如下所示：</p>
+<figure>
+<img
+src="https://pic2.zhimg.com/80/v2-aace394f4fb4d1e17be5c74cc9ca3469_1440w.webp"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<figure>
+<img
+src="https://img.singhe.art/v2-cd0263a8b49217e456622c566181799b_1440w.webp"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<figure>
+<img
+src="https://images2017.cnblogs.com/blog/579102/201712/579102-20171212215105691-256965612.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>其中堆元组头部的结构定义如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">HeapTupleHeaderData</span></span><br><span class="line">&#123;</span><br><span class="line">     <span class="keyword">union</span></span><br><span class="line">     &#123;</span><br><span class="line">        HeapTupleFields  t_heap;</span><br><span class="line">        DatumTupleFields  t_datum;</span><br><span class="line">     &#125;   t_choice;</span><br><span class="line"></span><br><span class="line">     ItemPointerData t_ctid;  <span class="comment">/* current TID of this or newer tuple (or a</span></span><br><span class="line"><span class="comment">                               * speculative insertion token) */</span></span><br><span class="line">     <span class="comment">/* Fields below here must match MinimalTupleData! */</span></span><br><span class="line">      <span class="meta">#<span class="keyword">define</span> FIELDNO_HEAPTUPLEHEADERDATA_INFOMASK2 2</span></span><br><span class="line">     uint16  t_infomask2; <span class="comment">/* number of attributes + various flags */</span></span><br><span class="line"></span><br><span class="line">      <span class="meta">#<span class="keyword">define</span> FIELDNO_HEAPTUPLEHEADERDATA_INFOMASK 3</span></span><br><span class="line">     uint16  t_infomask;  <span class="comment">/* various flag bits, see below */</span></span><br><span class="line"></span><br><span class="line">      <span class="meta">#<span class="keyword">define</span> FIELDNO_HEAPTUPLEHEADERDATA_HOFF 4</span></span><br><span class="line">     uint8  t_hoff;   <span class="comment">/* sizeof header incl. bitmap, padding */</span></span><br><span class="line"></span><br><span class="line">     <span class="comment">/* ^ - 23 bytes - ^ */</span></span><br><span class="line">      <span class="meta">#<span class="keyword">define</span> FIELDNO_HEAPTUPLEHEADERDATA_BITS 5</span></span><br><span class="line">     bits8  t_bits[FLEXIBLE_ARRAY_MEMBER]; <span class="comment">/* bitmap of NULLs */</span></span><br><span class="line"></span><br><span class="line">     <span class="comment">/* MORE DATA FOLLOWS AT END OF STRUCT */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>其中<code>t_choice</code>成员变量是一个共用体数据类型。对于<code>t_choice</code>中的<code>t_heap</code>成员，它描述了当前元组的事务<code>id</code>、事务<code>id</code>等信息，如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">HeapTupleFields</span></span><br><span class="line">&#123;</span><br><span class="line">     TransactionId t_xmin;  <span class="comment">/* inserting xact ID */</span></span><br><span class="line">     TransactionId t_xmax;  <span class="comment">/* deleting or locking xact ID */</span></span><br><span class="line"></span><br><span class="line">     <span class="keyword">union</span></span><br><span class="line">     &#123;</span><br><span class="line">        CommandId t_cid;  <span class="comment">/* inserting or deleting command ID, or both */</span></span><br><span class="line">        TransactionId t_xvac; <span class="comment">/* old-style VACUUM FULL xact ID */</span></span><br><span class="line">     &#125;   t_field3;</span><br><span class="line">&#125; HeapTupleFields;</span><br></pre></td></tr></table></figure>
+<p><code>t_ctid</code>定义如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">ItemPointerData</span> &#123;</span><br><span class="line">    BlockIdData ip_blkid;</span><br><span class="line">    OffsetNumber ip_posid;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>该数据类型中，<code>t_xmin</code>成员保存的是插入该元组的事务<code>txid</code>。<code>t_xmax</code>报错删除或是更新该元组的<code>txid</code>。如果尚未删除或更新过该元组，则<code>t_xmax</code>将设置为0，即<code>INVALID</code>。<code>t_cid</code>保留命令<code>id(cid)</code>。这表示了从0开始到当前事务中共执行了多少个SQL命令。比如我们在一个事务中查询了2个INSERT
+INTO命令，即：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&#x27;BEGIN;</span></span><br><span class="line"><span class="string">INSERT INTO ... ;</span></span><br><span class="line"><span class="string">INSERT INTO ... ;</span></span><br><span class="line"><span class="string">COMMIT;&#x27;</span></span><br></pre></td></tr></table></figure>
+<p>那么第一次插入该元组时候，<code>t_cid</code>初始化为0.第二次插入次元组时候，该<code>t_cid</code>将被设置为1，依次类推。</p>
+<p>t_ctid保存指向自身或是新元组的元组表示符。当该元组被更新时，该元组的<code>t_ctid</code>指向新的元组；否则，<code>t_ctid</code>指向自身。注：为了标识数据表中的元组，在元组内部使用了元组标识符(<code>Tuple Identifile</code>,
+<code>TID</code>),
+tid包含一对值，类似<code>tid(key1, key2)</code>。其中key1表示包含元组的页的块号，key2表示指向元组的行指针的偏移量。如下所示：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">test=# select *from heap_page_items(get_raw_page(&#x27;student&#x27;,0));</span><br><span class="line"> lp | lp_off | lp_flags | lp_len | t_xmin | t_xmax | t_field3 | t_ctid | t_infomask2 | t_infomask | t_hoff | t_bits | t_oid |                   t_data</span><br><span class="line">----+--------+----------+--------+--------+--------+----------+--------+-------------+------------+--------+--------+-------+--------------------------------------------</span><br><span class="line">  1 |   8144 |        1 |     44 | 604154 |      0 |        0 | (0,1)  |           3 |       2050 |     24 |        |       | \x01000000174c495849414f47414e47001c000000</span><br><span class="line">(1 row)</span><br><span class="line"></span><br><span class="line">test=# SELECT * from page_header(get_raw_page(&#x27;student&#x27;, 0));</span><br><span class="line">    lsn    | checksum | flags | lower | upper | special | pagesize | version | prune_xid </span><br><span class="line">-----------+----------+-------+-------+-------+---------+----------+---------+-----------</span><br><span class="line"> 0/19A0818 |        0 |     0 |    28 |  8144 |    8192 |     8192 |       4 |         0</span><br><span class="line">(1 行记录)</span><br><span class="line"></span><br><span class="line">test=# </span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>成员<code>t_infomask2</code>用来表示当前元组的属性个数。<code>t_infomask</code>用于标识元组的当前状态，比如是否空属性、是否具有对象id、是否具有外部存储属性等等，PostgreSQL
+13.2版本中，<code>t_infomask</code>成员具有以下状态信息：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * information stored in t_infomask:</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> HEAP_HASNULL   0x0001 <span class="comment">/* has null attribute(s) */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> HEAP_HASVARWIDTH  0x0002 <span class="comment">/* has variable-width attribute(s) */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> HEAP_HASEXTERNAL  0x0004 <span class="comment">/* has external stored attribute(s) */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> HEAP_HASOID_OLD   0x0008 <span class="comment">/* has an object-id field */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> HEAP_XMAX_KEYSHR_LOCK 0x0010 <span class="comment">/* xmax is a key-shared locker */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> HEAP_COMBOCID   0x0020 <span class="comment">/* t_cid is a combo cid */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> HEAP_XMAX_EXCL_LOCK  0x0040 <span class="comment">/* xmax is exclusive locker */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> HEAP_XMAX_LOCK_ONLY  0x0080 <span class="comment">/* xmax, if valid, is only a locker */</span></span></span><br><span class="line"></span><br><span class="line"> <span class="comment">/* xmax is a shared locker */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> HEAP_XMAX_SHR_LOCK (HEAP_XMAX_EXCL_LOCK | HEAP_XMAX_KEYSHR_LOCK)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> HEAP_LOCK_MASK (HEAP_XMAX_SHR_LOCK | HEAP_XMAX_EXCL_LOCK | \</span></span><br><span class="line"><span class="meta">       HEAP_XMAX_KEYSHR_LOCK)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> HEAP_XMIN_COMMITTED  0x0100 <span class="comment">/* t_xmin committed */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> HEAP_XMIN_INVALID  0x0200 <span class="comment">/* t_xmin invalid/aborted */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> HEAP_XMIN_FROZEN  (HEAP_XMIN_COMMITTED|HEAP_XMIN_INVALID)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> HEAP_XMAX_COMMITTED  0x0400 <span class="comment">/* t_xmax committed */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> HEAP_XMAX_INVALID  0x0800 <span class="comment">/* t_xmax invalid/aborted */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> HEAP_XMAX_IS_MULTI  0x1000 <span class="comment">/* t_xmax is a MultiXactId */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> HEAP_UPDATED   0x2000 <span class="comment">/* this is UPDATEd version of row */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> HEAP_MOVED_OFF   0x4000 <span class="comment">/* moved to another place by pre-9.0</span></span></span><br><span class="line"><span class="comment"><span class="meta">           * VACUUM FULL; kept for binary</span></span></span><br><span class="line"><span class="comment"><span class="meta">           * upgrade support */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> HEAP_MOVED_IN   0x8000 <span class="comment">/* moved from another place by pre-9.0</span></span></span><br><span class="line"><span class="comment"><span class="meta">           * VACUUM FULL; kept for binary</span></span></span><br><span class="line"><span class="comment"><span class="meta">           * upgrade support */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> HEAP_MOVED (HEAP_MOVED_OFF | HEAP_MOVED_IN)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> HEAP_XACT_MASK   0xFFF0 <span class="comment">/* visibility-related bits */</span></span></span><br></pre></td></tr></table></figure>
+<p>成员<code>t_hoff</code>标识该元组头的大小。成员<code>t_bits</code>数组用于标识当前元组哪些字段是空。</p>
+<p>在读写元组头<code>HeapTupleHeaderData</code>时候，我们往往直接使用其<code>HeapTupleHeader</code>指针来进行操作。其声明如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* typedefs and forward declarations for structs defined in htup_details.h */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">HeapTupleHeaderData</span> HeapTupleHeaderData;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> HeapTupleHeaderData *HeapTupleHeader;</span><br></pre></td></tr></table></figure>
+<p>堆元组的整体数据类型声明如下，它嵌套了元组头部结构信息，另外新增了几个附加成员字段，用以描述当前元组的用户数据长度等。如下：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">typedef struct HeapTupleData</span><br><span class="line">&#123;</span><br><span class="line">     uint32    t_len;   /* length of *t_data */</span><br><span class="line">     ItemPointerData  t_self;   /* SelfItemPointer */</span><br><span class="line">     Oid     t_tableOid;  /* table the tuple came from */</span><br><span class="line">     #define FIELDNO_HEAPTUPLEDATA_DATA 3</span><br><span class="line">     HeapTupleHeader  t_data;   /* -&gt; tuple header and data */</span><br><span class="line">&#125; HeapTupleData;</span><br><span class="line"></span><br><span class="line">typedef HeapTupleData *HeapTuple;</span><br></pre></td></tr></table></figure>
+<h3 id="pageinspect扩展查看页内容">2.1.2 pageinspect扩展查看页内容</h3>
+<p>详细信息见另一篇markdown</p>
+<h4 id="查看表文件页头信息">2.1.2.1 查看表文件页头信息</h4>
+<p>使用<code>page_header()</code>函数和<code>get_raw_page()</code>函数结合可得到指定页的头部信息。如下所示，其中数字0表示指定表的页数。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">test=# select *from page_header(get_raw_page(&#x27;student&#x27;, 0));</span><br><span class="line">    lsn     | checksum | flags | lower | upper | special | pagesize | version | prune_xid</span><br><span class="line">------------+----------+-------+-------+-------+---------+----------+---------+-----------</span><br><span class="line"> 0/39620C78 |        0 |     0 |    28 |  8144 |    8192 |     8192 |       4 |         0</span><br><span class="line">(1 row)</span><br></pre></td></tr></table></figure>
+<p>使用<code>heap_page_items</code>和<code>get_raw_page</code>可得到表元组的头部信息和数据信息，如下：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">test=# select *from heap_page_items(get_raw_page(&#x27;student&#x27;,0));</span><br><span class="line"> lp | lp_off | lp_flags | lp_len | t_xmin | t_xmax | t_field3 | t_ctid | t_infomask2 | t_infomask | t_hoff | t_bits | t_oid |                   t_data</span><br><span class="line">----+--------+----------+--------+--------+--------+----------+--------+-------------+------------+--------+--------+-------+--------------------------------------------</span><br><span class="line">  1 |   8144 |        1 |     44 | 604154 |      0 |        0 | (0,1)  |           3 |       2050 |     24 |        |       | \x01000000174c495849414f47414e47001c000000</span><br><span class="line">(1 row)</span><br></pre></td></tr></table></figure>
+<h2 id="使用工具读分析表文件内容">2.2 使用工具读分析表文件内容</h2>
+<p>因为表文件中的数据都是二进制，所以在不借助工具的情况下，是无法直接查看的。因此我们需要借助工具来查看表文件中的数据内容，结合上面的介绍进行分析。在类UNIX环境上，可以使用<code>hexdump</code>、<code>od</code>命令对堆文件表中的数据进行十六进制转存，然后进行分析。当前student表中的数据仅有一条，如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">test=# \d+ student;</span><br><span class="line">                                                       Table &quot;public.student&quot;</span><br><span class="line"> Column |         Type          | Collation | Nullable |               Default               | Storage  | Stats target | Description</span><br><span class="line">--------+-----------------------+-----------+----------+-------------------------------------+----------+--------------+-------------</span><br><span class="line"> id     | integer               |           | not null | nextval(&#x27;student_id_seq&#x27;::regclass) | plain    |              |</span><br><span class="line"> name   | character varying(10) |           |          |                                     | extended |              |</span><br><span class="line"> age    | integer               |           |          |                                     | plain    |              |</span><br><span class="line">Indexes:</span><br><span class="line">    &quot;student_pkey&quot; PRIMARY KEY, btree (id)</span><br><span class="line"></span><br><span class="line">test=# SELECT *FROM student;</span><br><span class="line"> id |   name   | age</span><br><span class="line">----+----------+-----</span><br><span class="line">  1 | XIAOGANG |  27</span><br><span class="line">(1 row)</span><br><span class="line"></span><br><span class="line">test=#</span><br></pre></td></tr></table></figure>
+<p><code>hexdump</code>命令主要用来查看二进制文件的十六进制编码(当然，也可以直接<code>vim</code>，然后<code>:%!xxd</code>将其二进制数据转换为十六进制)，如下所示：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@Thor 163898]# hexdump  16387</span><br><span class="line">0000000 0000 0000 aab8 40a1 0000 0000 001c 1fd0</span><br><span class="line">0000010 2000 2004 0000 0000 9fd0 0058 0000 0000</span><br><span class="line">0000020 0000 0000 0000 0000 0000 0000 0000 0000</span><br><span class="line">* //省略若干字节内容(全是0000, free space,未使用的内存空间)</span><br><span class="line">0001fd0 b4cb 0009 0000 0000 0000 0000 0000 0000</span><br><span class="line">0001fe0 0001 0003 0902 0018 0001 0000 5813 4149</span><br><span class="line">0001ff0 474f 4e41 0047 0000 001b 0000 0000 0000</span><br><span class="line">0002000</span><br></pre></td></tr></table></figure>
+<p>注：堆表文件的元组数据是从页的尾部开始存储，直到<code>pd_upper - pd_lower</code>的空间不足以存储元组为止。如下图中的<code>Tuple1</code>、<code>Tuple2</code>、<code>Tuple3</code>、<code>Tuple4</code>等等。</p>
+<figure>
+<img
+src="https://pic2.zhimg.com/80/v2-1edc85ae1aaaf6a1ba5e50419fd04a09_1440w.webp"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>现在我们将上面<code>hexdump</code>显示的十六进制数据结合页头数据结构(<code>PageHeaderData</code>)成员列表来进行详细分析。如下图所示：</p>
+<figure>
+<img
+src="https://pic4.zhimg.com/80/v2-8ee06b41cb0c4d963ad045ab1eb7c3eb_1440w.webp"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>堆表文件中的页头部信息可以通过系统表<code>page_header</code>获取得到，其查询出来的结果和<code>hexdump</code>显示的十六进制数据是能够一一对应的。上图中黄色标注的24字节是页的头部(<code>PageHeaderData</code>)，其中各成员的大小如下图所示：</p>
+<p>上图中<code>2000 2004 0000 0000</code>依次对应这页头中的<code>m_special</code>、<code>m_pagesize_version</code>、<code>pd_prune_xid</code>。</p>
+<p>紫色表示的4字节(<code>d09F 5800</code>)是指向元组的行指针<code>pd_linp</code>(也称为<code>ItemId</code>)。行指针的结构声明如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">ItemIdData</span></span><br><span class="line">&#123;</span><br><span class="line">       <span class="type">unsigned</span> lp_off:<span class="number">15</span>,  <span class="comment">/* offset to tuple (from start of page) */</span></span><br><span class="line">       lp_flags:<span class="number">2</span>,  <span class="comment">/* state of line pointer, see below */</span></span><br><span class="line">       lp_len:<span class="number">15</span>;  <span class="comment">/* byte length of tuple */</span></span><br><span class="line">&#125; ItemIdData;</span><br></pre></td></tr></table></figure>
+<p>第1至15位指向该元组的偏移量(从页开始)、15至17位声明当前元组的状态，这个前面有说过、17至32声明该元组的长度大小。这里之所以将<code>hexdump</code>展示的十六进制反过来书写是因为我当前系统架构是小端模式。经转换过后，其各值能够和<code>pg_header</code>表查出来的结果相吻合。说明分析是正确的。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pd_linp[0] ==== 00589FD0 //转换为二进制后是：10110001001111111010000   </span><br><span class="line">101100          01    001111111010000</span><br><span class="line">44(字节)         1    8144(字节)</span><br></pre></td></tr></table></figure>
+<p>上面对页中元组的头部信息、行指针进行了详细的分析。接下来重点剖析页中行指针所指向的对应的元组数据信息。</p>
+<p>在分析元组的结构信息时候，我们需要借助<code>heap_page_items()</code>函数，该函数会将元组在页内存中的分布信息详细展示出来。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">test=# select *from heap_page_items(get_raw_page(&#x27;student&#x27;,0));</span><br><span class="line"> lp | lp_off | lp_flags | lp_len | t_xmin | t_xmax | t_field3 | t_ctid | t_infomask2 | t_infomask | t_hoff | t_bits | t_oid |                   t_data</span><br><span class="line">----+--------+----------+--------+--------+--------+----------+--------+-------------+------------+--------+--------+-------+--------------------------------------------</span><br><span class="line">  1 |   8144 |        1 |     44 | 636107 |      0 |        0 | (0,1)  |           3 |       2306 |     24 |        |       | \x01000000135849414f47414e470000001b000000</span><br><span class="line">(1 row)</span><br><span class="line"></span><br><span class="line">test=# select *from student;</span><br><span class="line"> id |   name   | age</span><br><span class="line">----+----------+-----</span><br><span class="line">  1 | XIAOGANG |  27</span><br><span class="line">(1 row)</span><br></pre></td></tr></table></figure>
+<p>由于元组中字段占用的大小有严格的内存对齐要求，所以实际上可以看到各成员之间会存在一些“填充”字节数据。其对齐(必须始终是平台的<code>MAXALIGN</code>距离的倍数。)要求如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> MAXALIGN(LEN)   TYPEALIGN(MAXIMUM_ALIGNOF, (LEN))</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TYPEALIGN(ALIGNVAL,LEN)  \</span></span><br><span class="line"><span class="meta"> (((uintptr_t) (LEN) + ((ALIGNVAL) - 1)) &amp; ~((uintptr_t) ((ALIGNVAL) - 1)))</span></span><br></pre></td></tr></table></figure>
+<p>通过<code>heap_page_items()</code>函数得到结果与<code>hexdump</code>命令得到的数据，最终可得到该元组在页为0内存中布局详情如下图所示。下图中紫色标注的1b其值是age字段中的值27。该字段周边的0000是填充字节数据z，用于保证内存对齐。</p>
+<figure>
+<img
+src="https://pic3.zhimg.com/80/v2-f48cba9d471b497b01fb261cf20deef6_1440w.webp"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<h3 id="hexdump分析堆表文件">2.2.1 hexdump分析堆表文件</h3>
+<p>由于这两个命令显示的结果在不手动转换情况下，无法直接看出(需要转换)该文件中的表头结构、行指针和元组结构等数据信息。因此，出于方便，还需使用其他工具，分别是：<code>pg_filedump</code>和<code>pg_hexedit</code>。<code>pg_filedump</code>
+和<code>pg_hexedit</code>
+两个工具并没有附加在PostgreSQL源码中，所以源码安装的PostgreSQL中，bin目录下是没有这两个工具命令的。这两个工具有专门的pg团队在进行维护，所以你可以在github上面找到其源码，然后进行源码安装。</p>
+<p>由于<code>pg_hexedit</code>工具显示的结果需要借助
+<code>wxHexEditor</code>工具来进行展示，所以这里使用<code>pg_filedump</code>工具来进行分析。</p>
+<h2 id="pg_filedump">2.2.2 pg_filedump</h2>
+<p><code>pg_filedump</code>命令提供许多供选的参数，具体详情可使用
+<code>pg_filedump --help</code>。该工具得到的数据比较直观，因为结果中直接给出了当前文件中的页数、行指针的起始位置，以及各页中分别指向空闲空间起始、结束位置的地址等。如下所示：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">[root@Thor bin]#</span><br><span class="line">[root@Thor bin]#</span><br><span class="line">[root@Thor bin]#</span><br><span class="line">[root@Thor bin]# ./pg_filedump -i /var/lib/pgsql/11/data/base/163898/16387</span><br><span class="line"></span><br><span class="line">*******************************************************************</span><br><span class="line">* PostgreSQL File/Block Formatted Dump Utility</span><br><span class="line">*</span><br><span class="line">* File: /var/lib/pgsql/11/data/base/163898/164056</span><br><span class="line">* Options used: -i</span><br><span class="line">*******************************************************************</span><br><span class="line"></span><br><span class="line">Block    0 ********************************************************</span><br><span class="line">&lt;Header&gt; -----</span><br><span class="line">Block Offset: 0x00000000         Offsets: Lower      28 (0x001c)</span><br><span class="line">Block: Size 8192  Version    4            Upper    8144 (0x1fd0)</span><br><span class="line">LSN:  logid      0 recoff 0x40a1aab8      Special  8192 (0x2000)</span><br><span class="line">Items:    1                      Free Space: 8116</span><br><span class="line">Checksum: 0x0000  Prune XID: 0x00000000  Flags: 0x0000 ()</span><br><span class="line">Length (including item array): 28</span><br><span class="line"></span><br><span class="line">&lt;Data&gt; -----</span><br><span class="line">Item   1 -- Length:   44  Offset: 8144 (0x1fd0)  Flags: NORMAL</span><br><span class="line">XMIN: 636107  XMAX: 0  CID|XVAC: 0</span><br><span class="line">Block Id: 0  linp Index: 1   Attributes: 3   Size: 24</span><br><span class="line">infomask: 0x0902 (HASVARWIDTH|XMIN_COMMITTED|XMAX_INVALID)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">*** End of File Encountered. Last Block Read: 0 ***</span><br><span class="line">[root@Thor bin]#</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/06/27/openGauss/PostgreSQL%E7%B3%BB%E7%BB%9F%E8%A1%A8%E5%88%86%E6%9E%90/" rel="prev" title="postgreSQL系统表分析">
+                  <i class="fa fa-chevron-left"></i> postgreSQL系统表分析
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/06/27/openGauss/PostgreSQL%E5%8F%AF%E5%8F%98%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/" rel="next" title="postgreSQL可变数据类型">
+                  postgreSQL可变数据类型 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">singheart</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div><script color="0,0,255" opacity="0.5" zIndex="-1" count="99" src="https://cdn.jsdelivr.net/npm/canvas-nest.js@1/dist/canvas-nest.js"></script>
+
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"xinjiempolde","repo":"xinjiempolde.github.io","client_id":"89019d63999840fdbf7f","client_secret":"48d2133d88acfafada6414ec6eee5a9d9febcbc8","admin_user":"xinjiempolde","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"750dc60b6c454eedf19399b7043551a3"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/haruto.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>

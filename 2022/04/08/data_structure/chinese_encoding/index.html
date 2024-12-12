@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0-rc1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.11.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="参考自B站柴知道，十分推荐观看原视频，侵权请联系删除。  什么是编码 计算机存储的内容都是二进制的数据，图像、音频、文字等也都需要按照一定的规则转换成二进制数据进行存储。将文字转换成二进制数据的规则就叫做编码。 假如世界上只有三个文字“柴知道”，那么我们就可以按照下面的方式进行编码：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="编码以及中文乱码">
+<meta property="og:url" content="http://example.com/2022/04/08/data_structure/chinese_encoding/index.html">
+<meta property="og:site_name" content="singheart&#39;s blog">
+<meta property="og:description" content="参考自B站柴知道，十分推荐观看原视频，侵权请联系删除。  什么是编码 计算机存储的内容都是二进制的数据，图像、音频、文字等也都需要按照一定的规则转换成二进制数据进行存储。将文字转换成二进制数据的规则就叫做编码。 假如世界上只有三个文字“柴知道”，那么我们就可以按照下面的方式进行编码：">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://img.singhe.art/image-20221014102739026.png">
+<meta property="og:image" content="http://img.singhe.art/800px-USASCII_code_chart.png">
+<meta property="og:image" content="http://img.singhe.art/image-20221014110216164.png">
+<meta property="og:image" content="http://img.singhe.art/image-20221014111416438.png">
+<meta property="og:image" content="http://img.singhe.art/image-20221014132653375.png">
+<meta property="og:image" content="http://img.singhe.art/image-20221014140132630.png">
+<meta property="og:image" content="http://img.singhe.art/image-20221014140916470.png">
+<meta property="og:image" content="http://img.singhe.art/image-20221014140814843.png">
+<meta property="og:image" content="http://img.singhe.art/image-20221014141641526.png">
+<meta property="og:image" content="http://img.singhe.art/image-20221014142013935.png">
+<meta property="article:published_time" content="2022-04-08T10:19:52.000Z">
+<meta property="article:modified_time" content="2024-12-11T13:03:57.699Z">
+<meta property="article:author" content="singheart">
+<meta property="article:tag" content="encode">
+<meta property="article:tag" content="coding">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://img.singhe.art/image-20221014102739026.png">
+
+
+<link rel="canonical" href="http://example.com/2022/04/08/data_structure/chinese_encoding/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2022/04/08/data_structure/chinese_encoding/","path":"2022/04/08/data_structure/chinese_encoding/","title":"编码以及中文乱码"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>编码以及中文乱码 | singheart's blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">singheart's blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">多读书，多思考</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E7%BC%96%E7%A0%81"><span class="nav-number">1.</span> <span class="nav-text">什么是编码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ascii%E7%BC%96%E7%A0%81"><span class="nav-number">2.</span> <span class="nav-text">ASCII编码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#gb2312%E7%BC%96%E7%A0%81"><span class="nav-number">3.</span> <span class="nav-text">GB2312编码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#gbk%E7%BC%96%E7%A0%81"><span class="nav-number">4.</span> <span class="nav-text">GBK编码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#unicode%E7%BC%96%E7%A0%81"><span class="nav-number">5.</span> <span class="nav-text">UNICODE编码</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#utf-32%E7%BC%96%E7%A0%81"><span class="nav-number">5.1.</span> <span class="nav-text">UTF-32编码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#utf-8%E7%BC%96%E7%A0%81"><span class="nav-number">5.2.</span> <span class="nav-text">UTF-8编码</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%94%9F%E6%96%A4%E6%8B%B7%E7%9A%84%E5%BD%A2%E6%88%90"><span class="nav-number">6.</span> <span class="nav-text">“锟斤拷”的形成</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%83%AB%E7%83%AB%E7%83%AB%E5%92%8C%E5%B1%AF%E5%B1%AF%E5%B1%AF"><span class="nav-number">7.</span> <span class="nav-text">烫烫烫和屯屯屯</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="singheart"
+      src="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+  <p class="site-author-name" itemprop="name">singheart</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xinjiempolde" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xinjiempolde" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/04/08/data_structure/chinese_encoding/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+      <meta itemprop="name" content="singheart">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="编码以及中文乱码 | singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          编码以及中文乱码
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-04-08 18:19:52" itemprop="dateCreated datePublished" datetime="2022-04-08T18:19:52+08:00">2022-04-08</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-12-11 21:03:57" itemprop="dateModified" datetime="2024-12-11T21:03:57+08:00">2024-12-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/data-structure/" itemprop="url" rel="index"><span itemprop="name">data_structure</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <blockquote>
+<p>参考自<a
+target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1cB4y177QR/?spm_id_from=333.337.search-card.all.click&amp;vd_source=34f42153abf8d06182c3e941bc952660">B站柴知道</a>，十分推荐观看原视频，侵权请联系删除。</p>
+</blockquote>
+<h1 id="什么是编码">什么是编码</h1>
+<p>计算机存储的内容都是二进制的数据，图像、音频、文字等也都需要按照一定的规则转换成二进制数据进行存储。将文字转换成二进制数据的规则就叫做编码。</p>
+<p>假如世界上只有三个文字“柴知道”，那么我们就可以按照下面的方式进行编码：</p>
+<span id="more"></span>
+<figure>
+<img src="http://img.singhe.art/image-20221014102739026.png"
+alt="image-20221014102739026" />
+<figcaption aria-hidden="true">image-20221014102739026</figcaption>
+</figure>
+<h1 id="ascii编码">ASCII编码</h1>
+<p>计算机存储中最小的单位是一个字节（byte），一个byte等于8bit，因此一共可以编码2^8=256个字符。美国最先使用计算机，它们使用的文字只有26个英文字母，完全足够了。因此他们按照下面的方式对英文字母进行了编码，同时还包含了一些特殊控制符号（如回车、换行、删除），一共用了128个。所以只用了7bit（2^7=128)，所以最高位置0。</p>
+<figure>
+<img src="http://img.singhe.art/800px-USASCII_code_chart.png"
+alt="USASCII code chart.png" />
+<figcaption aria-hidden="true">USASCII code chart.png</figcaption>
+</figure>
+<p>比如，字母a对应的码位就是01100001，十六进制为0x61。z对应的码位为01111010，十六进制为0x7A。</p>
+<p>下面的代码，我们将通过手动构造二进制数据，然后输出得到字符串"hello
+world"。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    <span class="type">char</span> char_array[<span class="number">12</span>] = &#123;<span class="number">0b01101000</span>,  <span class="comment">/* 0x68 h */</span></span><br><span class="line">                        <span class="number">0b01100101</span>,     <span class="comment">/* 0x65 e */</span></span><br><span class="line">                        <span class="number">0b01101100</span>,     <span class="comment">/* 0x6c l */</span></span><br><span class="line">                        <span class="number">0b01101100</span>,     <span class="comment">/* 0x6c l */</span></span><br><span class="line">                        <span class="number">0b01101111</span>,     <span class="comment">/* 0x6f o */</span></span><br><span class="line">                        <span class="number">0b01110111</span>,     <span class="comment">/* 0x77 w */</span></span><br><span class="line">                        <span class="number">0b01101111</span>,     <span class="comment">/* 0x6f o */</span></span><br><span class="line">                        <span class="number">0b01110010</span>,     <span class="comment">/* 0x72 r */</span></span><br><span class="line">                        <span class="number">0b01101100</span>,     <span class="comment">/* 0x6c l */</span></span><br><span class="line">                        <span class="number">0b01100100</span>,     <span class="comment">/* 0x64 d */</span></span><br><span class="line">                        <span class="number">0b00000000</span>&#125;;    <span class="comment">/* 0x00 &#x27;\0&#x27;*/</span></span><br><span class="line">    <span class="type">char</span> *<span class="built_in">string</span> = (<span class="type">char</span>*)char_array;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s&quot;</span>, <span class="built_in">string</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="gb2312编码">GB2312编码</h1>
+<p>ASCII只能编码英文字母和数字，而且一个byte最多只能编码256个字符，那么怎么来编码中文呢？GB2312-80就是1980年公布的汉字编码国家标准，采用两个byte来编码字符。如果是ASCII码已经存在的字符（如字母、数字），仍按照原有的方案用一个byte来编码，如果是汉字则使用2byte来编码。</p>
+<figure>
+<img src="http://img.singhe.art/image-20221014110216164.png"
+alt="image-20221014110216164" />
+<figcaption aria-hidden="true">image-20221014110216164</figcaption>
+</figure>
+<p>从上图中可以看出，hello仍然按照ASCII的编码方法编码成68 65 6c 6c
+6f，而“中”字则被编码成D6 D0，“国”字被编码成B9 FA，均采用两字节编码。</p>
+<h1 id="gbk编码">GBK编码</h1>
+<p>GBK编码是微软在GBK编码的基础上，进行了一部分拓展，以便支持其他类型的汉字（如繁体、日文汉字、韩文汉字）。“hello中国”在GBK中的编码和GB2312中的编码内容一致，但是GBK不是同一的标准，只是行业的技术规范。</p>
+<h1 id="unicode编码">UNICODE编码</h1>
+<p>由于没有统一起来，各种编码方式层出不穷，各国间的编码方式也很难兼容。因此UNICODE就出现了，它被称为万国码或者统一码。</p>
+<p>UNICODE如今已经有了1114112个码位，，被划分成17个平面，每个平面容纳655356个码位。</p>
+<p>Unicode
+本身只规定了每个字符的数字编号是多少（即码位，或叫做UNICODE值），并没有规定这个编号如何存储，具体怎么存储有多种方式，也就UTF-8、UTF-16、UTF-32.</p>
+<figure>
+<img src="http://img.singhe.art/image-20221014111416438.png"
+alt="image-20221014111416438" />
+<figcaption aria-hidden="true">image-20221014111416438</figcaption>
+</figure>
+<h2 id="utf-32编码">UTF-32编码</h2>
+<p>UTF-32采用定长4byte来编码字符，也就是每个字符有4byte长，它是直接将码位转换成4byte数据，这和UTF-8有区别。</p>
+<p>使用UTF-32进行存储会有存储空间浪费的问题，比如对于英文使用着来说，要存储“h”这个字符，使用ASCII编码只需要0x68一个byte就可以了，而使用UTF-32却仍需要0x00
+0x00 0x00 0x68四个字节，这样就造成了极大的存储空间浪费。</p>
+<p>因此UTF-32编码方式虽然简单，直接将码位存储为4byte，但却造成了严重的空间浪费。</p>
+<h2 id="utf-8编码">UTF-8编码</h2>
+<p>UTF-8是另一种UNICODE的编码方式，并且相比UTF-32也更节省空间，因此是最常用的Unicode编码方式。</p>
+<p>1字节 0xxxxxxx 2字节 110xxxxx 10xxxxxx 3字节 1110xxxx 10xxxxxx
+10xxxxxx 4字节 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx 5字节 111110xx
+10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 6字节 1111110x 10xxxxxx 10xxxxxx
+10xxxxxx 10xxxxxx 10xxxxxx
+同样以“hello中国”举例，我们来看看它按照UTF-8是怎样保存的。</p>
+<figure>
+<img src="http://img.singhe.art/image-20221014132653375.png"
+alt="image-20221014132653375" />
+<figcaption aria-hidden="true">image-20221014132653375</figcaption>
+</figure>
+<p>可以看出，hello这几个字符被存储为68 65 6c 6c
+6f，每个字符存储为一个byte，这和ASCII编码方式是一致的。而“中”字被存储为E4
+B8 AD，其二进制表示为1110 0100 10111000
+10101101。如果吧1110和10这些前置信息去掉，那么我们可以得到其二进制序列为0100111000101101，其十六进制为4E
+2D，其就是“中”字的UNICODE值（也就是码位）。</p>
+<h1 id="锟斤拷的形成">“锟斤拷”的形成</h1>
+<p>锟斤拷的形成主要是由于编辑者A使用GBK编码保存文本文件后，将此文本文件发送给其他用户B，而用户B按照UTF-8的格式打开并保存后，又将该文件发给了用户C，C重新用GBK编码打开文件就会得到很多很多的”锟斤拷“。下面我们仍然通过例子来说明。</p>
+<figure>
+<img src="http://img.singhe.art/image-20221014140132630.png"
+alt="image-20221014140132630" />
+<figcaption aria-hidden="true">image-20221014140132630</figcaption>
+</figure>
+<p>首先是以GBK的编码保存文本。</p>
+<p>然后再用UTF-8打开文本并保存，可以看出UTF-8并不能识别以GBK编码保存的“中国”两字，对于UTF-8不能识别的字符，会自动用EF
+BF BD来替换，也就是对应左边出现的一个问号。</p>
+<figure>
+<img src="http://img.singhe.art/image-20221014140916470.png"
+alt="image-20221014140916470" />
+<figcaption aria-hidden="true">image-20221014140916470</figcaption>
+</figure>
+<p>接着，我们将被UTF-8读取了并修改的文件重新按照GBK编码的方式打开。按照GBK编码的方式EF
+BF被解释成“锟”， BD EF被解释成“斤”， BF BD被解释成“拷”。</p>
+<figure>
+<img src="http://img.singhe.art/image-20221014140814843.png"
+alt="image-20221014140814843" />
+<figcaption aria-hidden="true">image-20221014140814843</figcaption>
+</figure>
+<h1 id="烫烫烫和屯屯屯">烫烫烫和屯屯屯</h1>
+<p>在Microsoft Visual
+studio的Debug模式下，用户未初始化的栈内存会被系统初始化为0xcc，而GBK编码中“烫”字的编码正是0xcc
+0xcc。而未初始化的堆空间会被初始化成0xcd，而0xcd
+0xcd在GBK编码下对应的就是“屯”字。下面我们试着用例子来解释下。</p>
+<figure>
+<img src="http://img.singhe.art/image-20221014141641526.png"
+alt="image-20221014141641526" />
+<figcaption aria-hidden="true">image-20221014141641526</figcaption>
+</figure>
+<figure>
+<img src="http://img.singhe.art/image-20221014142013935.png"
+alt="image-20221014142013935" />
+<figcaption aria-hidden="true">image-20221014142013935</figcaption>
+</figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/encode/" rel="tag"># encode</a>
+              <a href="/tags/coding/" rel="tag"># coding</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/04/08/go/go%E5%AF%BC%E5%85%A5%E8%87%AA%E5%AE%9A%E4%B9%89%E5%8C%85/" rel="prev" title="go导入自定义包">
+                  <i class="fa fa-chevron-left"></i> go导入自定义包
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/04/10/cpp/%E6%A8%A1%E6%9D%BF%E7%B1%BB%E7%BB%A7%E6%89%BF%E6%A8%A1%E6%9D%BF%E7%B1%BB%EF%BC%8C%E5%AD%90%E7%B1%BB%E7%9C%8B%E4%B8%8D%E5%88%B0%E7%88%B6%E7%B1%BB%E5%AF%B9%E8%B1%A1/" rel="next" title="模板类继承模板类，子类看不到父类对象">
+                  模板类继承模板类，子类看不到父类对象 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">singheart</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div><script color="0,0,255" opacity="0.5" zIndex="-1" count="99" src="https://cdn.jsdelivr.net/npm/canvas-nest.js@1/dist/canvas-nest.js"></script>
+
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"xinjiempolde","repo":"xinjiempolde.github.io","client_id":"89019d63999840fdbf7f","client_secret":"48d2133d88acfafada6414ec6eee5a9d9febcbc8","admin_user":"xinjiempolde","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"96f3f7c7dbb078d784bfc8c79a268c47"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/haruto.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>

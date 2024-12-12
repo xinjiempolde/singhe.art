@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0-rc1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.11.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="zmq + protobuf安装教程 环境  centos 7.6">
+<meta property="og:type" content="article">
+<meta property="og:title" content="zmq和protobuf安装教程">
+<meta property="og:url" content="http://example.com/2022/05/31/cpp/zmq_protobuf/index.html">
+<meta property="og:site_name" content="singheart&#39;s blog">
+<meta property="og:description" content="zmq + protobuf安装教程 环境  centos 7.6">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-05-31T10:41:25.000Z">
+<meta property="article:modified_time" content="2024-12-11T13:03:57.699Z">
+<meta property="article:author" content="singheart">
+<meta property="article:tag" content="zmq">
+<meta property="article:tag" content="protobuf">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2022/05/31/cpp/zmq_protobuf/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2022/05/31/cpp/zmq_protobuf/","path":"2022/05/31/cpp/zmq_protobuf/","title":"zmq和protobuf安装教程"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>zmq和protobuf安装教程 | singheart's blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">singheart's blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">多读书，多思考</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#zmq-protobuf%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text">zmq + protobuf安装教程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83"><span class="nav-number">1.1.</span> <span class="nav-text">环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E9%A2%84%E5%AE%89%E8%A3%85"><span class="nav-number">1.2.</span> <span class="nav-text">环境预安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85libsodium"><span class="nav-number">1.3.</span> <span class="nav-text">安装libsodium</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85libzmq"><span class="nav-number">1.4.</span> <span class="nav-text">安装libzmq</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85zmqpp"><span class="nav-number">1.5.</span> <span class="nav-text">安装zmqpp</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95zmq"><span class="nav-number">1.6.</span> <span class="nav-text">测试zmq</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85protobuf3"><span class="nav-number">1.7.</span> <span class="nav-text">安装protobuf3</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#protobuf3%E4%BE%8B%E5%AD%90"><span class="nav-number">1.8.</span> <span class="nav-text">protobuf3例子</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="singheart"
+      src="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+  <p class="site-author-name" itemprop="name">singheart</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xinjiempolde" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xinjiempolde" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/05/31/cpp/zmq_protobuf/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+      <meta itemprop="name" content="singheart">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="zmq和protobuf安装教程 | singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          zmq和protobuf安装教程
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-05-31 18:41:25" itemprop="dateCreated datePublished" datetime="2022-05-31T18:41:25+08:00">2022-05-31</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-12-11 21:03:57" itemprop="dateModified" datetime="2024-12-11T21:03:57+08:00">2024-12-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/cpp/" itemprop="url" rel="index"><span itemprop="name">cpp</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="zmq-protobuf安装教程">zmq + protobuf安装教程</h1>
+<h2 id="环境">环境</h2>
+<ul>
+<li>centos 7.6</li>
+</ul>
+<span id="more"></span>
+<h2 id="环境预安装">环境预安装</h2>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo yum install -y wget gcc-c++ automake autoconf libtool make lsof vim nano boost git</span><br><span class="line">sudo yum -y install openssl-devel bzip2-devel expat-devel gdbm-devel curl-devel boost-devel readline-devel sqlite-devel kernel-devel</span><br></pre></td></tr></table></figure>
+<h2 id="安装libsodium">安装libsodium</h2>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">wget https://download.libsodium.org/libsodium/releases/libsodium-1.0.18-stable.tar.gz --no-check-certificate</span><br><span class="line">tar -zxvf libsodium-1.0.18-stable.tar.gz</span><br><span class="line"><span class="built_in">cd</span> libsodium-stable/</span><br><span class="line">./configure</span><br><span class="line">make</span><br><span class="line">make check</span><br><span class="line">sudo make install</span><br><span class="line">sudo ldconfig</span><br></pre></td></tr></table></figure>
+<h2 id="安装libzmq">安装libzmq</h2>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">wget https://github.com/zeromq/libzmq/releases/download/v4.3.4/zeromq-4.3.4.tar.gz</span><br><span class="line">tar -zxvf zeromq-4.3.4.tar.gz</span><br><span class="line"><span class="built_in">cd</span> zeromq-4.3.4</span><br><span class="line">./configure --with-libsodium=/usr/local</span><br><span class="line">make</span><br><span class="line">sudo make install</span><br></pre></td></tr></table></figure>
+<h2 id="安装zmqpp">安装zmqpp</h2>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/zeromq/zmqpp.git</span><br><span class="line"><span class="built_in">cd</span> zmqpp</span><br><span class="line">make</span><br><span class="line">sudo make install</span><br></pre></td></tr></table></figure>
+<h2 id="测试zmq">测试zmq</h2>
+<p><strong><em>server.cc</em></strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//  Hello World server</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;zmqpp/zmqpp.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;chrono&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;thread&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> </span>&#123;</span><br><span class="line">  <span class="type">const</span> string endpoint = <span class="string">&quot;tcp://*:5555&quot;</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// initialize the 0MQ context</span></span><br><span class="line">  zmqpp::context context;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// generate a pull socket</span></span><br><span class="line">  zmqpp::socket_type type = zmqpp::socket_type::reply;</span><br><span class="line">  <span class="function">zmqpp::socket <span class="title">socket</span> <span class="params">(context, type)</span></span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// bind to the socket</span></span><br><span class="line">  socket.<span class="built_in">bind</span>(endpoint);</span><br><span class="line">  <span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">    <span class="comment">// receive the message</span></span><br><span class="line">    zmqpp::message message;</span><br><span class="line">    <span class="comment">// decompose the message </span></span><br><span class="line">    socket.<span class="built_in">receive</span>(message);</span><br><span class="line">    string text;</span><br><span class="line">    message &gt;&gt; text;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//Do some &#x27;work&#x27;</span></span><br><span class="line">    std::this_thread::<span class="built_in">sleep_for</span>(std::chrono::<span class="built_in">seconds</span>(<span class="number">1</span>));</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;Received Hello&quot;</span> &lt;&lt; endl;</span><br><span class="line">    socket.<span class="built_in">send</span>(<span class="string">&quot;World&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>编译：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ server.cc -o server.app -std=c++11 -lzmq -lzmqpp</span><br></pre></td></tr></table></figure>
+<p><strong><em>client.cc</em></strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//  Hello World client</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;zmqpp/zmqpp.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> </span>&#123;</span><br><span class="line">  <span class="type">const</span> string endpoint = <span class="string">&quot;tcp://localhost:5555&quot;</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// initialize the 0MQ context</span></span><br><span class="line">  zmqpp::context context;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// generate a push socket</span></span><br><span class="line">  zmqpp::socket_type type = zmqpp::socket_type::req;</span><br><span class="line">  <span class="function">zmqpp::socket <span class="title">socket</span> <span class="params">(context, type)</span></span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// open the connection</span></span><br><span class="line">  cout &lt;&lt; <span class="string">&quot;Connecting to hello world server…&quot;</span> &lt;&lt; endl;</span><br><span class="line">  socket.<span class="built_in">connect</span>(endpoint);</span><br><span class="line">  <span class="type">int</span> request_nbr;</span><br><span class="line">  <span class="keyword">for</span> (request_nbr = <span class="number">0</span>; request_nbr != <span class="number">10</span>; request_nbr++) &#123;</span><br><span class="line">    <span class="comment">// send a message</span></span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;Sending Hello &quot;</span> &lt;&lt; request_nbr &lt;&lt;<span class="string">&quot;…&quot;</span> &lt;&lt; endl;</span><br><span class="line">    zmqpp::message message;</span><br><span class="line">    <span class="comment">// compose a message from a string and a number</span></span><br><span class="line">    message &lt;&lt; <span class="string">&quot;Hello&quot;</span>;</span><br><span class="line">    socket.<span class="built_in">send</span>(message);</span><br><span class="line">    string buffer;</span><br><span class="line">    socket.<span class="built_in">receive</span>(buffer);</span><br><span class="line">    </span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;Received World &quot;</span> &lt;&lt; request_nbr &lt;&lt; endl;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>编译：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ client.cc -o client.app -std=c++11 -lzmq -lzmqpp</span><br></pre></td></tr></table></figure>
+<h2 id="安装protobuf3">安装protobuf3</h2>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">wget https://github.com/protocolbuffers/protobuf/releases/download/v21.5/protobuf-cpp-3.21.5.tar.gz</span><br><span class="line">tar -zxvf protobuf-cpp-3.21.5.tar.gz</span><br><span class="line"><span class="built_in">cd</span> protobuf-3.21.5/</span><br><span class="line">./configure -prefix=/usr/local/</span><br><span class="line">make</span><br><span class="line">sudo make install</span><br></pre></td></tr></table></figure>
+<h2 id="protobuf3例子">protobuf3例子</h2>
+<blockquote>
+<p>内容转载自<a
+target="_blank" rel="noopener" href="https://www.jianshu.com/p/d29913998976">https://www.jianshu.com/p/d29913998976</a></p>
+</blockquote>
+<p>创建game.proto</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">syntax = <span class="string">&quot;proto3&quot;</span>;</span><br><span class="line"><span class="keyword">package</span> pt;</span><br><span class="line"></span><br><span class="line"><span class="keyword">message </span><span class="title class_">req_login</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">string</span> username = <span class="number">1</span>;</span><br><span class="line">    <span class="type">string</span> password = <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">message </span><span class="title class_">obj_user_info</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">string</span> nickname    = <span class="number">1</span>;    <span class="comment">//昵称</span></span><br><span class="line">    <span class="type">string</span> icon        = <span class="number">2</span>;    <span class="comment">//头像</span></span><br><span class="line">    <span class="type">int64</span>  coin        = <span class="number">3</span>;    <span class="comment">//金币</span></span><br><span class="line">    <span class="type">string</span> location    = <span class="number">4</span>;    <span class="comment">//所属地</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//游戏数据统计</span></span><br><span class="line"><span class="keyword">message </span><span class="title class_">obj_user_game_record</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">string</span> time = <span class="number">1</span>;</span><br><span class="line">    <span class="type">int32</span> kill  = <span class="number">2</span>;        <span class="comment">//击杀数</span></span><br><span class="line">    <span class="type">int32</span> dead  = <span class="number">3</span>;        <span class="comment">//死亡数</span></span><br><span class="line">    <span class="type">int32</span> assist= <span class="number">4</span>;        <span class="comment">//助攻数</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">message </span><span class="title class_">rsp_login</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">enum </span><span class="title class_">RET</span> &#123;</span><br><span class="line">        SUCCESS         = <span class="number">0</span>;</span><br><span class="line">        ACCOUNT_NULL    = <span class="number">1</span>;    <span class="comment">//账号不存在</span></span><br><span class="line">        ACCOUNT_LOCK    = <span class="number">2</span>;    <span class="comment">//账号锁定</span></span><br><span class="line">        PASSWORD_ERROR  = <span class="number">3</span>;    <span class="comment">//密码错误</span></span><br><span class="line">        ERROR           = <span class="number">10</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">int32</span> ret = <span class="number">1</span>;</span><br><span class="line">    obj_user_info user_info = <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">repeated</span> obj_user_game_record record = <span class="number">3</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>生成<code>.h</code>和<code>.cc</code>文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">protoc ./game.proto --cpp_out=./</span><br></pre></td></tr></table></figure>
+<p>创建main.cpp</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;game.pb.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    pt::rsp_login rsp&#123;&#125;;</span><br><span class="line">    rsp.<span class="built_in">set_ret</span>(pt::rsp_login_RET_SUCCESS);</span><br><span class="line">    <span class="keyword">auto</span> user_info = rsp.<span class="built_in">mutable_user_info</span>();</span><br><span class="line">    user_info-&gt;<span class="built_in">set_nickname</span>(<span class="string">&quot;dsw&quot;</span>);</span><br><span class="line">    user_info-&gt;<span class="built_in">set_icon</span>(<span class="string">&quot;345DS55GF34D774S&quot;</span>);</span><br><span class="line">    user_info-&gt;<span class="built_in">set_coin</span>(<span class="number">2000</span>);</span><br><span class="line">    user_info-&gt;<span class="built_in">set_location</span>(<span class="string">&quot;zh&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">        <span class="keyword">auto</span> record = rsp.<span class="built_in">add_record</span>();</span><br><span class="line">        record-&gt;<span class="built_in">set_time</span>(<span class="string">&quot;2017/4/13 12:22:11&quot;</span>);</span><br><span class="line">        record-&gt;<span class="built_in">set_kill</span>(i * <span class="number">4</span>);</span><br><span class="line">        record-&gt;<span class="built_in">set_dead</span>(i * <span class="number">2</span>);</span><br><span class="line">        record-&gt;<span class="built_in">set_assist</span>(i * <span class="number">5</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    std::string buff&#123;&#125;;</span><br><span class="line">    rsp.<span class="built_in">SerializeToString</span>(&amp;buff);</span><br><span class="line">    <span class="comment">//------------------解析----------------------</span></span><br><span class="line">    pt::rsp_login rsp2&#123;&#125;;</span><br><span class="line">    <span class="keyword">if</span> (!rsp2.<span class="built_in">ParseFromString</span>(buff)) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;parse error\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">auto</span> temp_user_info = rsp2.<span class="built_in">user_info</span>();</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;nickname:&quot;</span> &lt;&lt; temp_user_info.<span class="built_in">nickname</span>() &lt;&lt; std::endl;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;coin:&quot;</span> &lt;&lt; temp_user_info.<span class="built_in">coin</span>() &lt;&lt; std::endl;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> m = <span class="number">0</span>; m &lt; rsp2.<span class="built_in">record_size</span>(); m++) &#123;</span><br><span class="line">        <span class="keyword">auto</span> temp_record = rsp2.<span class="built_in">record</span>(m);</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;time:&quot;</span> &lt;&lt; temp_record.<span class="built_in">time</span>() &lt;&lt; <span class="string">&quot; kill:&quot;</span> &lt;&lt; temp_record.<span class="built_in">kill</span>() &lt;&lt; <span class="string">&quot; dead:&quot;</span> &lt;&lt; temp_record.<span class="built_in">dead</span>() &lt;&lt; <span class="string">&quot; assist:&quot;</span> &lt;&lt; temp_record.<span class="built_in">assist</span>() &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>编译，运行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">g++ -std=c++11 main.cpp game.pb.cc `pkg-config --cflags --libs protobuf` -lpthread -lprotobuf</span><br><span class="line">./a.out</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/zmq/" rel="tag"># zmq</a>
+              <a href="/tags/protobuf/" rel="tag"># protobuf</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/05/31/linux/minecraft_server/" rel="prev" title="MineCraft在linux上开服">
+                  <i class="fa fa-chevron-left"></i> MineCraft在linux上开服
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/05/31/cpp/std-mutex/" rel="next" title="std::mutex">
+                  std::mutex <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">singheart</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div><script color="0,0,255" opacity="0.5" zIndex="-1" count="99" src="https://cdn.jsdelivr.net/npm/canvas-nest.js@1/dist/canvas-nest.js"></script>
+
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"xinjiempolde","repo":"xinjiempolde.github.io","client_id":"89019d63999840fdbf7f","client_secret":"48d2133d88acfafada6414ec6eee5a9d9febcbc8","admin_user":"xinjiempolde","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"4728cf855c9ee1a38bfd8820ab30c3a4"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/haruto.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>

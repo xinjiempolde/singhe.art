@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0-rc1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.11.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="背景 Geo-replicated DBMS SLOG假设一个数据库系统是跑在横跨世界各地的数据中心的系统，这种系统我们通常称之为Geo-replicated Database Management System(DBMS)，它将数据复制多份在各地的资料中心中。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SLOG">
+<meta property="og:url" content="http://example.com/2022/05/31/database/SLOG/index.html">
+<meta property="og:site_name" content="singheart&#39;s blog">
+<meta property="og:description" content="背景 Geo-replicated DBMS SLOG假设一个数据库系统是跑在横跨世界各地的数据中心的系统，这种系统我们通常称之为Geo-replicated Database Management System(DBMS)，它将数据复制多份在各地的资料中心中。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://img.singhe.art/geo-dbms.png">
+<meta property="og:image" content="http://img.singhe.art/home-region.png">
+<meta property="og:image" content="http://img.singhe.art/sortledton-2.png">
+<meta property="og:image" content="http://img.singhe.art/image-20221010230820560.png">
+<meta property="og:image" content="http://img.singhe.art/multi-home-1.png">
+<meta property="og:image" content="http://img.singhe.art/mh-mp-2.png">
+<meta property="og:image" content="http://img.singhe.art/image-20221011001507539.png">
+<meta property="og:image" content="http://img.singhe.art/image-20221011003542954.png">
+<meta property="og:image" content="http://img.singhe.art/image-20221011140318225.png">
+<meta property="og:image" content="http://img.singhe.art/image-20221011021949992.png">
+<meta property="og:image" content="http://img.singhe.art/mh-mp.png">
+<meta property="og:image" content="http://img.singhe.art/image-20221011024804253.png">
+<meta property="article:published_time" content="2022-05-31T10:41:25.000Z">
+<meta property="article:modified_time" content="2024-12-11T13:03:57.699Z">
+<meta property="article:author" content="singheart">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://img.singhe.art/geo-dbms.png">
+
+
+<link rel="canonical" href="http://example.com/2022/05/31/database/SLOG/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2022/05/31/database/SLOG/","path":"2022/05/31/database/SLOG/","title":"SLOG"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>SLOG | singheart's blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">singheart's blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">多读书，多思考</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#geo-replicated-dbms"><span class="nav-number">1.1.</span> <span class="nav-text">Geo-replicated DBMS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#motivation"><span class="nav-number">1.2.</span> <span class="nav-text">motivation</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BA%E6%96%87%E5%8F%91%E7%8E%B0"><span class="nav-number">1.3.</span> <span class="nav-text">论文发现</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#slog%E6%A6%82%E5%BF%B5"><span class="nav-number">2.</span> <span class="nav-text">SLOG概念</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#home-region"><span class="nav-number">2.1.</span> <span class="nav-text">Home Region</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#single-home-transactions"><span class="nav-number">2.2.</span> <span class="nav-text">Single-home Transactions</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#multi-home-transactions"><span class="nav-number">2.3.</span> <span class="nav-text">multi-home transactions</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#multi-home-transaction-%E8%B7%9Fmulti-home-transaction%E4%B9%8B%E9%97%B4%E7%9A%84%E5%86%B2%E7%AA%81%E5%A4%84%E7%90%86"><span class="nav-number">2.3.1.</span> <span class="nav-text">multi-home
+transaction 跟multi-home transaction之间的冲突处理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#multi-home-transaction%E8%B7%9Fsingle-home-transaction%E4%B9%8B%E9%97%B4%E7%9A%84%E5%86%B2%E7%AA%81%E5%A4%84%E7%90%86"><span class="nav-number">2.4.</span> <span class="nav-text">multi-home
+transaction跟single-home transaction之间的冲突处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#home-region%E7%9A%84%E6%9B%B4%E6%8D%A2"><span class="nav-number">2.5.</span> <span class="nav-text">home-region的更换</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#remaster%E5%AF%BC%E8%87%B4%E7%9A%84%E4%B8%8D%E4%B8%80%E8%87%B4%E6%80%A7%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">3.</span> <span class="nav-text">remaster导致的不一致性解决方案</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C%E5%AF%B9%E6%AF%94"><span class="nav-number">4.</span> <span class="nav-text">实验结果对比</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88slog%E5%90%9E%E5%90%90%E7%8E%87%E4%BD%8E%E4%BA%8Ecalvin"><span class="nav-number">4.1.</span> <span class="nav-text">为什么slog吞吐率低于Calvin？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88slog%E5%BB%B6%E8%BF%9F%E6%AF%94calvin%E4%BD%8E"><span class="nav-number">4.2.</span> <span class="nav-text">为什么slog延迟比calvin低？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="nav-number">5.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="singheart"
+      src="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+  <p class="site-author-name" itemprop="name">singheart</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xinjiempolde" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xinjiempolde" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/05/31/database/SLOG/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+      <meta itemprop="name" content="singheart">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="SLOG | singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SLOG
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-05-31 18:41:25" itemprop="dateCreated datePublished" datetime="2022-05-31T18:41:25+08:00">2022-05-31</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-12-11 21:03:57" itemprop="dateModified" datetime="2024-12-11T21:03:57+08:00">2024-12-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/database/" itemprop="url" rel="index"><span itemprop="name">database</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="背景">背景</h1>
+<h2 id="geo-replicated-dbms">Geo-replicated DBMS</h2>
+<p>SLOG假设一个数据库系统是跑在横跨世界各地的数据中心的系统，这种系统我们通常称之为Geo-replicated
+Database Management
+System(DBMS)，它将数据复制多份在各地的资料中心中。</p>
+<span id="more"></span>
+<p>下图展示了一个分布在三个地区的数据库系统。通常一个数据中心会持有一份完整的数据，然后每个数据中心中的数据会再切分成多个不相交的partition。在下图之中，一共有三分备份(replica)，然后每个数据中心内有三个partition。数据中心之间会需要时常同步数据来保证数据的一致性。</p>
+<figure>
+<img src="http://img.singhe.art/geo-dbms.png"
+alt="Geo-replicated DBMS" />
+<figcaption aria-hidden="true">Geo-replicated DBMS</figcaption>
+</figure>
+<p>跨区域备份的架构主要有两个目的：</p>
+<ul>
+<li>High
+Available：因为数据有多个备份，当某个备份无法服务的时候就可以由其他备份提供服务。</li>
+<li>Low Read Latency：
+可以优先从地理位置较近的数据中心更快地读取需要的数据。</li>
+</ul>
+<h2 id="motivation">motivation</h2>
+<p>分布式数据库系统有三大目标：</p>
+<ul>
+<li>Strict Serializablity</li>
+<li>Low Latency</li>
+<li>High Throughput</li>
+</ul>
+<p>到SLOG为止，这时目前尚未有人能够完美同时解决的问题。</p>
+<p>例如，要实现strict
+serializability，通常需要通过协调(coordination)来得到全局的事务顺序，但这会导致write
+latency较高。如果使用weak consistency（如snapshot
+isolation)能够同时保证low latency和high throughput，但是又不是strict
+serializability。</p>
+<h2 id="论文发现">论文发现</h2>
+<p>SLOG依赖了两个主要发现来达成以上目标：</p>
+<ol type="1">
+<li>使用者通常都会在同一个地区（数据中心）存取自己的数据</li>
+<li>并非所有transaction之间都一定要有global
+order，不冲突的transaction之间的顺序可以排序。</li>
+</ol>
+<p>第1点说的就是数据局部性问题，用户的写入和读取大多都在同一个数据中心。</p>
+<p>第2点举例来说，如果有两个事务T1、T2，T1修改数据A，T2修改数据B，那么T1、T2谁先谁后都不影响结果。因此这两个transaction无论如何排序，都不影响serializability。</p>
+<h1 id="slog概念">SLOG概念</h1>
+<h2 id="home-region">Home Region</h2>
+<p>每一组 records 可能会被跨数据中心复制很多份 replica，但是只有一份
+replica 是主要的 (primary)。 存放这个主要的 replica 的区域就叫做 home
+region。 这个时候，一般马上就会想到 master-slave 架构。 那 SLOG
+跟那种架构又有什么不同呢？ 主要差异是，在常见的 master-slave
+架构之中，replica 通常是以整个 database 作为单位，其中 primary replica
+一定是整组 database 放在同一个区域中。但是 SLOG
+提出的架构是以<strong>一组 records</strong> 作为单位。也就是说，可能有些
+records 的 primary replica 在台湾，有些 records 在美国。
+如下图所示，每个方块代表一组 records。 黑色代表 primary。 A 组的 home
+region 是 region 1，B 组则是在 region 2。</p>
+<figure>
+<img src="http://img.singhe.art/home-region.png" alt="Home Region" />
+<figcaption aria-hidden="true">Home Region</figcaption>
+</figure>
+<p>还需要注意的是在一个partition（一个物理机器）中，并不是所有的records都是primary，如下图所示。</p>
+<figure>
+<img src="http://img.singhe.art/sortledton-2.png" alt="sortledton-2" />
+<figcaption aria-hidden="true">sortledton-2</figcaption>
+</figure>
+<p>那么怎么得到一个record的home-region呢?SLOG在每个region设立一个LookupMaster
+index，它保存的是record id到record metadata的映射，而record
+meta由两部分组成，第一部分是该record的当前home-region，第二部分是该record的home-region改变次数（后面有用）。</p>
+<p>每个Record中也含有这个metadata，并且当record的metadata被更新的时候，更新LookUpMaster
+Index。</p>
+<p>SLOG将事务分成两类：single-home transaction和multi-home
+transaction</p>
+<h2 id="single-home-transactions">Single-home Transactions</h2>
+<p>如果一个事务存取的数据的home
+region都在同一个region，这种transaction被称作single-home
+transaction。如下图所示，T1、T2、T3、T4都是single-home transaction。</p>
+<p>对于single-home transaction，我们只需要在home
+region内做冲突处理，其他数据中心的replica只要确保有复制到home
+region的结果就好。因此SLOG在home
+region完成transaction之后，就会把log复制到slave。一旦有N个数据中心回复（N由使用者设定），就可以回复client该transaction完成。如此以来，就可以省下跨数据中心的coordination带来的多个round-trip
+time。</p>
+<figure>
+<img src="http://img.singhe.art/image-20221010230820560.png"
+alt="image-20221010230820560" />
+<figcaption aria-hidden="true">image-20221010230820560</figcaption>
+</figure>
+<p>举个例子，T1、T2都只访问数据A，而数据A的home region是region
+0，因此T1、T2会在Region0上进行冲突处理（client发送transaction到最近的region，即使被发送到了region1，也会被转发到region
+0上）。T3，T4被送到region
+1上进行冲突处理。对于single-home类型的transaction，它首先写日志到local
+log，当local log收集到一批事务日志后，通过paxos发给其他region。global
+log是全局的事务顺序，它既包含本地local
+log的日志，也包含从其他region接收到的log，因此每个region的global
+log顺序可能不一致（但是T1一定在T2之前，T3一定在T4之前）。但是因为它们都是single-home
+transaction，即使顺序不一致也能保证结果的一致性，因为它们的存取的数据不相交（这也就是论文发现的第2点）。</p>
+<blockquote>
+<p>Batch 0-1 0代表的region id，1代表batch id</p>
+</blockquote>
+<p>global log的顺序确定好之后，region只需要从global
+log取log然后执行就可以了。</p>
+<h2 id="multi-home-transactions">multi-home transactions</h2>
+<p>如果事务都是single-home的，那就皆大欢喜了，可事实却肯定并非如此。如果一个transaction访问的数据home-region不止一个，那么就称为multi-region
+transaction。如果figure 3的T2不仅要访问A，还要访问B，那么按照figure
+3的方式得到的global
+log是有问题的，会导致region间数据不一致性。比如region0和region1对数据B最后写入的是T4，而region2最后写入的是T2，导致region0和region2，以及region1和region2的状态不一致。</p>
+<p>对于multi-home transaction的处理，我们可以分为multi-home
+transaction跟multi-home transaction之间的冲突处理，以及multi-home
+transaction跟single-home transaction之间的冲突处理。</p>
+<h3
+id="multi-home-transaction-跟multi-home-transaction之间的冲突处理">multi-home
+transaction 跟multi-home transaction之间的冲突处理</h3>
+<p>SLOG采用deterministic database的概念，在一开始先把所有 multi-home
+transactions 通过一个 total ordering protocol 进行排序，确定了这些
+transaction 的 global order 后，再送到 deterministic execution engine
+执行，以确保 consistent 的结果。</p>
+<p>如下图，Tx G.1 与 Tx G.2 无论送到哪个 region，都会被强制送进 total
+ordering layer 进行全域的排序之后，再送到下面的系统开始执行。</p>
+<figure>
+<img src="http://img.singhe.art/multi-home-1.png"
+alt="Multiple Home - Total Oredering" />
+<figcaption aria-hidden="true">Multiple Home - Total
+Oredering</figcaption>
+</figure>
+<p>只要保证了事务的全局顺序，那么multi-home transaction和multi-home
+transaction之间的就完成了并发冲突。</p>
+<h2
+id="multi-home-transaction跟single-home-transaction之间的冲突处理">multi-home
+transaction跟single-home transaction之间的冲突处理</h2>
+<p>上述的方案能够结果multi-home和multi-home之间的冲突，但是解决不了mutli-home和single-home之间的冲突。</p>
+<figure>
+<img src="http://img.singhe.art/mh-mp-2.png" alt="mh-mp-2" />
+<figcaption aria-hidden="true">mh-mp-2</figcaption>
+</figure>
+<p>上图中T1和T3是single-home transaction，而T2和T4是multi-home
+transaction。从上图可以看出multi-home和multi-home
+transaction间有序（T2在T4前面），但是和single-home
+transaction间却导致了乱序，这也会导致region间数据不一致性问题。如何解决？加锁。</p>
+<figure>
+<img src="http://img.singhe.art/image-20221011001507539.png"
+alt="image-20221011001507539" />
+<figcaption aria-hidden="true">image-20221011001507539</figcaption>
+</figure>
+<p>figure4所示，T1、T3、T4为single-home，T2为multi-home
+transaction。T2在total order
+module排序出来后，会生成T2<sub>0</sub>和T2<sub>1</sub>两个事务（因为T2涉及两个home
+region，需要为每一个region都生成一个），这两个事务叫做LockOnlyTxn。T2<sub>0</sub>用来锁住数据项A，T2<sub>1</sub>用来锁住数据项B。single-home
+transaction对数据读取的时候也需要进行加锁，而multi-home
+transaction（图中没有画出，我把它称作T2，它出现在global
+log的任何地方都不影响数据一致性，不相信的话可以举个例子）要执行的时候，必须拿到所有的锁（T2<sub>0</sub>和T2<sub>1</sub>执行）才能够执行，否则会阻塞。</p>
+<h2 id="home-region的更换">home-region的更换</h2>
+<p>client发送的transaction是发给最近的region，但是此region可能不是home-region，因此这个region会将这个事务发送给home-region。如下图所示。事务T1存取B，它被client发送给了T1，但是T1要访问的数据B的home-region是region1，因此T1被转发给region1.</p>
+<figure>
+<img src="http://img.singhe.art/image-20221011003542954.png"
+alt="image-20221011003542954" />
+<figcaption aria-hidden="true">image-20221011003542954</figcaption>
+</figure>
+<p>但是这种转发的次数多了肯定影响性能，因此我们希望设定一个阈值（比如region0连着三次都在转发），那么我们希望把B的home-region变更到region0，充分的利用局部性原理（也就是论文发现的第1点），论文把这种行为称为remaster。</p>
+<p>但是简单的remaster也会导致region间数据的不一致性。例如在上图中，事务T1、T2、T3都有存取数据B，T1被转发给region1，而T<sub>remaster</sub>事务要将数据B的home-region改为region0。当remaster事务执行后，home
+region改变了，那么T3的home region就不应该在region
+1了，而应该是region0，所以T3
+abort，并得到T3<sub>new</sub>，发送给region0。由此得到的global
+log如图figure 5所示。</p>
+<p>那么这么得到的global
+log就会导致region间的不一致，region0和region1的事务顺序是T1、T2、T3，而region2的事务顺序是T1、T3、T2。</p>
+<h1
+id="remaster导致的不一致性解决方案">remaster导致的不一致性解决方案</h1>
+<p>为了解决remaster导致的region间数据不一致性问题，我们通过record的metadata中的counter（也就是该record的home-region被更改了几次）来解决。我们通过举个例子来理解。</p>
+<p>当事务T被发送个第一个region时（比如T1发给region0），region0首先通过LookUpMaster查找该record的metadata，并将此metadata信息插入到事务中。因此T1可以表示为T1(1,0)，1代表它的当前home
+region为1，0表示home-region改变了0次。类似的，T2(1,0)，T3(1,0)，T3new(0,1)。</p>
+<p>当我们要对该事务事务涉及的数据项上锁时，会将事务中的数据项counter和region中数据项的metadata中的counter进行比较。如果前者更大，那么说明本region还没有处理remaster请求，因此需要阻塞该事务等到remaster请求被执行后再换行。如果后者更大，那么说明LookupMaster
+Index中的映射是stale的，本事务应该abort。</p>
+<figure>
+<img src="http://img.singhe.art/image-20221011140318225.png"
+alt="image-20221011140318225" />
+<figcaption aria-hidden="true">image-20221011140318225</figcaption>
+</figure>
+<h1 id="实验结果对比">实验结果对比</h1>
+<h2 id="为什么slog吞吐率低于calvin">为什么slog吞吐率低于Calvin？</h2>
+<p>导致slog吞吐率比calvin低最主要的原因是multi-home事务的存在，在calvin中没有multi-home的概念，因此calvin不受multi-home的影响。</p>
+<p>xxxxxxxxxx /<em>client_tcp.c</em>/#include&lt;stdio.h&gt;#include&lt;string.h&gt;#include&lt;stdlib.h&gt;#include&lt;unistd.h&gt;#include&lt;arpa/inet.h&gt;#include&lt;sys/socket.h&gt;​int
+main(){ //创建套接字 int sock = socket(AF_INET, SOCK_STREAM, 0);​
+//服务器的ip为本地，端口号1234 struct sockaddr_in serv_addr;
+memset(&amp;serv_addr, 0, sizeof(serv_addr)); serv_addr.sin_family =
+AF_INET; inet_pton(AF_INET, "127.0.0.1", &amp;serv_addr.sin_addr);
+serv_addr.sin_port = htons(1234); //向服务器发送连接请求 connect(sock,
+(struct sockaddr*)&amp;serv_addr, sizeof(serv_addr)); //发送并接收数据
+char buffer[40]; printf("Please write:"); scanf("%s", buffer);
+write(sock, buffer, sizeof(buffer));​ memset(buffer, 0, sizeof(buffer));
+read(sock, buffer, sizeof(buffer) - 1); printf("Serve send: %s",
+buffer);​ //断开连接 close(sock);​ return 0;}c</p>
+<p>但是当multi-partition（跨分片）事务数量变多的时候，calvin和slog的吞吐率差距会变小，因为calvin对于跨分片的事务也需要进行协调带来额外的开销，而slog在处理multi-home的时候顺带也解决了（部分）multi-partition的冲突。</p>
+<figure>
+<img src="http://img.singhe.art/image-20221011021949992.png"
+alt="image-20221011021949992" />
+<figcaption aria-hidden="true">image-20221011021949992</figcaption>
+</figure>
+<p>如下图所示，T1和T2既是multi-home
+transaction又是multi-partition事务，calvin对于multi-partion事务需要做coordination，而slog需要对multi-home事务做coordination，因此当multi-partition的比例较高时，slog和calvin的差距就不是很明显。</p>
+<figure>
+<img src="http://img.singhe.art/mh-mp.png" alt="mh-mp" />
+<figcaption aria-hidden="true">mh-mp</figcaption>
+</figure>
+<h2 id="为什么slog延迟比calvin低">为什么slog延迟比calvin低？</h2>
+<figure>
+<img src="http://img.singhe.art/image-20221011024804253.png"
+alt="image-20221011024804253" />
+<figcaption aria-hidden="true">image-20221011024804253</figcaption>
+</figure>
+<p>上图曲线越靠近左边代表延迟越低。可以看出slog延迟在multi-home比例很低（也就是single-home
+transaction比例很高）的时候明显优于calvin。因为对于slog来说，single-home
+transaction每个record有它的master，只要transaction的日志写入到master（home-region）上该事务就可以返回了，然后异步地使用paxos同步日志给slave
+region，因此延迟比较低。而multi-home事务越多，对slog的latency影响越大。</p>
+<h1 id="参考文献">参考文献</h1>
+<ol type="1">
+<li>https://www.slmt.tw/blog/2019/10/20/paper-slog/</li>
+<li>Thomson, Alexander, and Daniel J. Abadi. “The case for determinism
+in database systems.” Proceedings of the VLDB Endowment 3.1-2 (2010):
+70-80.</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/05/31/database/isolation_level/" rel="prev" title="丢失修改、不可重复度、读脏数据">
+                  <i class="fa fa-chevron-left"></i> 丢失修改、不可重复度、读脏数据
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/05/31/database/GFS/" rel="next" title="GFS">
+                  GFS <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">singheart</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div><script color="0,0,255" opacity="0.5" zIndex="-1" count="99" src="https://cdn.jsdelivr.net/npm/canvas-nest.js@1/dist/canvas-nest.js"></script>
+
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"xinjiempolde","repo":"xinjiempolde.github.io","client_id":"89019d63999840fdbf7f","client_secret":"48d2133d88acfafada6414ec6eee5a9d9febcbc8","admin_user":"xinjiempolde","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"e6d295a1c5e2e53063f1ee6a7a7e6c3f"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/haruto.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>

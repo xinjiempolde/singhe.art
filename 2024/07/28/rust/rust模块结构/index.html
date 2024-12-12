@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0-rc1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.11.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="转载自  rust 模块组织结构 - li-peng - 博客园 (cnblogs.com)   rust有自己的规则和约定用来组织模块，比如一个包最多可以有一个库crate，任意多个二进制crate、导入文件夹内的模块的两种约定方式... 知道这些约定，就可以快速了解rust的模块系统。 先把一些术语说明一下：  包是cargo的一个功能，当执行cargo new xxxx的时候就是创建了一个">
+<meta property="og:type" content="article">
+<meta property="og:title" content="rust模块结构">
+<meta property="og:url" content="http://example.com/2024/07/28/rust/rust%E6%A8%A1%E5%9D%97%E7%BB%93%E6%9E%84/index.html">
+<meta property="og:site_name" content="singheart&#39;s blog">
+<meta property="og:description" content="转载自  rust 模块组织结构 - li-peng - 博客园 (cnblogs.com)   rust有自己的规则和约定用来组织模块，比如一个包最多可以有一个库crate，任意多个二进制crate、导入文件夹内的模块的两种约定方式... 知道这些约定，就可以快速了解rust的模块系统。 先把一些术语说明一下：  包是cargo的一个功能，当执行cargo new xxxx的时候就是创建了一个">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-07-28T12:04:21.000Z">
+<meta property="article:modified_time" content="2024-12-12T03:10:26.604Z">
+<meta property="article:author" content="singheart">
+<meta property="article:tag" content="rust">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2024/07/28/rust/rust%E6%A8%A1%E5%9D%97%E7%BB%93%E6%9E%84/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2024/07/28/rust/rust%E6%A8%A1%E5%9D%97%E7%BB%93%E6%9E%84/","path":"2024/07/28/rust/rust模块结构/","title":"rust模块结构"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>rust模块结构 | singheart's blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">singheart's blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">多读书，多思考</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A8%A1%E5%9D%97"><span class="nav-number">1.</span> <span class="nav-text">模块</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8C%E4%B8%80%E6%96%87%E4%BB%B6%E5%86%85%E7%9A%84%E6%A8%A1%E5%9D%97"><span class="nav-number">1.1.</span> <span class="nav-text">同一文件内的模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8pub-use-%E9%87%8D%E5%AF%BC%E5%87%BA%E5%90%8D%E7%A7%B0"><span class="nav-number">1.2.</span> <span class="nav-text">使用pub use 重导出名称</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%8D%E5%90%8C%E6%96%87%E4%BB%B6%E5%A4%B9%E7%9A%84%E5%BC%95%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">不同文件夹的引用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E5%BC%8F%E4%B8%80"><span class="nav-number">2.1.</span> <span class="nav-text">方式一</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E5%BC%8F%E4%BA%8C"><span class="nav-number">2.2.</span> <span class="nav-text">方式二</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%A4%96%E9%83%A8%E5%8C%85"><span class="nav-number">3.</span> <span class="nav-text">使用外部包</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E8%88%AC%E6%96%B9%E5%BC%8F"><span class="nav-number">3.1.</span> <span class="nav-text">一般方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%87%E5%AE%9A%E5%BA%93%E5%9C%B0%E5%9D%80"><span class="nav-number">3.2.</span> <span class="nav-text">指定库地址</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%9C%AC%E5%9C%B0%E7%9A%84%E5%BA%93"><span class="nav-number">3.3.</span> <span class="nav-text">使用本地的库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%87%AA%E5%BB%BA%E7%A7%81%E6%9C%89%E5%BA%93"><span class="nav-number">3.4.</span> <span class="nav-text">自建私有库</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="singheart"
+      src="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+  <p class="site-author-name" itemprop="name">singheart</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xinjiempolde" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xinjiempolde" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/07/28/rust/rust%E6%A8%A1%E5%9D%97%E7%BB%93%E6%9E%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+      <meta itemprop="name" content="singheart">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="rust模块结构 | singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          rust模块结构
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-07-28 20:04:21" itemprop="dateCreated datePublished" datetime="2024-07-28T20:04:21+08:00">2024-07-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-12-12 11:10:26" itemprop="dateModified" datetime="2024-12-12T11:10:26+08:00">2024-12-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/rust/" itemprop="url" rel="index"><span itemprop="name">rust</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <blockquote>
+<p>转载自</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/li-peng/p/13587910.html">rust
+模块组织结构 - li-peng - 博客园 (cnblogs.com)</a></li>
+</ul>
+</blockquote>
+<p><code>rust</code>有自己的规则和约定用来组织模块，比如一个包最多可以有一个库<code>crate</code>，任意多个二进制<code>crate</code>、导入文件夹内的模块的两种约定方式...
+知道这些约定，就可以快速了解<code>rust</code>的模块系统。
+先把一些术语说明一下：</p>
+<ul>
+<li><code>包</code>是cargo的一个功能，当执行<code>cargo new xxxx</code>的时候就是创建了一个包。</li>
+<li><code>crate</code>是二进制或者库项目。<code>rust</code>约定在<code>Cargo.toml</code>的同级目录下包含<code>src</code>目录并且包含<code>main.rs</code>文件，就是与包同名的<strong>二进制<code>crate</code></strong>，如果包目录中包含<code>src/lib.rs</code>，就是与包同名的<strong>库<code>crate</code></strong>。包内可以有多<code>crate</code>，多个<code>crates</code>就是一个模块的树形结构。如果一个包内同时包含<code>src/main.rs</code>和<code>src/lib.rs</code>，那么他就有两个<code>crate</code>，如果想有多个二进制<code>crate</code>，<code>rust</code>约定需要将文件放在<code>src/bin</code>目录下，每个文件就是一个单独的<code>crate</code>。</li>
+<li><code>crate根</code>用来描述如何构建<code>crate</code>的文件。比如<code>src/main.rs</code>或者<code>src/lib.rs</code>就是<code>crate根</code>。<strong><code>crate根</code>文件将由<code>Cargo</code>传递给<code>rustc</code>来实际构建库或者二进制项目。</strong></li>
+<li>带有<code>Cargo.toml</code>文件的包用来描述如何构建<code>crate</code>，一个包可以最多有一个库<code>crate</code>，任意多个二进制<code>crate</code>。</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://github.com/lpxxn/rust_module">github
+代码地址</a></p>
+<span id="more"></span>
+<h1 id="模块">模块</h1>
+<p>模块以<code>mod</code>开头，下面创建了一个<code>say</code>模块</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">mod</span> say &#123;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hello</span>() &#123;</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;Hello, world!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>需要注意的是模块内，所有的项（函数、方法、结构体、枚举、模块和常量）默认都是私有的，可以用<code>pub</code>将项变为公有，上面的代码里<code>pub fn hello()</code>就是把函数<code>hello()</code>变为公有的。
+子模块可以通过<code>super</code>访问父模块中所有的代码，包括私有代码。但是父模块中的代码不能访问子模块中的私有代码。</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">mod</span> say &#123;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hello</span>() &#123;</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;Hello, world!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">fn</span> <span class="title function_">hello_2</span>() &#123;</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;hello&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">mod</span> hi &#123;</span><br><span class="line">        <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hi_1</span>() &#123;</span><br><span class="line">            super::<span class="title function_ invoke__">hello_2</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hi_2</span>() &#123;</span><br><span class="line">            <span class="built_in">println!</span>(<span class="string">&quot;hi there&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="同一文件内的模块">同一文件内的模块</h2>
+<p>同一文件内的模块，最外层的<code>mod say</code>不用设置为<code>pub</code>就可以访问，但是<code>mod say</code>下面的要设置成<code>pub</code>才可以访问。</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">fn</span> <span class="title function_">main</span>() &#123;</span><br><span class="line">    <span class="comment">// 相对路径</span></span><br><span class="line">    say::<span class="title function_ invoke__">hello</span>();</span><br><span class="line">    <span class="comment">// 绝对路径调用</span></span><br><span class="line">    crate::say::<span class="title function_ invoke__">hello</span>();</span><br><span class="line">    </span><br><span class="line">    say::hi::<span class="title function_ invoke__">hi_1</span>();</span><br><span class="line">    say::hi::<span class="title function_ invoke__">hi_2</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">mod</span> say &#123;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hello</span>() &#123;</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;Hello, world!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">fn</span> <span class="title function_">hello_2</span>() &#123;</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;hello&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">mod</span> hi &#123;</span><br><span class="line">        <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hi_1</span>() &#123;</span><br><span class="line">            super::<span class="title function_ invoke__">hello_2</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hi_2</span>() &#123;</span><br><span class="line">            <span class="built_in">println!</span>(<span class="string">&quot;hi there&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>调用模块内的方法，可以使用绝对路径以<code>crate</code>开头，也就是从<code>crate根</code>开始查找，<code>say</code>模块定义在<code>crate根 src/main.rs</code>中，所以就可以这么调用<code>crate::say::hello();</code>绝对路径类似于<code>Shell</code>中使用<code>/</code>从文件系统根开始查找文件。
+相对路径以模块名开始<code>say</code>，他定义于<code>main()</code>函数相同的模块中，类似<code>Shell</code>在当前目录开始查找指定文件<code>say/hello</code>。</p>
+<p><code>mod hi</code>是一个嵌套模块，使用时要写比较长<code>say::hi::hi_2();</code>，可以使用<code>use</code>将名称引入作用域。</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> crate::say::hi;</span><br><span class="line"></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">main</span>() &#123;</span><br><span class="line">    <span class="comment">// 相对路径</span></span><br><span class="line">    say::<span class="title function_ invoke__">hello</span>();</span><br><span class="line">    <span class="comment">// 绝对路径调用</span></span><br><span class="line">    crate::say::<span class="title function_ invoke__">hello</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 不使用 use</span></span><br><span class="line">    say::hi::<span class="title function_ invoke__">hi_1</span>();</span><br><span class="line">    say::hi::<span class="title function_ invoke__">hi_2</span>();</span><br><span class="line">    <span class="comment">// 使用 use 后就可以这么调用</span></span><br><span class="line">    hi::<span class="title function_ invoke__">hi_1</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="使用pub-use-重导出名称">使用<code>pub use</code> 重导出名称</h2>
+<p>不同的模块之前使用<code>use</code>引入，默认也是私有的。如果希望调用的模块内<code>use</code>引用的模块，就要用<code>pub</code>公开，也叫<strong>重导出</strong></p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">fn</span> <span class="title function_">main</span>() &#123;</span><br><span class="line">    <span class="comment">// 重导出名称</span></span><br><span class="line">    people::hi::<span class="title function_ invoke__">hi_1</span>();</span><br><span class="line">    people::<span class="title function_ invoke__">hello</span>();</span><br><span class="line">    <span class="comment">// 但是不能 </span></span><br><span class="line">    <span class="comment">// people::say::hello();</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">mod</span> say &#123;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hello</span>() &#123;</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;Hello, world!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">fn</span> <span class="title function_">hello_2</span>() &#123;</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;hello&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">mod</span> hi &#123;</span><br><span class="line">        <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hi_1</span>() &#123;</span><br><span class="line">            super::<span class="title function_ invoke__">hello_2</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hi_2</span>() &#123;</span><br><span class="line">            <span class="built_in">println!</span>(<span class="string">&quot;hi there&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">mod</span> people &#123;</span><br><span class="line">    <span class="comment">// 重导出名称</span></span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">use</span> crate::say::hi;</span><br><span class="line">    <span class="keyword">use</span> crate::say;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hello</span>() &#123;</span><br><span class="line">        say::<span class="title function_ invoke__">hello</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果想都导出自己和嵌入的指定包可以用<code>self</code>，例<code>mod people_2</code>
+把模块<code>people</code>和嵌套模块<code>info</code>全部导出来了。</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> crate::say::hi;</span><br><span class="line"></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">main</span>() &#123;</span><br><span class="line">    <span class="comment">// 相对路径</span></span><br><span class="line">    say::<span class="title function_ invoke__">hello</span>();</span><br><span class="line">    <span class="comment">// 绝对路径调用</span></span><br><span class="line">    crate::say::<span class="title function_ invoke__">hello</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 不使用 use</span></span><br><span class="line">    say::hi::<span class="title function_ invoke__">hi_1</span>();</span><br><span class="line">    say::hi::<span class="title function_ invoke__">hi_2</span>();</span><br><span class="line">    <span class="comment">// 使用 use 后就可以这么调用</span></span><br><span class="line">    hi::<span class="title function_ invoke__">hi_1</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 重导出名称</span></span><br><span class="line">    people::hi::<span class="title function_ invoke__">hi_1</span>();</span><br><span class="line">    people::<span class="title function_ invoke__">hello</span>();</span><br><span class="line">    <span class="comment">// 但是不能 </span></span><br><span class="line">    <span class="comment">// people::say::hello();</span></span><br><span class="line"></span><br><span class="line">    people_2::people::<span class="title function_ invoke__">hello</span>();</span><br><span class="line">    people_2::info::<span class="title function_ invoke__">name</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">mod</span> say &#123;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hello</span>() &#123;</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;Hello, world!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">fn</span> <span class="title function_">hello_2</span>() &#123;</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;hello&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">mod</span> hi &#123;</span><br><span class="line">        <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hi_1</span>() &#123;</span><br><span class="line">            super::<span class="title function_ invoke__">hello_2</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hi_2</span>() &#123;</span><br><span class="line">            <span class="built_in">println!</span>(<span class="string">&quot;hi there&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">mod</span> people &#123;</span><br><span class="line">    <span class="comment">// 重导出名称</span></span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">use</span> crate::say::hi;</span><br><span class="line">    <span class="keyword">use</span> crate::say;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hello</span>() &#123;</span><br><span class="line">        say::<span class="title function_ invoke__">hello</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">mod</span> info &#123;</span><br><span class="line">        <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">name</span>() &#123;</span><br><span class="line">            <span class="built_in">println!</span>(<span class="string">&quot;zhangsang&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">mod</span> people_2 &#123;</span><br><span class="line">    <span class="comment">// 重导出名称</span></span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">use</span> crate::people::&#123;<span class="keyword">self</span>, info&#125;;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">hello</span>() &#123;</span><br><span class="line">        info::<span class="title function_ invoke__">name</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="不同文件夹的引用">不同文件夹的引用</h1>
+<h2 id="方式一">方式一</h2>
+<p>看一下目录结构： <img
+src="https://img2020.cnblogs.com/blog/342595/202008/342595-20200831092952337-240410311.png"
+alt="img" />
+<code>rust</code>的约定，在目录下使用<code>mod.rs</code>将模块导出。
+看一下user.rs的代码：</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#[derive(Debug)]</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">struct</span> <span class="title class_">User</span> &#123;</span><br><span class="line">    name: <span class="type">String</span>,</span><br><span class="line">    age: <span class="type">i32</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">impl</span> <span class="title class_">User</span> &#123;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">new_user</span>(name: <span class="type">String</span>, age: <span class="type">i32</span>) <span class="punctuation">-&gt;</span> User &#123;</span><br><span class="line">        User&#123;</span><br><span class="line">            name,</span><br><span class="line">            age</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">name</span>(&amp;<span class="keyword">self</span>) <span class="punctuation">-&gt;</span> &amp;<span class="type">str</span> &#123;</span><br><span class="line">        &amp;<span class="keyword">self</span>.name</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">add</span>(x: <span class="type">i32</span>, y: <span class="type">i32</span>) <span class="punctuation">-&gt;</span> <span class="type">i32</span> &#123;</span><br><span class="line">    x + y </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后在<code>mod.rs</code>里导出：</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">mod</span> user;</span><br></pre></td></tr></table></figure>
+<p>在<code>main.rs</code>调用</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">mod</span> user_info;</span><br><span class="line"><span class="keyword">use</span> user_info::user::User;</span><br><span class="line"></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">main</span>() &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">u1</span> = User::<span class="title function_ invoke__">new_user</span>(<span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;tom&quot;</span>), <span class="number">5</span>);</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">&quot;user name: &#123;&#125;&quot;</span>, u1.<span class="title function_ invoke__">name</span>());</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">&quot;1+2: &#123;&#125;&quot;</span>, user_info::user::<span class="title function_ invoke__">add</span>(<span class="number">1</span>, <span class="number">2</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="方式二">方式二</h2>
+<p>看一下目录结构 <img
+src="https://img2020.cnblogs.com/blog/342595/202008/342595-20200831093032927-706165161.png"
+alt="img" />
+和上面的不同之前是。这种方式是<code>user_info</code>目录里没有<code>mod.rs</code>，但是在外面有一个<code>user_info.rs</code>
+在<code>user_info.rs</code>中使用<code>pub mod user;</code>是告诉<code>Rust</code>在另一个与模块同名的文件夹内(user_info文件夹)内加载模块<code>user</code>。这也是<code>rust</code>的一个约定，但比较推荐用上面的方式。
+代码和上面是一样的。 user.rs</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#[derive(Debug)]</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">struct</span> <span class="title class_">User</span> &#123;</span><br><span class="line">    name: <span class="type">String</span>,</span><br><span class="line">    age: <span class="type">i32</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">impl</span> <span class="title class_">User</span> &#123;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">new_user</span>(name: <span class="type">String</span>, age: <span class="type">i32</span>) <span class="punctuation">-&gt;</span> User &#123;</span><br><span class="line">        User&#123;</span><br><span class="line">            name,</span><br><span class="line">            age</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">name</span>(&amp;<span class="keyword">self</span>) <span class="punctuation">-&gt;</span> &amp;<span class="type">str</span> &#123;</span><br><span class="line">        &amp;<span class="keyword">self</span>.name</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">add</span>(x: <span class="type">i32</span>, y: <span class="type">i32</span>) <span class="punctuation">-&gt;</span> <span class="type">i32</span> &#123;</span><br><span class="line">    x + y </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>user_info.rs里导出</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">mod</span> user;</span><br></pre></td></tr></table></figure>
+<p>在<code>main.rs</code>调用</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">mod</span> user_info;</span><br><span class="line"><span class="keyword">use</span> user_info::user::User;</span><br><span class="line"></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">main</span>() &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">u1</span> = User::<span class="title function_ invoke__">new_user</span>(<span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;tom&quot;</span>), <span class="number">5</span>);</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">&quot;user name: &#123;&#125;&quot;</span>, u1.<span class="title function_ invoke__">name</span>());</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">&quot;1+2: &#123;&#125;&quot;</span>, user_info::user::<span class="title function_ invoke__">add</span>(<span class="number">1</span>, <span class="number">2</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="使用外部包">使用外部包</h1>
+<p>使用外部包，一般就是从<code>crates.io</code>下载，当然也可以自己指写下载地点，或者使用我们本地的库，或者自建的的仓库。</p>
+<h2 id="一般方式">一般方式</h2>
+<p>在<code>Cargo.toml</code>的<code>dependencies</code>下写要导入的依赖库</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[dependencies]</span></span><br><span class="line"><span class="attr">regex</span> = <span class="string">&quot;0.1.41&quot;</span></span><br></pre></td></tr></table></figure>
+<p>运行<code>cargo build</code>会从<code>crates.io</code>下载依赖库。
+使用的时候，直接使用<code>use</code>引入</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">use regex::Regex;</span><br><span class="line"></span><br><span class="line">fn main() &#123;</span><br><span class="line">    let re = Regex::new(<span class="string">r&quot;^\d&#123;4&#125;-\d&#123;2&#125;-\d&#123;2&#125;$&quot;</span>).unwrap();</span><br><span class="line">    println!(<span class="string">&quot;Did our date match? &#123;&#125;&quot;</span>, re.is_match(<span class="string">&quot;2014-01-01&quot;</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="指定库地址">指定库地址</h2>
+<p>除了<code>crates.io</code>下载依赖库，也可以自己指定地址，也可以指定<code>branch</code>
+<code>tag</code> <code>commit</code>，比如下面这个</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[dependencies]</span></span><br><span class="line"><span class="comment"># 可以和包不同名，也可以同名</span></span><br><span class="line"><span class="attr">my_rust_lib_1</span>=&#123;package=<span class="string">&quot;my_lib_1&quot;</span>,git=<span class="string">&quot;ssh://git@github.com/lpxxn/my_rust_lib_1.git&quot;</span>,tag=<span class="string">&quot;v0.0.2&quot;</span>&#125;</span><br></pre></td></tr></table></figure>
+<p>就是从<code>github.com/lpxxn/my_rust_lib_1</code>上下载包。也可以使用<code>https</code></p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">my_rust_lib_1</span>=&#123;package=<span class="string">&quot;my_lib_1&quot;</span>,git=<span class="string">&quot;https://github.com/lpxxn/my_rust_lib_1.git&quot;</span>,branch=<span class="string">&quot;master&quot;</span>&#125;</span><br></pre></td></tr></table></figure>
+<p>执行<code>cargo build</code>就会自动下载，使用的时候也是一样的。</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> my_rust_lib_1;</span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">main</span>() &#123;</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">&quot;Hello, world!&quot;</span>);</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, my_rust_lib_1::<span class="title function_ invoke__">add</span>(<span class="number">1</span>, <span class="number">2</span>));</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">u</span> = my_rust_lib_1::User::<span class="title function_ invoke__">new_user</span>(<span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;tom&quot;</span>), <span class="number">2</span>);</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">&quot;user: &#123;:#?&#125;&quot;</span>, u);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="使用本地的库">使用本地的库</h2>
+<p>我们新建一个二进制库项目</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cargo <span class="keyword">new</span> pkg_demo_3</span><br></pre></td></tr></table></figure>
+<p>然后在<code>pkg_demo_3</code>内建一个库项目</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cargo <span class="keyword">new</span> <span class="comment">--lib utils</span></span><br></pre></td></tr></table></figure>
+<p>然后就可以在 <code>utils</code>里写我们的库代码了
+看一下现在的目录结构 <img
+src="https://img2020.cnblogs.com/blog/342595/202008/342595-20200831093104024-66370552.png"
+alt="img" />
+在<code>utils</code>库的<code>user.rs</code>里还是我们上面的代码</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#[derive(Debug)]</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">struct</span> <span class="title class_">User</span> &#123;</span><br><span class="line">    name: <span class="type">String</span>,</span><br><span class="line">    age: <span class="type">i32</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">impl</span> <span class="title class_">User</span> &#123;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">new_user</span>(name: <span class="type">String</span>, age: <span class="type">i32</span>) <span class="punctuation">-&gt;</span> User &#123;</span><br><span class="line">        User&#123;</span><br><span class="line">            name,</span><br><span class="line">            age</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">name</span>(&amp;<span class="keyword">self</span>) <span class="punctuation">-&gt;</span> &amp;<span class="type">str</span> &#123;</span><br><span class="line">        &amp;<span class="keyword">self</span>.name</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">add</span>(x: <span class="type">i32</span>, y: <span class="type">i32</span>) <span class="punctuation">-&gt;</span> <span class="type">i32</span> &#123;</span><br><span class="line">    x + y </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在<code>lib.rs</code>里对<code>user</code>模块导出</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="keyword">mod</span> user;</span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">use</span> user::User;</span><br></pre></td></tr></table></figure>
+<p>然后在我们的二进制库的<code>Cargo.toml</code>引入库</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[dependencies]</span></span><br><span class="line"><span class="attr">utils</span> = &#123; path = <span class="string">&quot;utils&quot;</span>, version = <span class="string">&quot;0.1.0&quot;</span> &#125;</span><br></pre></td></tr></table></figure>
+<p><code>path</code>就是库项目的路径
+<code>main.rs</code>使用<code>use</code>引入就可以使用了</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> utils::User;</span><br><span class="line"></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">main</span>() &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">u</span> = User::<span class="title function_ invoke__">new_user</span>(<span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;tom&quot;</span>), <span class="number">5</span>);</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">&quot;user: &#123;:#?&#125;&quot;</span>, u);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="自建私有库">自建私有库</h2>
+<p>除了<code>crates.io</code>也可以自建<code>registrie</code>。这个有时间再重新写一篇帖子单独说，可以先看一下官方文档。
+<a
+target="_blank" rel="noopener" href="https://doc.rust-lang.org/cargo/reference/registries.html#registries">官方文档:registrie</a>
+<a
+target="_blank" rel="noopener" href="https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html">依赖官方文档</a>
+<a target="_blank" rel="noopener" href="https://github.com/lpxxn/rust_module">帖子 github
+代码地址</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/rust/" rel="tag"># rust</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/07/28/rust/rust%E8%87%AA%E5%BC%95%E7%94%A8/" rel="prev" title="rust自引用">
+                  <i class="fa fa-chevron-left"></i> rust自引用
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/07/28/rust/rust%E4%B8%ADArc%E5%92%8CMutex/" rel="next" title="rust中ARC和Mutex">
+                  rust中ARC和Mutex <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">singheart</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div><script color="0,0,255" opacity="0.5" zIndex="-1" count="99" src="https://cdn.jsdelivr.net/npm/canvas-nest.js@1/dist/canvas-nest.js"></script>
+
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"xinjiempolde","repo":"xinjiempolde.github.io","client_id":"89019d63999840fdbf7f","client_secret":"48d2133d88acfafada6414ec6eee5a9d9febcbc8","admin_user":"xinjiempolde","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"a615f5450c1a355eef99e6562e329038"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/haruto.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>
