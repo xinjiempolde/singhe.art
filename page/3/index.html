@@ -265,18 +265,18 @@ mjx-container[display="true"] + br {
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-count">67</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-count">9</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-count">34</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -310,6 +310,104 @@ mjx-container[display="true"] + br {
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/12/13/cpp/locks/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+      <meta itemprop="name" content="singheart">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2023/12/13/cpp/locks/" class="post-title-link" itemprop="url">locks</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-12-13 01:02:25" itemprop="dateCreated datePublished" datetime="2023-12-13T01:02:25+08:00">2023-12-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-12-11 21:03:57" itemprop="dateModified" datetime="2024-12-11T21:03:57+08:00">2024-12-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/cpp/" itemprop="url" rel="index"><span itemprop="name">cpp</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="x00-背景介绍">0x00 背景介绍</h1>
+<p>多个线程访问同一个互斥资源的时候，需要保证数据的正确性，其中一个方案就是加锁。spinlock(自旋锁)尽可能的减少线程的阻塞，这对于锁的竞争不激烈，且占用锁时间非常短的代码块来说性能能大幅度的提升，因为自旋的消耗会小于线程阻塞挂起再唤醒的操作的消耗，这些操作会导致线程发生两次上下文切换！</p>
+<p>但是如果锁的竞争激烈，或者持有锁的线程需要长时间占用锁执行同步块，这时候就不适合使用自旋锁了，因为自旋锁在获取锁前一直都是占用
+cpu
+做无用功，同时有大量线程在竞争一个锁，会导致获取锁的时间很长，线程自旋的消耗大于线程阻塞挂起操作的消耗，其它需要
+cpu 的线程又不能获取到 cpu，造成 cpu
+的浪费。所以这种情况下我们要关闭自旋锁。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023/12/13/cpp/locks/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1176,127 +1274,6 @@ target="_blank" rel="noopener" href="https://blog.csdn.net/qq_28119741/article/d
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/06/07/database/multi-clock-snapshot-isolation/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
-      <meta itemprop="name" content="singheart">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="singheart's blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | singheart's blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2023/06/07/database/multi-clock-snapshot-isolation/" class="post-title-link" itemprop="url">multi-clock snapshot isolation</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2023-06-07 11:07:01" itemprop="dateCreated datePublished" datetime="2023-06-07T11:07:01+08:00">2023-06-07</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-12-11 21:03:57" itemprop="dateModified" datetime="2024-12-11T21:03:57+08:00">2024-12-11</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/database/" itemprop="url" rel="index"><span itemprop="name">database</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="section"></h1>
-<h1 id="motivatione">Motivatione</h1>
-<p>a previous single-layer NVM database N2DB[14] used the snapshot
-isolation from PostgreSQL[17]. Its snapshot generation process involves
-taking a lock and scanning a global active transaction list, which
-blocks concurrent transactions and is not scalable</p>
-<h1 id="background">Background</h1>
-<h2 id="concurrency-control-for-nvm-databases">2.3 Concurrency control
-for NVM databases</h2>
-<p>The snapshot isolation concurrency control implementation used in
-traditional MVCC databases is not well suited for NVM because of two
-reasons. (1) The concurrency control implementations of traditional
-databases mainly focus on their in-memory part without discussing
-durability and crash consistency. They leave those to another dedicated
-recovery protocol, such as ARIES or write-ahead logging. The situation
-is different in NVM databases because a single copy of data is used for
-both runtime access and durability. Ensuring crash consistency should
-unavoidably be part of the concurrency control itself. (2) Concurrency
-control methods from a two-layer architecture have suboptimal
-performance when directly applied to a single-layer NVM database.
-FOEDUS[28] points out that centralized components, such as lock manager
-and logs in traditional concurrency control implementations, will cause
-performance bottlenecks in a multicore NVM database. A previous NVM
-database N2DB[14] adopted the concurrency control from PostgreSQL[17] to
-implement snapshot isolation. The concurrency control scheme from
-PostgreSQL uses the currently completed transactions in the system to
-represent a snapshot. When generating a snapshot, it has to take a lock
-and scan the global active transaction list. This approach blocks
-concurrent transactions and is not scalable. N2DB also adopted the
-commit log in NVM to persistently store transaction status for crash
-consistency. The commit log is an array-like structure and is
-write-shared by all threads, which limits its scalability. Zen[29] also
-points out that traditional concurrency control methods often need to
-modify the tuple metadata not only by tuple writes but also by tuple
-reads, which incurs expensive NVM writes.</p>
-<h1 id="multi-clock-concurrency-control">Multi-Clock Concurrency
-Control</h1>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
     <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
@@ -1310,7 +1287,7 @@ Control</h1>
 
 <div class="copyright">
   &copy; 
-  <span itemprop="copyrightYear">2024</span>
+  <span itemprop="copyrightYear">2025</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

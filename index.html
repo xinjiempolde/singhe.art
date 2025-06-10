@@ -153,18 +153,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-count">67</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-count">9</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-count">34</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -198,6 +198,132 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2025/06/09/audio/wav%E9%9F%B3%E9%A2%91%E6%A0%BC%E5%BC%8F%E8%A7%A3%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+      <meta itemprop="name" content="singheart">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2025/06/09/audio/wav%E9%9F%B3%E9%A2%91%E6%A0%BC%E5%BC%8F%E8%A7%A3%E6%9E%90/" class="post-title-link" itemprop="url">wav音频格式解析</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2025-06-09 10:23:23" itemprop="dateCreated datePublished" datetime="2025-06-09T10:23:23+08:00">2025-06-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-06-10 21:12:02" itemprop="dateModified" datetime="2025-06-10T21:12:02+08:00">2025-06-10</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/audio/" itemprop="url" rel="index"><span itemprop="name">audio</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <blockquote>
+<p>参考：</p>
+<ul>
+<li>https://www.cnblogs.com/douzujun/p/10600793.html</li>
+</ul>
+</blockquote>
+<h1 id="wav格式专业名词">WAV格式专业名词</h1>
+<p>wav是微软开发的一种音频文件格式，wav文件格式是无损音频文件格式，相对于其他音频格式文件数据是没有经过压缩的，通常文件也相对比较大些。</p>
+<blockquote>
+<p>支持多种音频数字，取样频率和声道，标准格式化的WAV文件和CD格式一样，也是44.1K的取样频率，16位量化数字，因此在声音文件质量和CD相差无几！
+通常使用<strong>三个参数来表示声音</strong>，<strong>量化位数，取样频率和<a
+href="http://link.zhihu.com/?target=http%3A//baike.baidu.com/item/%E9%87%87%E6%A0%B7%E7%82%B9">采样点</a>振幅</strong>。<strong>量化位数</strong>分为<strong>8位，16位，24位</strong>三种，<strong>声道</strong>有<strong>单声道和<a
+href="http://link.zhihu.com/?target=http%3A//baike.baidu.com/item/%E7%AB%8B%E4%BD%93%E5%A3%B0">立体声</a></strong>之分，单声道振幅数据为n*1矩阵点，立体声为n*2矩阵点，<strong>取样频率</strong>一般有11025Hz(11kHz)
+，22050Hz(22kHz)和44100Hz(44kHz) 三种，不过尽管<a
+href="http://link.zhihu.com/?target=http%3A//baike.baidu.com/item/%E9%9F%B3%E8%B4%A8">音质</a>出色，但在压缩后的文件体积过大！相对其他音频格式而言是一个缺点，其
+<strong>文件大小的计算方式</strong>为：<a
+href="http://link.zhihu.com/?target=http%3A//baike.baidu.com/item/WAV%E6%A0%BC%E5%BC%8F">WAV格式</a>文件所占<strong>容量</strong>（B)
+= （取样频率 X<a
+href="http://link.zhihu.com/?target=http%3A//baike.baidu.com/item/%E9%87%8F%E5%8C%96%E4%BD%8D%E6%95%B0">量化位数</a>X
+声道） X 时间 / 8 (<a
+href="http://link.zhihu.com/?target=http%3A//baike.baidu.com/item/%E5%AD%97%E8%8A%82">字节</a>=
+8bit)
+<strong>每一分钟WAV格式的音频文件的大小为10MB，其大小不随音量大小及清晰度的变化而变化</strong>。</p>
+</blockquote>
+<p>注：专业名词（取样频率、量化位数、声道）解释：https://blog.csdn.net/eric88/article/details/17098603</p>
+<ul>
+<li><strong><font color="red">采样位数</font>：也叫量化位数(单位:比特)，</strong>是存储每个采样值所用的二进制位数。采样值反应了声音的波动状态。采样位数决定了量化精度。<strong>采样位数越长,量化的精度就越高,还原的波形曲线越真实,产生的量化噪声越小,回放的效果就越逼真</strong>。常用的量化位数有4、8、12、16、24。量化位数与声卡的位数和编码有关。如果采样位数为16位，那么能够表示的范围就是<span
+class="math inline">\(2^{16}\)</span>,采样位数越大，对声音的大小变化表现得也就越精细。</li>
+<li><strong><font color="red">采样频率</font>：采样频率是指录音设备在一秒钟内对声音信号的采样次数，采样频率越高声音的还原就越真实越自然。</strong>越高所能描述的<strong>声波频率</strong>就越高。<strong>采样率</strong>决定<strong>声音频率</strong>的范围（<strong>相当于音调</strong>），由采样定理得知采样率需为待采样声音频率的2倍。</li>
+<li><strong><font color="red">声道数</font>:
+使用的声音通道的个数，</strong>也是采样时所<strong>产生的声音波形的个数</strong>。播放声音时,单声道的WAV一般使用一个喇叭发声,立体声的WAV可以使两个喇叭发声。记录声音时,单声道,每次产生一个波形的数据,双声道,每次产生两个波形的数据,所占的存储空间增加一倍。</li>
+<li><strong>WAV格式大小：</strong>采样率一般是44.1K，16bit采样精度，存储成<strong>WAV格式大小</strong>
+= 44.1KHz(采样率) X 16bit(采样位数) X 2(双声道) X 播放时间</li>
+<li>WAV格式是没有压缩无损的，MP3格式是按1:12压缩保存的，所以MP3格式大小等于上式的1/12。</li>
+</ul>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2025/06/09/audio/wav%E9%9F%B3%E9%A2%91%E6%A0%BC%E5%BC%8F%E8%A7%A3%E6%9E%90/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1064,117 +1190,6 @@ Technique”（超尺寸属性存储技术）</strong>的缩写，主要用于�
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/06/27/openGauss/PostgreSQL%E5%8F%AF%E5%8F%98%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
-      <meta itemprop="name" content="singheart">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="singheart's blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | singheart's blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/06/27/openGauss/PostgreSQL%E5%8F%AF%E5%8F%98%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/" class="post-title-link" itemprop="url">postgreSQL可变数据类型</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-06-27 20:47:24" itemprop="dateCreated datePublished" datetime="2024-06-27T20:47:24+08:00">2024-06-27</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-12-11 21:03:57" itemprop="dateModified" datetime="2024-12-11T21:03:57+08:00">2024-12-11</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/openGauss/" itemprop="url" rel="index"><span itemprop="name">openGauss</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <blockquote>
-<p>参考：</p>
-<ul>
-<li><a
-target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/614890090">postgreSQL可变数据类型 -
-知乎 (zhihu.com)</a></li>
-<li><a
-target="_blank" rel="noopener" href="https://zhmin.github.io/posts/postgresql-varlena/">Postgresql
-Varlena 结构 | 学习笔记 (zhmin.github.io)</a></li>
-</ul>
-</blockquote>
-<h1 id="x00-可变长类型">0x00 可变长类型</h1>
-<h2 id="datum-的-typlen-的约定">0. Datum 的 typlen 的约定</h2>
-<p>如果Datum 类型是 “byVal”，则Datum表示一个值。如果Datum
-类型不是”byVal“，则Datum 表示一个指针：</p>
-<p>typlen &gt; 0， Datum 就指向固定长度字节流，比如int类型 typlen ==
--1， Datum 指向一个变长 varlena 结构体，比如char，varchar类型 typlen ==
--2， Datum 指向一个C语言风格的字符串；</p>
-<p>因此，查看所有的变长数据类型：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> typname <span class="keyword">FROM</span> pg_type <span class="keyword">WHERE</span> typlen <span class="operator">=</span> <span class="number">-1</span></span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2024/06/27/openGauss/PostgreSQL%E5%8F%AF%E5%8F%98%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
     <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
@@ -1188,7 +1203,7 @@ Varlena 结构 | 学习笔记 (zhmin.github.io)</a></li>
 
 <div class="copyright">
   &copy; 
-  <span itemprop="copyrightYear">2024</span>
+  <span itemprop="copyrightYear">2025</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

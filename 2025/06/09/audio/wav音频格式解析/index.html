@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0-rc1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.11.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="参考：  https:&#x2F;&#x2F;www.cnblogs.com&#x2F;douzujun&#x2F;p&#x2F;10600793.html   WAV格式专业名词 wav是微软开发的一种音频文件格式，wav文件格式是无损音频文件格式，相对于其他音频格式文件数据是没有经过压缩的，通常文件也相对比较大些。  支持多种音频数字，取样频率和声道，标准格式化的WAV文件和CD格式一样，也是44.1K的取样频率，16位量化数字，因此在声音">
+<meta property="og:type" content="article">
+<meta property="og:title" content="wav音频格式解析">
+<meta property="og:url" content="http://example.com/2025/06/09/audio/wav%E9%9F%B3%E9%A2%91%E6%A0%BC%E5%BC%8F%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:site_name" content="singheart&#39;s blog">
+<meta property="og:description" content="参考：  https:&#x2F;&#x2F;www.cnblogs.com&#x2F;douzujun&#x2F;p&#x2F;10600793.html   WAV格式专业名词 wav是微软开发的一种音频文件格式，wav文件格式是无损音频文件格式，相对于其他音频格式文件数据是没有经过压缩的，通常文件也相对比较大些。  支持多种音频数字，取样频率和声道，标准格式化的WAV文件和CD格式一样，也是44.1K的取样频率，16位量化数字，因此在声音">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img.singhe.art/817161-20190326184927550-508732460.png">
+<meta property="article:published_time" content="2025-06-09T02:23:23.000Z">
+<meta property="article:modified_time" content="2025-06-10T13:12:02.858Z">
+<meta property="article:author" content="singheart">
+<meta property="article:tag" content="audio">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img.singhe.art/817161-20190326184927550-508732460.png">
+
+
+<link rel="canonical" href="http://example.com/2025/06/09/audio/wav%E9%9F%B3%E9%A2%91%E6%A0%BC%E5%BC%8F%E8%A7%A3%E6%9E%90/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2025/06/09/audio/wav%E9%9F%B3%E9%A2%91%E6%A0%BC%E5%BC%8F%E8%A7%A3%E6%9E%90/","path":"2025/06/09/audio/wav音频格式解析/","title":"wav音频格式解析"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>wav音频格式解析 | singheart's blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">singheart's blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">多读书，多思考</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#wav%E6%A0%BC%E5%BC%8F%E4%B8%93%E4%B8%9A%E5%90%8D%E8%AF%8D"><span class="nav-number">1.</span> <span class="nav-text">WAV格式专业名词</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#wav%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%A0%BC%E5%BC%8F%E8%A7%A3%E6%9E%90"><span class="nav-number">2.</span> <span class="nav-text">WAV二进制格式解析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#riff%E5%9D%97"><span class="nav-number">2.1.</span> <span class="nav-text">RIFF块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fmt%E5%9D%97"><span class="nav-number">2.2.</span> <span class="nav-text">FMT块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#data%E5%9D%97"><span class="nav-number">2.3.</span> <span class="nav-text">DATA块</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#c%E7%A8%8B%E5%BA%8F%E8%A7%A3%E6%9E%90%E6%A0%BC%E5%BC%8F"><span class="nav-number">3.</span> <span class="nav-text">C++程序解析格式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#python%E7%94%BB%E5%87%BAwav%E6%B3%A2%E5%BD%A2"><span class="nav-number">4.</span> <span class="nav-text">Python画出WAV波形</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="singheart"
+      src="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+  <p class="site-author-name" itemprop="name">singheart</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">34</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xinjiempolde" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xinjiempolde" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2025/06/09/audio/wav%E9%9F%B3%E9%A2%91%E6%A0%BC%E5%BC%8F%E8%A7%A3%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://img.singhe.art/FhsjiuZl1nWUeg6NRdM279QXbA1-">
+      <meta itemprop="name" content="singheart">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="wav音频格式解析 | singheart's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          wav音频格式解析
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2025-06-09 10:23:23" itemprop="dateCreated datePublished" datetime="2025-06-09T10:23:23+08:00">2025-06-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-06-10 21:12:02" itemprop="dateModified" datetime="2025-06-10T21:12:02+08:00">2025-06-10</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/audio/" itemprop="url" rel="index"><span itemprop="name">audio</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <blockquote>
+<p>参考：</p>
+<ul>
+<li>https://www.cnblogs.com/douzujun/p/10600793.html</li>
+</ul>
+</blockquote>
+<h1 id="wav格式专业名词">WAV格式专业名词</h1>
+<p>wav是微软开发的一种音频文件格式，wav文件格式是无损音频文件格式，相对于其他音频格式文件数据是没有经过压缩的，通常文件也相对比较大些。</p>
+<blockquote>
+<p>支持多种音频数字，取样频率和声道，标准格式化的WAV文件和CD格式一样，也是44.1K的取样频率，16位量化数字，因此在声音文件质量和CD相差无几！
+通常使用<strong>三个参数来表示声音</strong>，<strong>量化位数，取样频率和<a
+href="http://link.zhihu.com/?target=http%3A//baike.baidu.com/item/%E9%87%87%E6%A0%B7%E7%82%B9">采样点</a>振幅</strong>。<strong>量化位数</strong>分为<strong>8位，16位，24位</strong>三种，<strong>声道</strong>有<strong>单声道和<a
+href="http://link.zhihu.com/?target=http%3A//baike.baidu.com/item/%E7%AB%8B%E4%BD%93%E5%A3%B0">立体声</a></strong>之分，单声道振幅数据为n*1矩阵点，立体声为n*2矩阵点，<strong>取样频率</strong>一般有11025Hz(11kHz)
+，22050Hz(22kHz)和44100Hz(44kHz) 三种，不过尽管<a
+href="http://link.zhihu.com/?target=http%3A//baike.baidu.com/item/%E9%9F%B3%E8%B4%A8">音质</a>出色，但在压缩后的文件体积过大！相对其他音频格式而言是一个缺点，其
+<strong>文件大小的计算方式</strong>为：<a
+href="http://link.zhihu.com/?target=http%3A//baike.baidu.com/item/WAV%E6%A0%BC%E5%BC%8F">WAV格式</a>文件所占<strong>容量</strong>（B)
+= （取样频率 X<a
+href="http://link.zhihu.com/?target=http%3A//baike.baidu.com/item/%E9%87%8F%E5%8C%96%E4%BD%8D%E6%95%B0">量化位数</a>X
+声道） X 时间 / 8 (<a
+href="http://link.zhihu.com/?target=http%3A//baike.baidu.com/item/%E5%AD%97%E8%8A%82">字节</a>=
+8bit)
+<strong>每一分钟WAV格式的音频文件的大小为10MB，其大小不随音量大小及清晰度的变化而变化</strong>。</p>
+</blockquote>
+<p>注：专业名词（取样频率、量化位数、声道）解释：https://blog.csdn.net/eric88/article/details/17098603</p>
+<ul>
+<li><strong><font color="red">采样位数</font>：也叫量化位数(单位:比特)，</strong>是存储每个采样值所用的二进制位数。采样值反应了声音的波动状态。采样位数决定了量化精度。<strong>采样位数越长,量化的精度就越高,还原的波形曲线越真实,产生的量化噪声越小,回放的效果就越逼真</strong>。常用的量化位数有4、8、12、16、24。量化位数与声卡的位数和编码有关。如果采样位数为16位，那么能够表示的范围就是<span
+class="math inline">\(2^{16}\)</span>,采样位数越大，对声音的大小变化表现得也就越精细。</li>
+<li><strong><font color="red">采样频率</font>：采样频率是指录音设备在一秒钟内对声音信号的采样次数，采样频率越高声音的还原就越真实越自然。</strong>越高所能描述的<strong>声波频率</strong>就越高。<strong>采样率</strong>决定<strong>声音频率</strong>的范围（<strong>相当于音调</strong>），由采样定理得知采样率需为待采样声音频率的2倍。</li>
+<li><strong><font color="red">声道数</font>:
+使用的声音通道的个数，</strong>也是采样时所<strong>产生的声音波形的个数</strong>。播放声音时,单声道的WAV一般使用一个喇叭发声,立体声的WAV可以使两个喇叭发声。记录声音时,单声道,每次产生一个波形的数据,双声道,每次产生两个波形的数据,所占的存储空间增加一倍。</li>
+<li><strong>WAV格式大小：</strong>采样率一般是44.1K，16bit采样精度，存储成<strong>WAV格式大小</strong>
+= 44.1KHz(采样率) X 16bit(采样位数) X 2(双声道) X 播放时间</li>
+<li>WAV格式是没有压缩无损的，MP3格式是按1:12压缩保存的，所以MP3格式大小等于上式的1/12。</li>
+</ul>
+<span id="more"></span>
+<h1 id="wav二进制格式解析">WAV二进制格式解析</h1>
+<p>大部分的多媒体文件都依循着一种结构来存放信息，这种结构称为"资源互换文件格式"(Resources
+lnterchange File
+Format)，简称RIFF，例如声音的WAV文件，音频视频交错格式数据.AVI。</p>
+<figure>
+<img
+src="https://img.singhe.art/817161-20190326145146250-1289168612.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>以WAV格式为例，WAV文件一般由RIFF块、FMT块和DATA块三部分依次组成（还可能有JUNK块），下面分别进行介绍。</p>
+<h2 id="riff块">RIFF块</h2>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">WAV_RIFF</span> &#123;</span><br><span class="line">    <span class="type">char</span> chunk_id_[<span class="number">4</span>];     <span class="comment">// &quot;RIFF&quot;</span></span><br><span class="line">    <span class="type">uint32_t</span> chunk_size_;  <span class="comment">// 36 + sub_chunk2_size, 36是RIFF_T + FMT_T两个头信息的总大小</span></span><br><span class="line">    <span class="type">char</span> format_[<span class="number">4</span>];       <span class="comment">// &quot;WAVE&quot;</span></span><br><span class="line">&#125; RIFF_T;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>chunk_id_的值固定为"RIFF"，占用四个字节</li>
+<li>chunk_size_指示WAV数据的大小，包含RIFF块和FMT块的大小</li>
+<li>format_的值固定为"WAVE"，占用四个字节</li>
+</ul>
+<h2 id="fmt块">FMT块</h2>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">WAV_FMT</span> &#123;</span><br><span class="line">    <span class="type">char</span> sub_chunk1_id_[<span class="number">4</span>];</span><br><span class="line">    <span class="type">uint32_t</span> sub_chunk2_size_;</span><br><span class="line">    <span class="type">uint16_t</span> audio_format_;</span><br><span class="line">    <span class="type">uint16_t</span> num_channels_;</span><br><span class="line">    <span class="type">uint32_t</span> sample_rate_;</span><br><span class="line">    <span class="type">uint32_t</span> byte_rate_;</span><br><span class="line">    <span class="type">uint16_t</span> block_align_;</span><br><span class="line">    <span class="type">uint16_t</span> bits_per_sample_;</span><br><span class="line">&#125; FMT_T;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>sub_chunk1_id_固定值为"fmt"</li>
+<li>sub_chunk2_size_代表<code>fmt</code>
+块中后续格式数据的长度，后面剩下的字段(audio_format_等)加起来一共是16字节</li>
+<li>audio_format_：音频格式（1 = PCM）</li>
+<li>num_channels_：声道数（1 = mono，2 = stereo）</li>
+<li>sample_rate_：采样率，例如 44100</li>
+<li>byte_rate_： 每秒字节数 = sample_rate_ × num_channels_ ×
+(bits_per_sample_ / 8)</li>
+<li>block_align_：一个采样帧占用的字节数</li>
+<li>bits_per_sample_：每个采样的位数，例如 16 位</li>
+</ul>
+<h2 id="data块">DATA块</h2>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">WAV_DATA</span> &#123;</span><br><span class="line">    <span class="type">char</span> sub_chunk2_id_[<span class="number">4</span>];</span><br><span class="line">    <span class="type">uint32_t</span> sub_chunk2_size_;</span><br><span class="line">    <span class="comment">// sub-chunk-data</span></span><br><span class="line">    <span class="type">char</span> data[<span class="number">0</span>];</span><br><span class="line">&#125; DATA_T;</span><br></pre></td></tr></table></figure>
+<figure>
+<img src="https://img.singhe.art/817161-20190326184927550-508732460.png"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<h1 id="c程序解析格式">C++程序解析格式</h1>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cstdint&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cstring&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">WAV_RIFF</span> &#123;</span><br><span class="line">    <span class="type">char</span> chunk_id_[<span class="number">4</span>];     <span class="comment">// &quot;RIFF&quot;</span></span><br><span class="line">    <span class="type">uint32_t</span> chunk_size_;  <span class="comment">// 36 + sub_chunk2_size, 36是RIFF_T + FMT_T两个头信息的总大小</span></span><br><span class="line">    <span class="type">char</span> format_[<span class="number">4</span>];       <span class="comment">// &quot;WAVE&quot;</span></span><br><span class="line">&#125; RIFF_T;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">WAV_FMT</span> &#123;</span><br><span class="line">    <span class="type">char</span> sub_chunk1_id_[<span class="number">4</span>];</span><br><span class="line">    <span class="type">uint32_t</span> sub_chunk2_size_;</span><br><span class="line">    <span class="type">uint16_t</span> audio_format_;</span><br><span class="line">    <span class="type">uint16_t</span> num_channels_;</span><br><span class="line">    <span class="type">uint32_t</span> sample_rate_;</span><br><span class="line">    <span class="type">uint32_t</span> byte_rate_;</span><br><span class="line">    <span class="type">uint16_t</span> block_align_;</span><br><span class="line">    <span class="type">uint16_t</span> bits_per_sample_;</span><br><span class="line">&#125; FMT_T;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">WAV_DATA</span> &#123;</span><br><span class="line">    <span class="type">char</span> sub_chunk2_id_[<span class="number">4</span>];</span><br><span class="line">    <span class="type">uint32_t</span> sub_chunk2_size_;</span><br><span class="line">    <span class="comment">// sub-chunk-data</span></span><br><span class="line">&#125; DATA_T;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">WAV_FORMAT</span> &#123;</span><br><span class="line">    RIFF_T riff_;</span><br><span class="line">    WAV_FMT fmt_;</span><br><span class="line">&#125; WAV_HEADER;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">ShowWavHeaderInfo</span><span class="params">(<span class="type">const</span> WAV_HEADER &amp;header)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    FILE *fp = <span class="literal">nullptr</span>;</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *filepath = <span class="string">&quot;/home/singheart/440hz.wav&quot;</span>;</span><br><span class="line">    fp = <span class="built_in">fopen</span>(filepath, <span class="string">&quot;rb&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span> (fp == <span class="literal">nullptr</span>) &#123;</span><br><span class="line">        <span class="built_in">fprintf</span>(stderr, <span class="string">&quot;open file [%s] failed\n&quot;</span>, filepath);</span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">-1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    WAV_HEADER header;</span><br><span class="line">    <span class="built_in">fread</span>(&amp;header, <span class="built_in">sizeof</span>(header), <span class="number">1</span>, fp);</span><br><span class="line">    <span class="built_in">ShowWavHeaderInfo</span>(header);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="python画出wav波形">Python画出WAV波形</h1>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> wave <span class="keyword">as</span> we</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">wavread</span>(<span class="params">path</span>):</span><br><span class="line">    wavfile =  we.<span class="built_in">open</span>(path,<span class="string">&quot;rb&quot;</span>)</span><br><span class="line">    params = wavfile.getparams()</span><br><span class="line">    nchannels, sampwidth, framesra, frameswav = params[:<span class="number">4</span>]</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;声道数:%d&quot;</span> % nchannels)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;采样宽度（字节数）:%d&quot;</span> % sampwidth)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;采样率：:%d&quot;</span> % framesra)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;总帧数:%d（样本点数量）&quot;</span> % frameswav)</span><br><span class="line">    datawav = wavfile.readframes(frameswav)</span><br><span class="line">    wavfile.close()</span><br><span class="line">    datause = np.frombuffer(datawav,dtype = np.short)</span><br><span class="line">    <span class="keyword">if</span> nchannels == <span class="number">2</span>:</span><br><span class="line">        datause.shape = -<span class="number">1</span>,<span class="number">2</span></span><br><span class="line">    datause = datause.T</span><br><span class="line">    <span class="comment"># 总的样本点数量除以采样率（每秒采集多少个点）</span></span><br><span class="line">    time = np.arange(<span class="number">0</span>, frameswav) * (<span class="number">1.0</span>/framesra)</span><br><span class="line">    <span class="keyword">return</span> datause, time, nchannels</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    wavdata, wavtime, nchannels = wavread(<span class="string">&quot;/home/singheart/440hz.wav&quot;</span>)</span><br><span class="line"></span><br><span class="line">    duration = <span class="number">0.01</span>  <span class="comment"># 只显示前0.01秒</span></span><br><span class="line">    N = <span class="built_in">int</span>(<span class="number">44100</span> * duration)</span><br><span class="line">    plt.plot(wavtime[:N],wavdata[:N],color = <span class="string">&#x27;green&#x27;</span>)</span><br><span class="line">    plt.xlabel(<span class="string">&#x27;Time&#x27;</span>)</span><br><span class="line">    plt.ylabel(<span class="string">&#x27;Amplitude&#x27;</span>)</span><br><span class="line"></span><br><span class="line">    plt.show()</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/audio/" rel="tag"># audio</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/07/28/openGauss/openGauss_docker/" rel="prev" title="openGauss通过docker运行">
+                  <i class="fa fa-chevron-left"></i> openGauss通过docker运行
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">singheart</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div><script color="0,0,255" opacity="0.5" zIndex="-1" count="99" src="https://cdn.jsdelivr.net/npm/canvas-nest.js@1/dist/canvas-nest.js"></script>
+
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"xinjiempolde","repo":"xinjiempolde.github.io","client_id":"89019d63999840fdbf7f","client_secret":"48d2133d88acfafada6414ec6eee5a9d9febcbc8","admin_user":"xinjiempolde","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"71367a78e0abbac6d05bf1f3a25a7b1f"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/haruto.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>

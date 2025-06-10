@@ -28,7 +28,7 @@
 <meta property="og:description" content="参考文章:https:&#x2F;&#x2F;github.com&#x2F;cfenollosa&#x2F;os-tutorial&#x2F;tree&#x2F;master&#x2F;11-kernel-crosscompiler  0. 环境说明  ubuntu 16.04 gcc 4.9源码编译  1. 将环境变量导入 我使用的是oh-my-zsh，所以需要修改~&#x2F;.zshrc，在文件末尾添加以下语句. 123456export CC&#x3D;&#x2F;usr&#x2F;bin&#x2F;g">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-04-10T05:21:23.000Z">
-<meta property="article:modified_time" content="2024-12-11T13:03:57.700Z">
+<meta property="article:modified_time" content="2024-12-12T04:27:35.288Z">
 <meta property="article:author" content="singheart">
 <meta property="article:tag" content="linux">
 <meta property="article:tag" content="编译器">
@@ -160,18 +160,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-count">67</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-count">9</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-count">34</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -251,7 +251,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-12-11 21:03:57" itemprop="dateModified" datetime="2024-12-11T21:03:57+08:00">2024-12-11</time>
+      <time title="修改时间：2024-12-12 12:27:35" itemprop="dateModified" datetime="2024-12-12T12:27:35+08:00">2024-12-12</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -292,16 +292,16 @@ target="_blank" rel="noopener" href="https://github.com/cfenollosa/os-tutorial/t
 <h1 id="将环境变量导入">1. 将环境变量导入</h1>
 <p>我使用的是<code>oh-my-zsh</code>，所以需要修改<code>~/.zshrc</code>，在文件末尾添加以下语句.
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">export CC=/usr/bin/gcc-5</span><br><span class="line">export LD=/usr/bin/gcc-5</span><br><span class="line"></span><br><span class="line">export PREFIX=&quot;/usr/local/i386elfgcc&quot;</span><br><span class="line">export TARGET=i386-elf</span><br><span class="line">export PATH=&quot;$PREFIX/bin:$PATH&quot;</span><br></pre></td></tr></table></figure></p>
-<span id="more"></span>
 <p>使用<code>source ~/.zshrc</code>来激活修改。</p>
+<span id="more"></span>
 <h1 id="建立binutils">2. 建立binutils</h1>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mkdir /tmp/src</span><br><span class="line">cd /tmp/src</span><br><span class="line">curl -O http://ftp.gnu.org/gnu/binutils/binutils-2.24.tar.gz # If the link 404&#x27;s, look for a more recent version</span><br><span class="line">tar xf binutils-2.24.tar.gz</span><br><span class="line">mkdir binutils-build</span><br><span class="line">cd binutils-build</span><br><span class="line">../binutils-2.24/configure --target=$TARGET --enable-interwork --enable-multilib --disable-nls --disable-werror --prefix=$PREFIX 2&gt;&amp;1 | tee configure.log</span><br><span class="line">make all install 2&gt;&amp;1 | tee make.log</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mkdir /tmp/src</span><br><span class="line">cd /tmp/src</span><br><span class="line">curl -O http://ftp.gnu.org/gnu/binutils/binutils-2.43.tar.gz # If the link 404&#x27;s, look for a more recent version</span><br><span class="line">tar xf binutils-2.43.tar.gz</span><br><span class="line">mkdir binutils-build</span><br><span class="line">cd binutils-build</span><br><span class="line">../binutils-2.43/configure --target=$TARGET --enable-interwork --enable-multilib --disable-nls --disable-werror --prefix=$PREFIX 2&gt;&amp;1 | tee configure.log</span><br><span class="line">make all install 2&gt;&amp;1 | tee make.log</span><br></pre></td></tr></table></figure>
 <p>可能在执行<code>make</code>的过程中会出错，我的原因是因为此时的用户没有对<code>/usr/local</code>文件夹修改的权限，所以我的解决办法是切换到<code>root</code>权限，命令如下:
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">su - root</span><br></pre></td></tr></table></figure>
 若一直登录不上，可能的原因是未激活root用户，按以下命令激活root用户：
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo passwd root</span><br></pre></td></tr></table></figure></p>
 <h1 id="创建gcc交叉编译器">3. 创建gcc交叉编译器</h1>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">cd /tmp/src</span><br><span class="line">curl -O https://ftp.gnu.org/gnu/gcc/gcc-4.9.1/gcc-4.9.1.tar.bz2</span><br><span class="line">tar xf gcc-4.9.1.tar.bz2</span><br><span class="line">mkdir gcc-build</span><br><span class="line">cd gcc-build</span><br><span class="line">../gcc-4.9.1/configure --target=$TARGET --prefix=&quot;$PREFIX&quot; --disable-nls --disable-libssp --enable-languages=c --without-headers</span><br><span class="line">make all-gcc </span><br><span class="line">make all-target-libgcc </span><br><span class="line">make install-gcc </span><br><span class="line">make install-target-libgcc </span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">cd /tmp/src</span><br><span class="line">curl -O https://ftp.gnu.org/gnu/gcc/gcc-14.2.0/ggcc-14.2.0.tar.gz</span><br><span class="line">tar xf gcc-14.2.0.tar.gz</span><br><span class="line">mkdir gcc-build</span><br><span class="line">cd gcc-build</span><br><span class="line">../gcc-14.2.0/configure --target=$TARGET --prefix=&quot;$PREFIX&quot; --disable-nls --disable-libssp --enable-languages=c --without-headers</span><br><span class="line">make all-gcc </span><br><span class="line">make all-target-libgcc </span><br><span class="line">make install-gcc </span><br><span class="line">make install-target-libgcc </span><br></pre></td></tr></table></figure>
 <p>如果不出意外的话，在<code>configure</code>的过程中会出错，简略的信息为<code>configure: error: Building GCC requires GMP 4.2+, MPFR 2.4.0+ and MPC 0.8.0+.</code>，原因是需要这三个库的支持，而我们的电脑上没有或未能识别到，因此我们需要通过源码安装这三个库。</p>
 <p>你也可以通过以下方式解决:在gcc目录下运行:<code>./contrib/download_prerequisites</code>，如果可以解决问题，可以直接跳过源码安装过程。</p>
 <blockquote>
@@ -378,7 +378,7 @@ tips:--prefix选项指定安装的路径</p>
 
 <div class="copyright">
   &copy; 
-  <span itemprop="copyrightYear">2024</span>
+  <span itemprop="copyrightYear">2025</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
